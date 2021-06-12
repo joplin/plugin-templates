@@ -4,7 +4,8 @@
   "scripts": {
     "dist": "webpack --joplin-plugin-config buildMain && webpack --joplin-plugin-config buildExtraScripts && webpack --joplin-plugin-config createArchive",
     "prepare": "npm run dist",
-    "update": "npm install -g generator-joplin && yo joplin --update"
+    "update": "npm install -g generator-joplin && yo joplin --update",
+    "lint": "eslint src"
   },
   "license": "MIT",
   "keywords": [
@@ -12,8 +13,11 @@
   ],
   "devDependencies": {
     "@types/node": "^14.0.14",
+    "@typescript-eslint/eslint-plugin": "^4.26.0",
+    "@typescript-eslint/parser": "^4.26.0",
     "chalk": "^4.1.0",
     "copy-webpack-plugin": "^6.1.0",
+    "eslint": "^7.27.0",
     "fs-extra": "^9.0.1",
     "glob": "^7.1.6",
     "on-build-webpack": "^0.1.0",
