@@ -1,3 +1,3 @@
-export const parseTempalte = (template: string): string => {
+export const parseTempalte = async (template: string): Promise<string> => {
     return template;
 }

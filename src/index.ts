@@ -1,6 +1,6 @@
 import joplin from "api";
 import { SettingItemType } from "api/types";
-// import { parseTempalte } from "./parser";
+import { parseTempalte } from "./parser";
 import { doesFolderExist } from "./utils/folders";
 import { getUserTempateSelection } from "./utils/templates";
 
@@ -28,13 +28,32 @@ joplin.plugins.register({
 			name: "createNoteFromTemplate",
 			label: "Create note from template",
 			execute: async () => {
-				/*
-					1. Get all templates with ids and titles.
-					2. Ask user to select a template.
-					3. Parse the template to get markdown.
-					4. Execute newNote command with that markdown.
-				*/
-				console.log(await getUserTempateSelection(templatesFolderId));
+				const template = await getUserTempateSelection(templatesFolderId);
+				if (template) {
+					await joplin.commands.execute("newNote", await parseTempalte(template));
+				}
+			}
+		});
+
+		await joplin.commands.register({
+			name: "createTodoFromTemplate",
+			label: "Create to-do from template",
+			execute: async () => {
+				const template = await getUserTempateSelection(templatesFolderId);
+				if (template) {
+					await joplin.commands.execute("newTodo", await parseTempalte(template));
+				}
+			}
+		});
+
+		await joplin.commands.register({
+			name: "insertTemplate",
+			label: "Insert template",
+			execute: async () => {
+				const template = await getUserTempateSelection(templatesFolderId);
+				if (template) {
+					await joplin.commands.execute("insertText", await parseTempalte(template));
+				}
 			}
 		});
 
@@ -42,7 +61,14 @@ joplin.plugins.register({
 		await joplin.views.menus.create("templates", "Templates", [
 			{
 				commandName: "createNoteFromTemplate"
-			}
+			},
+			{
+				commandName: "createTodoFromTemplate"
+			},
+			{
+				commandName: "insertTemplate",
+				accelerator: "Alt+Ctrl+I"
+			},
 		]);
 	},
 });
