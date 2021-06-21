@@ -1,6 +1,6 @@
 import joplin from "api";
 import { SettingItemType } from "api/types";
-import { parseTempalte } from "./parser";
+import { parseTemplate } from "./parser";
 import { doesFolderExist } from "./utils/folders";
 import { getUserTempateSelection } from "./utils/templates";
 
@@ -30,7 +30,7 @@ joplin.plugins.register({
 			execute: async () => {
 				const template = await getUserTempateSelection(templatesFolderId);
 				if (template) {
-					await joplin.commands.execute("newNote", await parseTempalte(template));
+					await joplin.commands.execute("newNote", await parseTemplate(template));
 				}
 			}
 		});
@@ -41,7 +41,7 @@ joplin.plugins.register({
 			execute: async () => {
 				const template = await getUserTempateSelection(templatesFolderId);
 				if (template) {
-					await joplin.commands.execute("newTodo", await parseTempalte(template));
+					await joplin.commands.execute("newTodo", await parseTemplate(template));
 				}
 			}
 		});
@@ -52,7 +52,7 @@ joplin.plugins.register({
 			execute: async () => {
 				const template = await getUserTempateSelection(templatesFolderId);
 				if (template) {
-					await joplin.commands.execute("insertText", await parseTempalte(template));
+					await joplin.commands.execute("insertText", await parseTemplate(template));
 				}
 			}
 		});
