@@ -9,7 +9,7 @@ export const doesFolderExist = async (folderId: string): Promise<boolean> => {
     }
 };
 
-interface Note {
+export interface Note {
     id: string;
     title: string;
     body: string;

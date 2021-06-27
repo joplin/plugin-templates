@@ -2,7 +2,7 @@ import joplin from "api";
 import { SettingItemType } from "api/types";
 import { parseTemplate } from "./parser";
 import { doesFolderExist } from "./utils/folders";
-import { getUserTempateSelection } from "./utils/templates";
+import { getTemplateFromId, getUserTempateSelection } from "./utils/templates";
 
 joplin.plugins.register({
 	onStart: async function() {
@@ -40,6 +40,7 @@ joplin.plugins.register({
 			const folder = await joplin.data.post(["folders"], null, { title: "Templates" });
 			await joplin.settings.setValue("templatesFolderId", folder.id);
 		}
+
 
 		// Register all commands
 		await joplin.commands.register({
@@ -87,7 +88,11 @@ joplin.plugins.register({
 			name: "setDefaultNoteTemplate",
 			label: "Set default note template",
 			execute: async () => {
-				console.log("Command");
+				const templateId = await getUserTempateSelection(templatesFolderId, "id");
+				if (templateId) {
+					await joplin.settings.setValue("defaultNoteTemplateId", templateId);
+					await joplin.views.dialogs.showMessageBox("Default note template set successfully!");
+				}
 			}
 		});
 
@@ -95,7 +100,11 @@ joplin.plugins.register({
 			name: "setDefaultTodoTemplate",
 			label: "Set default to-do template",
 			execute: async () => {
-				console.log("Command");
+				const templateId = await getUserTempateSelection(templatesFolderId, "id");
+				if (templateId) {
+					await joplin.settings.setValue("defaultTodoTemplateId", templateId);
+					await joplin.views.dialogs.showMessageBox("Default to-do template set successfully!");
+				}
 			}
 		});
 
@@ -103,7 +112,15 @@ joplin.plugins.register({
 			name: "createNoteFromDefaultTemplate",
 			label: "Create note from default template",
 			execute: async () => {
-				console.log("Command");
+				const templateId = await joplin.settings.value("defaultNoteTemplateId");
+				if (templateId) {
+					const template = await getTemplateFromId(templateId)
+					if (template) {
+						await joplin.commands.execute("newNote", await parseTemplate(template.body));
+						return;
+					}
+				}
+				await joplin.views.dialogs.showMessageBox("No default note template is set.");
 			}
 		});
 
@@ -111,9 +128,18 @@ joplin.plugins.register({
 			name: "createTodoFromDefaultTemplate",
 			label: "Create to-do from default template",
 			execute: async () => {
-				console.log("Command");
+				const templateId = await joplin.settings.value("defaultTodoTemplateId");
+				if (templateId) {
+					const template = await getTemplateFromId(templateId)
+					if (template) {
+						await joplin.commands.execute("newTodo", await parseTemplate(template.body));
+						return;
+					}
+				}
+				await joplin.views.dialogs.showMessageBox("No default to-do template is set.");
 			}
 		});
+
 
 		// Create templates menu
 		await joplin.views.menus.create("templates", "Templates", [

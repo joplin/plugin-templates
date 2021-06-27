@@ -1,12 +1,14 @@
 import joplin from "api";
-import { getAllNotesInFolder } from "./folders";
+import { getAllNotesInFolder, Note } from "./folders";
 
-export const getUserTempateSelection = async (templatesFolderId: string): Promise<string | null> => {
+type NoteProperty = "body" | "id" | "title";
+
+export const getUserTempateSelection = async (templatesFolderId: string, property: NoteProperty = "body"): Promise<string | null> => {
     const templates = await getAllNotesInFolder(templatesFolderId);
     const templateOptions = templates.map(note => {
         return {
             label: note.title,
-            value: note.body
+            value: note[property]
         };
     });
 
@@ -27,4 +29,12 @@ export const getUserTempateSelection = async (templatesFolderId: string): Promis
     }
 
     return null;
+}
+
+export const getTemplateFromId = async (templateId: string): Promise<Note | null> => {
+    try {
+        return await joplin.data.get([ "notes", templateId ], { fields: ["id", "title", "body"] });
+    } catch (error) {
+        return null;
+    }
 }
