@@ -9,6 +9,7 @@
   ],
   "rules": {
     "indent": ["error", 4],
-    "quotes": ["error", "double"]
+    "quotes": ["error", "double"],
+    "eol-last": ["error", "always"]
   }
 }
