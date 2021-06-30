@@ -31,7 +31,11 @@ export const getUserTempateSelection = async (templatesFolderId: string, propert
     return null;
 }
 
-export const getTemplateFromId = async (templateId: string): Promise<Note | null> => {
+export const getTemplateFromId = async (templateId: string | null): Promise<Note | null> => {
+    if (!templateId) {
+        return null;
+    }
+
     try {
         return await joplin.data.get([ "notes", templateId ], { fields: ["id", "title", "body"] });
     } catch (error) {

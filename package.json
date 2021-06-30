@@ -5,7 +5,7 @@
     "dist": "webpack --joplin-plugin-config buildMain && webpack --joplin-plugin-config buildExtraScripts && webpack --joplin-plugin-config createArchive",
     "prepare": "npm run dist",
     "update": "npm install -g generator-joplin && yo joplin --update",
-    "lint": "eslint 'src/**/*'"
+    "lint": "eslint 'src/**/*.{ts,json}'"
   },
   "license": "MIT",
   "keywords": [

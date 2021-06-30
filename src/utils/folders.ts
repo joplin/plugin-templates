@@ -15,7 +15,7 @@ export interface Note {
     body: string;
 }
 
-export const getAllNotesInFolder = async (folderId: string): Promise <Note[]> => {
+export const getAllNotesInFolder = async (folderId: string): Promise<Note[]> => {
     let pageNum = 1;
     let response;
     let notes = [];
