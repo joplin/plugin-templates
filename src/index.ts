@@ -15,19 +15,13 @@ joplin.plugins.register({
                 type: SettingItemType.String,
                 value: null,
                 label: "Templates folder ID"
-            }
-        });
-
-        await joplin.settings.registerSettings({
+            },
             "defaultNoteTemplateId": {
                 public: false,
                 type: SettingItemType.String,
                 value: null,
                 label: "Default note template ID"
-            }
-        });
-
-        await joplin.settings.registerSettings({
+            },
             "defaultTodoTemplateId": {
                 public: false,
                 type: SettingItemType.String,
