@@ -3,7 +3,7 @@ import { getAllNotesInFolder, Note } from "./folders";
 
 type NoteProperty = "body" | "id" | "title";
 
-export const getUserTempateSelection = async (templatesFolderId: string, property: NoteProperty = "body"): Promise<string | null> => {
+export const getUserTemplateSelection = async (templatesFolderId: string, property: NoteProperty = "body"): Promise<string | null> => {
     const templates = await getAllNotesInFolder(templatesFolderId);
     const templateOptions = templates.map(note => {
         return {
@@ -39,6 +39,7 @@ export const getTemplateFromId = async (templateId: string | null): Promise<Note
     try {
         return await joplin.data.get([ "notes", templateId ], { fields: ["id", "title", "body"] });
     } catch (error) {
+        console.error("There was an error loading a template from id", error);
         return null;
     }
 }

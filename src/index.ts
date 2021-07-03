@@ -2,7 +2,7 @@ import joplin from "api";
 import { SettingItemType } from "api/types";
 import { parseTemplate } from "./parser";
 import { doesFolderExist } from "./utils/folders";
-import { getTemplateFromId, getUserTempateSelection } from "./utils/templates";
+import { getTemplateFromId, getUserTemplateSelection } from "./utils/templates";
 import { setDefaultTemplatesView } from "./views/defaultTemplates";
 
 joplin.plugins.register({
@@ -46,7 +46,7 @@ joplin.plugins.register({
             name: "createNoteFromTemplate",
             label: "Create note from template",
             execute: async () => {
-                const template = await getUserTempateSelection(templatesFolderId);
+                const template = await getUserTemplateSelection(templatesFolderId);
                 if (template) {
                     await joplin.commands.execute("newNote", await parseTemplate(template));
                 }
@@ -57,7 +57,7 @@ joplin.plugins.register({
             name: "createTodoFromTemplate",
             label: "Create to-do from template",
             execute: async () => {
-                const template = await getUserTempateSelection(templatesFolderId);
+                const template = await getUserTemplateSelection(templatesFolderId);
                 if (template) {
                     await joplin.commands.execute("newTodo", await parseTemplate(template));
                 }
@@ -68,7 +68,7 @@ joplin.plugins.register({
             name: "insertTemplate",
             label: "Insert template",
             execute: async () => {
-                const template = await getUserTempateSelection(templatesFolderId);
+                const template = await getUserTemplateSelection(templatesFolderId);
                 if (template) {
                     await joplin.commands.execute("insertText", await parseTemplate(template));
                 }
@@ -94,7 +94,7 @@ joplin.plugins.register({
             name: "setDefaultNoteTemplate",
             label: "Set default note template",
             execute: async () => {
-                const templateId = await getUserTempateSelection(templatesFolderId, "id");
+                const templateId = await getUserTemplateSelection(templatesFolderId, "id");
                 if (templateId) {
                     await joplin.settings.setValue("defaultNoteTemplateId", templateId);
                     await joplin.views.dialogs.showMessageBox("Default note template set successfully!");
@@ -106,7 +106,7 @@ joplin.plugins.register({
             name: "setDefaultTodoTemplate",
             label: "Set default to-do template",
             execute: async () => {
-                const templateId = await getUserTempateSelection(templatesFolderId, "id");
+                const templateId = await getUserTemplateSelection(templatesFolderId, "id");
                 if (templateId) {
                     await joplin.settings.setValue("defaultTodoTemplateId", templateId);
                     await joplin.views.dialogs.showMessageBox("Default to-do template set successfully!");
