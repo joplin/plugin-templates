@@ -9,13 +9,13 @@ export const doesFolderExist = async (folderId: string): Promise<boolean> => {
     }
 };
 
-interface Note {
+export interface Note {
     id: string;
     title: string;
     body: string;
 }
 
-export const getAllNotesInFolder = async (folderId: string): Promise <Note[]> => {
+export const getAllNotesInFolder = async (folderId: string): Promise<Note[]> => {
     let pageNum = 1;
     let response;
     let notes = [];
