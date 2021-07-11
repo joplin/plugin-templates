@@ -13,11 +13,11 @@ export class DateAndTimeUtils {
         moment.locale(this.locale);
     }
 
-    public getDateFormat() {
+    public getDateFormat(): string {
         return this.dateFormat;
     }
 
-    public getTimeFormat() {
+    public getTimeFormat(): string {
         return this.timeFormat;
     }
 
@@ -25,14 +25,14 @@ export class DateAndTimeUtils {
         return `${this.dateFormat} ${this.timeFormat}`;
     }
 
-    public formatMsToLocal(ms: number, format: string = null) {
+    public formatMsToLocal(ms: number, format: string = null): string {
         if (!format) {
             format = this.getDateTimeFormat();
         }
         return moment(ms).format(format);
     }
 
-    public getCurrentTime(format: string = null) {
+    public getCurrentTime(format: string = null): string {
         return this.formatMsToLocal(new Date().getTime(), format);
     }
 
