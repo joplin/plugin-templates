@@ -2,3 +2,13 @@ body {
     text-align: center;
     font-size: 14px;
 }
+
+.variableName {
+    text-decoration: underline;
+    margin-bottom: 5px;
+}
+
+input, select {
+    font-size: 16px;
+    width: 100%;
+}

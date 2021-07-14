@@ -45,7 +45,7 @@ joplin.plugins.register({
         const userDateFormat = await joplin.settings.globalValue("dateFormat");
         const userTimeFormat = await joplin.settings.globalValue("timeFormat");
         const dateAndTimeUtils = new DateAndTimeUtils(userLocale, userDateFormat, userTimeFormat);
-        const parser = new Parser(dateAndTimeUtils);
+        const parser = new Parser(dateAndTimeUtils, dialogViewHandle);
 
 
         // Register all commands
