@@ -55,7 +55,10 @@ joplin.plugins.register({
             execute: async () => {
                 const template = await getUserTemplateSelection(templatesFolderId);
                 if (template) {
-                    await joplin.commands.execute("newNote", await parser.parseTemplate(template));
+                    const parsedTemplate = await parser.parseTemplate(template);
+                    if (parsedTemplate) {
+                        await joplin.commands.execute("newNote", parsedTemplate);
+                    }
                 }
             }
         });
@@ -66,7 +69,10 @@ joplin.plugins.register({
             execute: async () => {
                 const template = await getUserTemplateSelection(templatesFolderId);
                 if (template) {
-                    await joplin.commands.execute("newTodo", await parser.parseTemplate(template));
+                    const parsedTemplate = await parser.parseTemplate(template);
+                    if (parsedTemplate) {
+                        await joplin.commands.execute("newTodo", parsedTemplate);
+                    }
                 }
             }
         });
@@ -77,7 +83,10 @@ joplin.plugins.register({
             execute: async () => {
                 const template = await getUserTemplateSelection(templatesFolderId);
                 if (template) {
-                    await joplin.commands.execute("insertText", await parser.parseTemplate(template));
+                    const parsedTemplate = await parser.parseTemplate(template);
+                    if (parsedTemplate) {
+                        await joplin.commands.execute("insertText", parsedTemplate);
+                    }
                 }
             }
         });
@@ -127,7 +136,10 @@ joplin.plugins.register({
             execute: async () => {
                 const template = await getTemplateFromId(await joplin.settings.value("defaultNoteTemplateId"));
                 if (template) {
-                    await joplin.commands.execute("newNote", await parser.parseTemplate(template.body));
+                    const parsedTemplate = await parser.parseTemplate(template.body);
+                    if (parsedTemplate) {
+                        await joplin.commands.execute("newNote", parsedTemplate);
+                    }
                     return;
                 }
                 await joplin.views.dialogs.showMessageBox("No default note template is set.");
@@ -140,7 +152,10 @@ joplin.plugins.register({
             execute: async () => {
                 const template = await getTemplateFromId(await joplin.settings.value("defaultTodoTemplateId"));
                 if (template) {
-                    await joplin.commands.execute("newTodo", await parser.parseTemplate(template.body));
+                    const parsedTemplate = await parser.parseTemplate(template.body);
+                    if (parsedTemplate) {
+                        await joplin.commands.execute("newTodo", parsedTemplate);
+                    }
                     return;
                 }
                 await joplin.views.dialogs.showMessageBox("No default to-do template is set.");

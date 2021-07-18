@@ -61,8 +61,13 @@ export class Parser {
         }
 
         await setTemplateVariablesView(this.dialog, variables);
-        const userResponse = (await joplin.views.dialogs.open(this.dialog)).formData.variables;
+        const dialogResponse = (await joplin.views.dialogs.open(this.dialog));
 
+        if (dialogResponse.id === "cancel") {
+            return null;
+        }
+
+        const userResponse = dialogResponse.formData.variables;
         return this.mapUserResponseToVariables(variables, userResponse);
     }
 
@@ -70,9 +75,15 @@ export class Parser {
         try {
             const processedTemplate = frontmatter(template);
             const templateVariables = processedTemplate.attributes;
+
+            const variableInputs = await this.getVariableInputs(templateVariables);
+            if (variableInputs === null) {
+                return null;
+            }
+
             const context = {
                 ...this.getDefaultContext(),
-                ...await this.getVariableInputs(templateVariables)
+                ...variableInputs
             };
 
             const templateBody = processedTemplate.body;
@@ -81,7 +92,8 @@ export class Parser {
             return compiledTemplate(context);
         } catch (err) {
             console.error("Error in parsing template.", err);
-            return "There was some error parsing your template.";
+            await joplin.views.dialogs.showMessageBox("There was some error parsing this template.");
+            return null;
         }
     }
 }
