@@ -1,4 +1,5 @@
 import joplin from "api";
+import { encode } from "html-entities";
 
 const getVariableHtml = (variable: string, type: string): string => {
     type = type.trim();
@@ -8,10 +9,10 @@ const getVariableHtml = (variable: string, type: string): string => {
             `
             <div class="variableInput">
                 <div class="variableName">
-                    ${variable}
+                    ${encode(variable)}
                 </div>
                 <div>
-                    <input name="${variable}" type="text"></input>
+                    <input name="${encode(variable)}" type="text"></input>
                 </div>
             </div>
             `
@@ -23,10 +24,10 @@ const getVariableHtml = (variable: string, type: string): string => {
             `
             <div class="variableInput">
                 <div class="variableName">
-                    ${variable}
+                    ${encode(variable)}
                 </div>
                 <div>
-                    <input name="${variable}" type="number"></input>
+                    <input name="${encode(variable)}" type="number"></input>
                 </div>
             </div>
             `
@@ -38,10 +39,10 @@ const getVariableHtml = (variable: string, type: string): string => {
             `
             <div class="variableInput">
                 <div class="variableName">
-                    ${variable}
+                    ${encode(variable)}
                 </div>
                 <div>
-                    <select name="${variable}">
+                    <select name="${encode(variable)}">
                         <option value="true">Yes</option>
                         <option value="false">No</option>
                     </select>
@@ -53,17 +54,17 @@ const getVariableHtml = (variable: string, type: string): string => {
 
     if (type.startsWith("enum(") && type.endsWith(")")) {
         const optionsHtml = type.substr(5, type.length - 6).split(",").map(o => {
-            return `<option value="${o.trim()}">${o.trim()}</option>`
+            return `<option value="${encode(o.trim())}">${encode(o.trim())}</option>`
         }).join("");
 
         return (
             `
             <div class="variableInput">
                 <div class="variableName">
-                    ${variable}
+                    ${encode(variable)}
                 </div>
                 <div>
-                    <select name="${variable}">
+                    <select name="${encode(variable)}">
                         ${optionsHtml}
                     </select>
                 </div>
