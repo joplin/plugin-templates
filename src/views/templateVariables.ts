@@ -73,7 +73,7 @@ const getVariableHtml = (variable: string, type: string): string => {
         );
     }
 
-    return `<div class="invalidVariable"><i>${variable} has an invalid type.</i></div>`;
+    return `<div class="invalidVariable"><i>${encode(variable)} has an invalid type.</i></div>`;
 }
 
 export const setTemplateVariablesView = async (viewHandle: string, variables: Record<string, string>): Promise<void> => {
@@ -88,7 +88,7 @@ export const setTemplateVariablesView = async (viewHandle: string, variables: Re
         `
         <h2> Template variables </h2>
         <form name="variables">
-            ${variablesFormInputHtml.join("<br />")}
+            ${variablesFormInputHtml.join("")}
         </form>
         `
     );
