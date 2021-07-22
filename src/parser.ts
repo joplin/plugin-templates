@@ -71,7 +71,11 @@ export class Parser {
         return this.mapUserResponseToVariables(variables, userResponse);
     }
 
-    public async parseTemplate(template: string): Promise<string> {
+    public async parseTemplate(template: string | null): Promise<string | null> {
+        if (!template) {
+            return null;
+        }
+
         try {
             const processedTemplate = frontmatter(template);
             const templateVariables = processedTemplate.attributes;
