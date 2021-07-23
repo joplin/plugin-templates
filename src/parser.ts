@@ -1,6 +1,7 @@
 import joplin from "api";
 import * as Handlebars from "handlebars/dist/handlebars";
 import { DateAndTimeUtils } from "./utils/dateAndTime";
+import { Note } from "./utils/folders";
 import { setTemplateVariablesView } from "./views/templateVariables";
 
 // Can't use import for this library because the types in the library
@@ -55,12 +56,12 @@ export class Parser {
         return variableValues;
     }
 
-    private async getVariableInputs(variables: Record<string, string>) {
+    private async getVariableInputs(title: string, variables: Record<string, string>) {
         if (Object.keys(variables).length == 0) {
             return {};
         }
 
-        await setTemplateVariablesView(this.dialog, variables);
+        await setTemplateVariablesView(this.dialog, title, variables);
         const dialogResponse = (await joplin.views.dialogs.open(this.dialog));
 
         if (dialogResponse.id === "cancel") {
@@ -71,16 +72,16 @@ export class Parser {
         return this.mapUserResponseToVariables(variables, userResponse);
     }
 
-    public async parseTemplate(template: string | null): Promise<string | null> {
+    public async parseTemplate(template: Note | null): Promise<string | null> {
         if (!template) {
             return null;
         }
 
         try {
-            const processedTemplate = frontmatter(template);
+            const processedTemplate = frontmatter(template.body);
             const templateVariables = processedTemplate.attributes;
 
-            const variableInputs = await this.getVariableInputs(templateVariables);
+            const variableInputs = await this.getVariableInputs(template.title, templateVariables);
             if (variableInputs === null) {
                 return null;
             }

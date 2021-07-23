@@ -76,7 +76,7 @@ const getVariableHtml = (variable: string, type: string): string => {
     return `<div class="invalidVariable"><i>${encode(variable)} has an invalid type.</i></div>`;
 }
 
-export const setTemplateVariablesView = async (viewHandle: string, variables: Record<string, string>): Promise<void> => {
+export const setTemplateVariablesView = async (viewHandle: string, title: string, variables: Record<string, string>): Promise<void> => {
     await joplin.views.dialogs.addScript(viewHandle, "./views/webview.css");
 
     const variablesFormInputHtml = Object.keys(variables).map(variable => {
@@ -86,7 +86,7 @@ export const setTemplateVariablesView = async (viewHandle: string, variables: Re
     await joplin.views.dialogs.setHtml(
         viewHandle,
         `
-        <h2> Template variables </h2>
+        <h2> ${encode(title)} </h2>
         <form name="variables">
             ${variablesFormInputHtml.join("")}
         </form>
