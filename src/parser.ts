@@ -72,9 +72,9 @@ export class Parser {
         return this.mapUserResponseToVariables(variables, userResponse);
     }
 
-    public async parseTemplate(template: Note | null): Promise<string | null> {
+    public async parseTemplate(template: Note | null): Promise<string> {
         if (!template) {
-            return null;
+            return "";
         }
 
         try {
@@ -83,7 +83,7 @@ export class Parser {
 
             const variableInputs = await this.getVariableInputs(template.title, templateVariables);
             if (variableInputs === null) {
-                return null;
+                return "";
             }
 
             const context = {
@@ -98,7 +98,7 @@ export class Parser {
         } catch (err) {
             console.error("Error in parsing template.", err);
             await joplin.views.dialogs.showMessageBox("There was some error parsing this template.");
-            return null;
+            return "";
         }
     }
 }
