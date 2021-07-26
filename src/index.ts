@@ -2,15 +2,14 @@ import joplin from "api";
 import { SettingItemType } from "api/types";
 import { Parser } from "./parser";
 import { DateAndTimeUtils } from "./utils/dateAndTime";
-import { doesFolderExist, Note } from "./utils/folders";
-import { getTemplateFromId, getUserTemplateSelection } from "./utils/templates";
+import { Note } from "./utils/folders";
+import { getTemplateFromId, getUserTemplateSelection, getTemplatesFolderId } from "./utils/templates";
 import { setDefaultTemplatesView } from "./views/defaultTemplates";
 import { JoplinCommand } from "./types";
 
 joplin.plugins.register({
     onStart: async function() {
         // Register all settings
-        // TODO: The settings name i.e. "templatesFolderId" in this case should be stored in a variable.
         await joplin.settings.registerSettings({
             "templatesFolderId": {
                 public: false,
@@ -32,14 +31,9 @@ joplin.plugins.register({
             }
         });
 
-        const templatesFolderId = await joplin.settings.value("templatesFolderId");
-        if (templatesFolderId == null || !(await doesFolderExist(templatesFolderId))) {
-            const folder = await joplin.data.post(["folders"], null, { title: "Templates" });
-            await joplin.settings.setValue("templatesFolderId", folder.id);
-        }
-
 
         // Global variables
+        const templatesFolderId = await getTemplatesFolderId();
         const dialogViewHandle = await joplin.views.dialogs.create("dialog");
 
         const userLocale = await joplin.settings.globalValue("locale");

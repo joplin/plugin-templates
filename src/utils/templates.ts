@@ -1,10 +1,58 @@
 import joplin from "api";
-import { getAllNotesInFolder, Note } from "./folders";
+import { doesFolderExist, getAllNotesInFolder, Note } from "./folders";
+import { getAllNotesWithTag, getTagWithTitle } from "./tags";
 
 type NoteProperty = "body" | "id" | "title";
 
+export const getTemplatesFolderId = async (): Promise<string> => {
+    const templatesFolderId = await joplin.settings.value("templatesFolderId");
+
+    if (templatesFolderId == null || !(await doesFolderExist(templatesFolderId))) {
+        const folder = await joplin.data.post(["folders"], null, { title: "Templates" });
+        await joplin.settings.setValue("templatesFolderId", folder.id);
+        return folder.id;
+    }
+
+    return templatesFolderId;
+}
+
+const removeDuplicateTemplates = (templates: Note[]) => {
+    const uniqueTemplates: Note[] = [];
+    const templateIds: string[] = [];
+
+    templates.forEach(note => {
+        if (!templateIds.includes(note.id)) {
+            templateIds.push(note.id);
+            uniqueTemplates.push(note);
+        }
+    });
+
+    return uniqueTemplates;
+}
+
+const getAllTemplates = async (folderId: string) => {
+    let templates: Note[] = [];
+
+    try {
+        templates = templates.concat(await getAllNotesInFolder(folderId));
+    } catch (err) {
+        console.error("There was some error in fetching notes in templates folder.", err);
+    }
+
+    try {
+        const templateTag = await getTagWithTitle("template");
+        if (templateTag) {
+            templates = templates.concat(await getAllNotesWithTag(templateTag.id));
+        }
+    } catch (err) {
+        console.error("There was some error in fetching notes with template tag.", err);
+    }
+
+    return removeDuplicateTemplates(templates);
+}
+
 export const getUserTemplateSelection = async (templatesFolderId: string, property?: NoteProperty): Promise<string | null> => {
-    const templates = await getAllNotesInFolder(templatesFolderId);
+    const templates = await getAllTemplates(templatesFolderId);
     const templateOptions = templates.map(note => {
         let optionValue;
 
