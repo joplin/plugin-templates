@@ -16,6 +16,10 @@ body {
     padding: 2px;
 }
 
+.formLabel {
+    margin-bottom: 5px;
+}
+
 input, select {
     height: 25px;
     font-size: 16px;

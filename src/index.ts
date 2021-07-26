@@ -33,8 +33,8 @@ joplin.plugins.register({
 
 
         // Global variables
-        const templatesFolderId = await getTemplatesFolderId();
         const dialogViewHandle = await joplin.views.dialogs.create("dialog");
+        let templatesFolderId = await getTemplatesFolderId(dialogViewHandle);
 
         const userLocale = await joplin.settings.globalValue("locale");
         const userDateFormat = await joplin.settings.globalValue("dateFormat");
@@ -145,6 +145,14 @@ joplin.plugins.register({
             }
         });
 
+        await joplin.commands.register({
+            name: "changeTemplatesFolder",
+            label: "Change templates notebook",
+            execute: async () => {
+                templatesFolderId = await getTemplatesFolderId(dialogViewHandle, true);
+            }
+        });
+
 
         // Create templates menu
         await joplin.views.menus.create("templates", "Templates", [
@@ -179,6 +187,9 @@ joplin.plugins.register({
                         accelerator: "Alt+Shift+T"
                     }
                 ]
+            },
+            {
+                commandName: "changeTemplatesFolder"
             }
         ]);
     },
