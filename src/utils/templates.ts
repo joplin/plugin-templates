@@ -3,12 +3,20 @@ import { getAllNotesInFolder, Note } from "./folders";
 
 type NoteProperty = "body" | "id" | "title";
 
-export const getUserTemplateSelection = async (templatesFolderId: string, property: NoteProperty = "body"): Promise<string | null> => {
+export const getUserTemplateSelection = async (templatesFolderId: string, property?: NoteProperty): Promise<string | null> => {
     const templates = await getAllNotesInFolder(templatesFolderId);
     const templateOptions = templates.map(note => {
+        let optionValue;
+
+        if (!property) {
+            optionValue = JSON.stringify(note);
+        } else {
+            optionValue = note[property];
+        }
+
         return {
             label: note.title,
-            value: note[property]
+            value: optionValue
         };
     });
 

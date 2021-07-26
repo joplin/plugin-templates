@@ -2,9 +2,10 @@ import joplin from "api";
 import { SettingItemType } from "api/types";
 import { Parser } from "./parser";
 import { DateAndTimeUtils } from "./utils/dateAndTime";
-import { doesFolderExist } from "./utils/folders";
+import { doesFolderExist, Note } from "./utils/folders";
 import { getTemplateFromId, getUserTemplateSelection } from "./utils/templates";
 import { setDefaultTemplatesView } from "./views/defaultTemplates";
+import { JoplinCommand } from "./types";
 
 joplin.plugins.register({
     onStart: async function() {
@@ -45,7 +46,21 @@ joplin.plugins.register({
         const userDateFormat = await joplin.settings.globalValue("dateFormat");
         const userTimeFormat = await joplin.settings.globalValue("timeFormat");
         const dateAndTimeUtils = new DateAndTimeUtils(userLocale, userDateFormat, userTimeFormat);
-        const parser = new Parser(dateAndTimeUtils);
+        const parser = new Parser(dateAndTimeUtils, dialogViewHandle);
+
+
+        // Utility Functions
+        const executeCommandWithParsedTemplate = async (command: JoplinCommand, template: Note | null) => {
+            const parsedTemplate = await parser.parseTemplate(template);
+            if (parsedTemplate) {
+                await joplin.commands.execute(command, parsedTemplate);
+            }
+        }
+
+        const getTemplateAndExecuteCommand = async (command: JoplinCommand) => {
+            const template: Note = JSON.parse(await getUserTemplateSelection(templatesFolderId));
+            await executeCommandWithParsedTemplate(command, template);
+        }
 
 
         // Register all commands
@@ -53,10 +68,7 @@ joplin.plugins.register({
             name: "createNoteFromTemplate",
             label: "Create note from template",
             execute: async () => {
-                const template = await getUserTemplateSelection(templatesFolderId);
-                if (template) {
-                    await joplin.commands.execute("newNote", await parser.parseTemplate(template));
-                }
+                await getTemplateAndExecuteCommand(JoplinCommand.NewNote);
             }
         });
 
@@ -64,10 +76,7 @@ joplin.plugins.register({
             name: "createTodoFromTemplate",
             label: "Create to-do from template",
             execute: async () => {
-                const template = await getUserTemplateSelection(templatesFolderId);
-                if (template) {
-                    await joplin.commands.execute("newTodo", await parser.parseTemplate(template));
-                }
+                await getTemplateAndExecuteCommand(JoplinCommand.NewTodo);
             }
         });
 
@@ -75,10 +84,7 @@ joplin.plugins.register({
             name: "insertTemplate",
             label: "Insert template",
             execute: async () => {
-                const template = await getUserTemplateSelection(templatesFolderId);
-                if (template) {
-                    await joplin.commands.execute("insertText", await parser.parseTemplate(template));
-                }
+                await getTemplateAndExecuteCommand(JoplinCommand.InsertText);
             }
         });
 
@@ -127,8 +133,7 @@ joplin.plugins.register({
             execute: async () => {
                 const template = await getTemplateFromId(await joplin.settings.value("defaultNoteTemplateId"));
                 if (template) {
-                    await joplin.commands.execute("newNote", await parser.parseTemplate(template.body));
-                    return;
+                    return await executeCommandWithParsedTemplate(JoplinCommand.NewNote, template);
                 }
                 await joplin.views.dialogs.showMessageBox("No default note template is set.");
             }
@@ -140,8 +145,7 @@ joplin.plugins.register({
             execute: async () => {
                 const template = await getTemplateFromId(await joplin.settings.value("defaultTodoTemplateId"));
                 if (template) {
-                    await joplin.commands.execute("newTodo", await parser.parseTemplate(template.body));
-                    return;
+                    return await executeCommandWithParsedTemplate(JoplinCommand.NewTodo, template);
                 }
                 await joplin.views.dialogs.showMessageBox("No default to-do template is set.");
             }
