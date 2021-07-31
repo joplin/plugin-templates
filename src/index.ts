@@ -2,8 +2,7 @@ import joplin from "api";
 import { SettingItemType } from "api/types";
 import { Parser } from "./parser";
 import { DateAndTimeUtils } from "./utils/dateAndTime";
-import { Note } from "./utils/folders";
-import { getTemplateFromId, getUserTemplateSelection, getTemplatesFolderId } from "./utils/templates";
+import { getTemplateFromId, getUserTemplateSelection, Note } from "./utils/templates";
 import { setDefaultTemplatesView } from "./views/defaultTemplates";
 import { JoplinCommand } from "./types";
 
@@ -11,12 +10,6 @@ joplin.plugins.register({
     onStart: async function() {
         // Register all settings
         await joplin.settings.registerSettings({
-            "templatesFolderId": {
-                public: false,
-                type: SettingItemType.String,
-                value: null,
-                label: "Templates folder ID"
-            },
             "defaultNoteTemplateId": {
                 public: false,
                 type: SettingItemType.String,
@@ -33,7 +26,6 @@ joplin.plugins.register({
 
 
         // Global variables
-        const templatesFolderId = await getTemplatesFolderId();
         const dialogViewHandle = await joplin.views.dialogs.create("dialog");
 
         const userLocale = await joplin.settings.globalValue("locale");
@@ -52,7 +44,7 @@ joplin.plugins.register({
         }
 
         const getTemplateAndExecuteCommand = async (command: JoplinCommand) => {
-            const template: Note = JSON.parse(await getUserTemplateSelection(templatesFolderId));
+            const template: Note = JSON.parse(await getUserTemplateSelection());
             await executeCommandWithParsedTemplate(command, template);
         }
 
@@ -101,7 +93,7 @@ joplin.plugins.register({
             name: "setDefaultNoteTemplate",
             label: "Set default note template",
             execute: async () => {
-                const templateId = await getUserTemplateSelection(templatesFolderId, "id");
+                const templateId = await getUserTemplateSelection("id");
                 if (templateId) {
                     await joplin.settings.setValue("defaultNoteTemplateId", templateId);
                     await joplin.views.dialogs.showMessageBox("Default note template set successfully!");
@@ -113,7 +105,7 @@ joplin.plugins.register({
             name: "setDefaultTodoTemplate",
             label: "Set default to-do template",
             execute: async () => {
-                const templateId = await getUserTemplateSelection(templatesFolderId, "id");
+                const templateId = await getUserTemplateSelection("id");
                 if (templateId) {
                     await joplin.settings.setValue("defaultTodoTemplateId", templateId);
                     await joplin.views.dialogs.showMessageBox("Default to-do template set successfully!");

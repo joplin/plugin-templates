@@ -1,4 +1,6 @@
 import joplin from "api";
+import { fetchAllItems } from "./dataApi";
+import { Note } from "./templates";
 
 export const doesFolderExist = async (folderId: string): Promise<boolean> => {
     try {
@@ -9,22 +11,6 @@ export const doesFolderExist = async (folderId: string): Promise<boolean> => {
     }
 };
 
-export interface Note {
-    id: string;
-    title: string;
-    body: string;
-}
-
 export const getAllNotesInFolder = async (folderId: string): Promise<Note[]> => {
-    let pageNum = 1;
-    let response;
-    let notes = [];
-
-    do {
-        response = await joplin.data.get(["folders", folderId, "notes"], { fields: ["id", "title", "body"], page: pageNum });
-        notes = notes.concat(response.items);
-        pageNum++;
-    } while (response.has_more);
-
-    return notes;
+    return fetchAllItems(["folders", folderId, "notes"], { fields: ["id", "title", "body"] });
 }

@@ -1,20 +1,13 @@
 import joplin from "api";
-import { doesFolderExist, getAllNotesInFolder, Note } from "./folders";
-import { getAllNotesWithTag, getTagWithTitle } from "./tags";
+import { getAllNotesWithTag, getAllTagsWithTitle } from "./tags";
+
+export interface Note {
+    id: string;
+    title: string;
+    body: string;
+}
 
 type NoteProperty = "body" | "id" | "title";
-
-export const getTemplatesFolderId = async (): Promise<string> => {
-    const templatesFolderId = await joplin.settings.value("templatesFolderId");
-
-    if (templatesFolderId == null || !(await doesFolderExist(templatesFolderId))) {
-        const folder = await joplin.data.post(["folders"], null, { title: "Templates" });
-        await joplin.settings.setValue("templatesFolderId", folder.id);
-        return folder.id;
-    }
-
-    return templatesFolderId;
-}
 
 const removeDuplicateTemplates = (templates: Note[]) => {
     const uniqueTemplates: Note[] = [];
@@ -30,29 +23,19 @@ const removeDuplicateTemplates = (templates: Note[]) => {
     return uniqueTemplates;
 }
 
-const getAllTemplates = async (folderId: string) => {
+const getAllTemplates = async () => {
     let templates: Note[] = [];
+    const templateTags = await getAllTagsWithTitle("template");
 
-    try {
-        templates = templates.concat(await getAllNotesInFolder(folderId));
-    } catch (err) {
-        console.error("There was some error in fetching notes in templates folder.", err);
-    }
-
-    try {
-        const templateTag = await getTagWithTitle("template");
-        if (templateTag) {
-            templates = templates.concat(await getAllNotesWithTag(templateTag.id));
-        }
-    } catch (err) {
-        console.error("There was some error in fetching notes with template tag.", err);
+    for (const tag of templateTags) {
+        templates = templates.concat(await getAllNotesWithTag(tag.id));
     }
 
     return removeDuplicateTemplates(templates);
 }
 
-export const getUserTemplateSelection = async (templatesFolderId: string, property?: NoteProperty): Promise<string | null> => {
-    const templates = await getAllTemplates(templatesFolderId);
+export const getUserTemplateSelection = async (property?: NoteProperty): Promise<string | null> => {
+    const templates = await getAllTemplates();
     const templateOptions = templates.map(note => {
         let optionValue;
 
