@@ -1,10 +1,41 @@
 import joplin from "api";
-import { getAllNotesInFolder, Note } from "./folders";
+import { getAllNotesWithTag, getAllTagsWithTitle } from "./tags";
+
+export interface Note {
+    id: string;
+    title: string;
+    body: string;
+}
 
 type NoteProperty = "body" | "id" | "title";
 
-export const getUserTemplateSelection = async (templatesFolderId: string, property?: NoteProperty): Promise<string | null> => {
-    const templates = await getAllNotesInFolder(templatesFolderId);
+const removeDuplicateTemplates = (templates: Note[]) => {
+    const uniqueTemplates: Note[] = [];
+    const templateIds: string[] = [];
+
+    templates.forEach(note => {
+        if (!templateIds.includes(note.id)) {
+            templateIds.push(note.id);
+            uniqueTemplates.push(note);
+        }
+    });
+
+    return uniqueTemplates;
+}
+
+const getAllTemplates = async () => {
+    let templates: Note[] = [];
+    const templateTags = await getAllTagsWithTitle("template");
+
+    for (const tag of templateTags) {
+        templates = templates.concat(await getAllNotesWithTag(tag.id));
+    }
+
+    return removeDuplicateTemplates(templates);
+}
+
+export const getUserTemplateSelection = async (property?: NoteProperty): Promise<string | null> => {
+    const templates = await getAllTemplates();
     const templateOptions = templates.map(note => {
         let optionValue;
 

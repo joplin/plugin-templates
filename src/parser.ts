@@ -1,7 +1,7 @@
 import joplin from "api";
 import * as Handlebars from "handlebars/dist/handlebars";
 import { DateAndTimeUtils } from "./utils/dateAndTime";
-import { Note } from "./utils/folders";
+import { Note } from "./utils/templates";
 import { setTemplateVariablesView } from "./views/templateVariables";
 
 // Can't use import for this library because the types in the library
