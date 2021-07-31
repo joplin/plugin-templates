@@ -1,36 +1,16 @@
 import joplin from "api";
 import { doesFolderExist, getAllNotesInFolder, Note } from "./folders";
 import { getAllNotesWithTag, getTagWithTitle } from "./tags";
-import { setTemplatesFolderView } from "../views/templatesFolder";
 
 type NoteProperty = "body" | "id" | "title";
-const WELCOME_MESSAGE = (
-    `Thanks for downloading the templates plugin. This plugin allows you to create and use templates in the Joplin desktop application. Please read the following instructions very carefully to get started.
 
-    1. You can see the menu for this plugin under the tools category in the menu bar. To read the complete plugin documentation you can click on the help option in the menu itself.
-    2. To use this plugin it is mandatory to have a templates notebook i.e. a notebook dedicated to storing templates. After you close this popup you'll be presented with another dialog to select or create a new templates notebook.
-    3. If you used the native templates feature, your templates will be automatically loaded by this plugin into your templates notebook.`
-);
-
-export const getTemplatesFolderId = async (dialogViewHandle: string, changeFolder = false): Promise<string> => {
+export const getTemplatesFolderId = async (): Promise<string> => {
     const templatesFolderId = await joplin.settings.value("templatesFolderId");
 
-    if (templatesFolderId == null || !(await doesFolderExist(templatesFolderId)) || changeFolder) {
-        if (!changeFolder) await joplin.views.dialogs.showMessageBox(WELCOME_MESSAGE);
-
-        await setTemplatesFolderView(dialogViewHandle);
-        const dialogResponse = await joplin.views.dialogs.open(dialogViewHandle);
-
-        const newTemplatesFolderId = dialogResponse.formData.folders.folder;
-
-        if (newTemplatesFolderId === "new") {
-            const folder = await joplin.data.post(["folders"], null, { title: "Templates" });
-            await joplin.settings.setValue("templatesFolderId", folder.id);
-            return folder.id;
-        }
-
-        await joplin.settings.setValue("templatesFolderId", newTemplatesFolderId);
-        return newTemplatesFolderId;
+    if (templatesFolderId == null || !(await doesFolderExist(templatesFolderId))) {
+        const folder = await joplin.data.post(["folders"], null, { title: "Templates" });
+        await joplin.settings.setValue("templatesFolderId", folder.id);
+        return folder.id;
     }
 
     return templatesFolderId;
