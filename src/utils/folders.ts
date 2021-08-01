@@ -14,3 +14,8 @@ export const doesFolderExist = async (folderId: string): Promise<boolean> => {
 export const getAllNotesInFolder = async (folderId: string): Promise<Note[]> => {
     return fetchAllItems(["folders", folderId, "notes"], { fields: ["id", "title", "body"] });
 }
+
+export const createFolder = async (title: string): Promise<string> => {
+    const folder = await joplin.data.post(["folders"], null, { title: title });
+    return folder.id;
+}

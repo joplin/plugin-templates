@@ -5,6 +5,7 @@ import { DateAndTimeUtils } from "./utils/dateAndTime";
 import { getTemplateFromId, getUserTemplateSelection, Note } from "./utils/templates";
 import { setDefaultTemplatesView } from "./views/defaultTemplates";
 import { JoplinCommand } from "./types";
+import { loadLegacyTemplates } from "./legacyTemplates";
 
 joplin.plugins.register({
     onStart: async function() {
@@ -33,6 +34,10 @@ joplin.plugins.register({
         const userTimeFormat = await joplin.settings.globalValue("timeFormat");
         const dateAndTimeUtils = new DateAndTimeUtils(userLocale, userDateFormat, userTimeFormat);
         const parser = new Parser(dateAndTimeUtils, dialogViewHandle);
+
+
+        // Asynchronously load legacy templates
+        loadLegacyTemplates(dateAndTimeUtils);
 
 
         // Utility Functions
