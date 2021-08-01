@@ -23,7 +23,10 @@ export const getAnyTagWithTitle = async (title: string): Promise<Tag> => {
     }
 
     const tag = await joplin.data.post(["tags"], null, { title: title });
-    return tag.id;
+    return {
+        id: tag.id,
+        title: tag.title
+    };
 }
 
 export const getAllNotesWithTag = async (tagId: string): Promise<Note[]> => {
