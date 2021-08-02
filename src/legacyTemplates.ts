@@ -4,7 +4,7 @@ import { createFolder } from "./utils/folders";
 import { applyTagToNote, getAnyTagWithTitle } from "./utils/tags";
 
 const README_BODY = (
-        `**Templates successfully imported!**
+    `**Templates successfully imported!**
 
   Here are some quick tips for getting started with the templates plugin:
   - You can rename this notebook if you want, or shift your templates to any other notebook.
