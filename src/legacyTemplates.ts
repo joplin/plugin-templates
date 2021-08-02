@@ -4,12 +4,14 @@ import { createFolder } from "./utils/folders";
 import { applyTagToNote, getAnyTagWithTitle } from "./utils/tags";
 
 const README_BODY = (
-    `As the templates feature was removed from the main application and was repackaged in a form a plugin, we noticed that you had some templates previously. We imported those templates for you in this notebook. Here are some quick tips for getting started with the templates plugin.
+        `**Templates successfully imported!**
 
-  - You can rename this notebook if you want. You can infact, shift your templates to any other notebook.
-  - All the notes or to-dos with a tag titled \`template\` are considered as templates.
+  Here are some quick tips for getting started with the templates plugin:
+  - You can rename this notebook if you want, or shift your templates to any other notebook.
+  - All notes or to-dos with the \`template\` tag are used as templates.
   - You can delete this readme or notebook if you've shifted your templates to any other notebook.
   - Your templates are still present in your templates directory but are renamed from \`.md\` to \`.md.old\`.
+    - These backups can be delete once you've confirmed that your templates have been safely imported
   - For full documentation and features, please refer to the official [readme](https://github.com/joplin/plugin-templates#readme).`);
 
 const createTemplatesFolder = async (utils: DateAndTimeUtils): Promise<string> => {
