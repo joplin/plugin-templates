@@ -90,7 +90,9 @@ You can define the templates you use the most as the default templates. Currentl
 
 ## FAQ
 ### Importing templates from a previous version of Joplin
-If you used templates in a version of Joplin that had this feature in the main application itself. Your templates will automatically be imported and saved in a new notebook created by this plugin.
+If you used templates in a version of Joplin that had this feature in the main application itself. Your templates will automatically be imported and saved in a new notebook titled `Imported Templates - dd/mm/yyyy`. 
+
+Your existing templates, after they're imported will still be present in the templates directory but will be renamed from `.md` to `.md.old`. You can safely delete these old templates once you verify that they've been imported correctly in Joplin.
 
 ## Contributing
 Contributions to this plugin are most welcome. Feel free to open a pull request or an issue. Make sure to use [conventional commit messages](https://github.com/pvdlg/conventional-commit-types) if you're creating a pull request.
