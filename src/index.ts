@@ -6,6 +6,9 @@ import { getTemplateFromId, getUserTemplateSelection, Note } from "./utils/templ
 import { setDefaultTemplatesView } from "./views/defaultTemplates";
 import { JoplinCommand } from "./types";
 import { loadLegacyTemplates } from "./legacyTemplates";
+import * as open from "open";
+
+const DOCUMENTATION_URL = "https://github.com/joplin/plugin-templates#readme";
 
 joplin.plugins.register({
     onStart: async function() {
@@ -142,6 +145,14 @@ joplin.plugins.register({
             }
         });
 
+        await joplin.commands.register({
+            name: "showPluginDocumentation",
+            label: "Help",
+            execute: async () => {
+                open(DOCUMENTATION_URL);
+            }
+        });
+
 
         // Create templates menu
         await joplin.views.menus.create("templates", "Templates", [
@@ -176,6 +187,9 @@ joplin.plugins.register({
                         accelerator: "Alt+Shift+T"
                     }
                 ]
+            },
+            {
+                commandName: "showPluginDocumentation"
             }
         ]);
     },
