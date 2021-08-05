@@ -4,7 +4,7 @@
     "app_min_version": "1.8",
     "version": "1.0.0",
     "name": "Templates",
-    "description": "Create and use templates in Joplin.",
+    "description": "This plugin allows you to create and use templates in Joplin.",
     "author": "Nishant Mittal",
     "homepage_url": "https://github.com/joplin/plugin-templates",
     "repository_url": "https://github.com/joplin/plugin-templates",
