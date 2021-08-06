@@ -5,7 +5,8 @@
     "dist": "webpack --joplin-plugin-config buildMain && webpack --joplin-plugin-config buildExtraScripts && webpack --joplin-plugin-config createArchive",
     "prepare": "npm run dist",
     "update": "npm install -g generator-joplin && yo joplin --update",
-    "lint": "eslint 'src/**/*.{ts,json}'"
+    "lint": "eslint 'src/**/*.{ts,json}'",
+    "release": "standard-version"
   },
   "license": "MIT",
   "keywords": [
@@ -25,6 +26,7 @@
     "fs-extra": "^9.0.1",
     "glob": "^7.1.6",
     "on-build-webpack": "^0.1.0",
+    "standard-version": "^9.3.1",
     "tar": "^6.0.5",
     "ts-loader": "^7.0.5",
     "typescript": "^3.9.3",
