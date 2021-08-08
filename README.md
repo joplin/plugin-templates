@@ -7,7 +7,7 @@
     </center>
 </h1>
 
-This plugin allows you to create templates in Joplin and use them to create new notes and todos.
+This plugin allows you to create templates in Joplin and use them to create new notes and to-dos.
 
 ## Table of contents
 
@@ -23,25 +23,34 @@ This plugin allows you to create templates in Joplin and use them to create new 
 - [Changelog](#changelog)
 - [Contributing](#contributing)
 
-## Installation
+## Installing Plugin
 - Open Joplin
 - Go to Tools > Options > Plugins
 - Search for `templates`
 - Click Install plugin
 - Restart Joplin to enable the plugin
 
-## Usage
+### Importing Legacy Templates
+- If you were already using the legacy version of templates, your templates will be automatically imported once you install the plugin. They will appear in an `Imported Templates - dd/mm/yyyy` notebook. See the `README` note in that notebook for more details. 
 
-You can create templates by creating notes with your template content and assigning them a tag titled `template`.
+Your existing templates will still be present in the templates directory but will be renamed from `.md` to `.md.old`. You can safely delete these old templates once you verify that they've been imported correctly in Joplin.
 
-You can see the templates menu in the `Tools` category. Other features of the plugin are explained below.
+## Using the Template Plugin
+
+### Adding a new template
+Create templates by creating a new note or to-do in any notebook that: 
+- includes your template content 
+- is tagged with `template`
+
+### Using templates
+You can access the templates options in `Tools` > `Templates`. 
 
 ## Features
 
 ### Template variables
 
-#### In-Built variables
-You can create templates with variables. Refer the following example.
+#### Built in variables
+Built in variables are inserted automatically, without interaction from you. For example, in the following template, the date will be automatically added: 
 
 ```markdown
 Date: {{date}}
@@ -49,19 +58,21 @@ Hours:
 Details:
 ```
 
-The currently supported in-built template variables are:
+The currently supported built in template variables are:
 
 | Variable | Description | Example |
 | --- | --- | --- |
-| `{{date}}` | Today's date formatted based on the settings format | 2019-01-01 |
-| `{{time}}` | Current time formatted based on the settings format | 13:00 |
-| `{{datetime}}` | Current date and time formatted based on the settings format | 01/01/19 1:00 PM |
+| `{{date}}` | Today's date  | 2019-01-01 |
+| `{{time}}` | Current time  | 13:00 |
+| `{{datetime}}` | Current date and time  | 01/01/19 1:00 PM |
 | `{{#custom_datetime}}` | Current date and/or time formatted based on a supplied string (using [moment.js](https://momentjs.com/) formatting) | `{{#custom_datetime}}M d{{/custom_datetime}}` |
-| `{{bowm}}` | Date of the beginning of the week (when week starts on Monday) based on the settings format | |
-| `{{bows}}` | Date of the beginning of the week (when week starts on Sunday) based on the settings format | |
+| `{{bowm}}` | Date of the beginning of the week (when week starts on Monday) | |
+| `{{bows}}` | Date of the beginning of the week (when week starts on Sunday) | |
 
+> **NOTE**: all dates are formatted based on your Joplin settings in `General > Date Format`
+ 
 #### Custom variables
-You can also define custom variables in your template that you can give a value for while using the template. Refer the following example
+You can also define custom variables in your template that prompt you to enter a value when you use the template. For example in the following example the name and color variables will prompt you each time you use the template: 
 
 ```markdown
 ---
@@ -80,20 +91,14 @@ The currently supported custom variable types are:
 | `text` | name: text |
 | `number` | count: number |
 | `boolean` | show_summary: boolean |
-| `enum` | color: enum(Red, Yellow) |
+| `enum` (dropdown list) | color: enum(Red, Yellow) |
 
-> **NOTE**: If you declare a custom variable with same name as the in-built variables, the custom variable value will be used.
+> **NOTE**: If you declare a custom variable with same name as the built-in variables, the custom variable value will be used. 
 
-Internally, [Handlebars.Js](https://handlebarsjs.com/) is used to compile the templates. You can write your templates that are compatible with `Handlebars`.
+Internally, [Handlebars.Js](https://handlebarsjs.com/) is used to compile the templates. You can write templates to be compatible with `Handlebars`.
 
 ### Default Templates
-You can define the templates you use the most as the default templates. Currently you can have two default templates. One for `notes` and one for `to-dos`. There are keyboard shortcuts, so that you can quickly create a new note/to-do with the respective default template.
-
-## FAQ
-### Importing templates from a previous version of Joplin
-If you used templates in a version of Joplin that had this feature in the main application itself. Your templates will automatically be imported and saved in a new notebook titled `Imported Templates - dd/mm/yyyy`.
-
-Your existing templates, after they're imported will still be present in the templates directory but will be renamed from `.md` to `.md.old`. You can safely delete these old templates once you verify that they've been imported correctly in Joplin.
+You can define the templates you use the most as default templates. Currently you can have two default templates. One for `notes` and one for `to-dos`. You can also assign keyboard shortcuts to these defaults, so that you can quickly create a new note/to-do with the respective default template.
 
 ## Changelog
 See [CHANGELOG.md](https://github.com/joplin/plugin-templates/blob/master/CHANGELOG.md).
