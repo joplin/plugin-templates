@@ -11,46 +11,47 @@ This plugin allows you to create templates in Joplin and use them to create new 
 
 ## Table of contents
 
-- [Installation](#installation)
-- [Usage](#usage)
+- [Installing Plugin](#installing-plugin)
+- [Importing Legacy Templates](#importing-legacy-templates)
+- [Using the Template Plugin](#using-the-template-plugin)
+  - [Adding a new template](#adding-a-new-template)
+  - [Using templates](#using-templates)
 - [Features](#features)
   - [Template variables](#template-variables)
-    - [In-Built variables](#in-built-variables)
+    - [Built in variables](#built-in-variables)
     - [Custom variables](#custom-variables)
   - [Default Templates](#default-templates)
-- [FAQ](#faq)
-  - [Importing templates from a previous version of Joplin](#importing-templates-from-a-previous-version-of-joplin)
 - [Changelog](#changelog)
 - [Contributing](#contributing)
 
 ## Installing Plugin
 - Open Joplin
 - Go to Tools > Options > Plugins
-- Search for `templates`
+- Search for `Templates`
 - Click Install plugin
 - Restart Joplin to enable the plugin
 
-### Importing Legacy Templates
-- If you were already using the legacy version of templates, your templates will be automatically imported once you install the plugin. They will appear in an `Imported Templates - dd/mm/yyyy` notebook. See the `README` note in that notebook for more details. 
+## Importing Legacy Templates
+- If you were already using the legacy version of templates, your templates will be automatically imported once you install the plugin. They will appear in an `Imported Templates - dd/mm/yyyy` notebook. See the `README` note in that notebook for more details.
 
-Your existing templates will still be present in the templates directory but will be renamed from `.md` to `.md.old`. You can safely delete these old templates once you verify that they've been imported correctly in Joplin.
+- Your existing templates will still be present in the templates directory but will be renamed from `.md` to `.md.old`. You can safely delete these old templates once you verify that they've been imported correctly in Joplin.
 
 ## Using the Template Plugin
 
 ### Adding a new template
-Create templates by creating a new note or to-do in any notebook that: 
-- includes your template content 
-- is tagged with `template`
+Create templates by creating a new note or to-do in any notebook that:
+- Includes your template content
+- Is tagged with `template`
 
 ### Using templates
-You can access the templates options in `Tools` > `Templates`. 
+You can access the templates options in `Tools` > `Templates`.
 
 ## Features
 
 ### Template variables
 
 #### Built in variables
-Built in variables are inserted automatically, without interaction from you. For example, in the following template, the date will be automatically added: 
+Built in variables are inserted automatically, without interaction from you. For example, in the following template, the date will be automatically added:
 
 ```markdown
 Date: {{date}}
@@ -69,10 +70,10 @@ The currently supported built in template variables are:
 | `{{bowm}}` | Date of the beginning of the week (when week starts on Monday) | |
 | `{{bows}}` | Date of the beginning of the week (when week starts on Sunday) | |
 
-> **NOTE**: all dates are formatted based on your Joplin settings in `General > Date Format`
- 
+> **NOTE**: All dates are formatted based on your Joplin settings in `General > Date Format`
+
 #### Custom variables
-You can also define custom variables in your template that prompt you to enter a value when you use the template. For example in the following example the name and color variables will prompt you each time you use the template: 
+You can also define custom variables in your template that prompt you to enter a value when you use the template. For example in the following example the name and color variables will prompt you each time you use the template:
 
 ```markdown
 ---
@@ -93,7 +94,7 @@ The currently supported custom variable types are:
 | `boolean` | show_summary: boolean |
 | `enum` (dropdown list) | color: enum(Red, Yellow) |
 
-> **NOTE**: If you declare a custom variable with same name as the built-in variables, the custom variable value will be used. 
+> **NOTE**: If you declare a custom variable with same name as the built-in variables, the custom variable value will be used.
 
 Internally, [Handlebars.Js](https://handlebarsjs.com/) is used to compile the templates. You can write templates to be compatible with `Handlebars`.
 
