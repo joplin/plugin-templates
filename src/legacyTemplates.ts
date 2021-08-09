@@ -6,13 +6,13 @@ import { applyTagToNote, getAnyTagWithTitle } from "./utils/tags";
 const README_BODY = (
     `**✅ Legacy Templates successfully imported!**
 
- Quick tips for the Template Plugin:
-  - All notes or to-dos with the \`template\` tag are considered templates, so this import folder can be renamed / reorganized / deleted
-  - To create a new template, create a new note or to-do and add tag \`template\`
+ Quick tips for the Templates Plugin:
+  - All notes or to-dos with the \`template\` tag are considered templates, so this import folder can be renamed / reorganized / deleted.
+  - To create a new template, create a new note or to-do and add tag \`template\`.
   - Your legacy templates are still in your Joplin directory but have been renamed from \`.md\` to \`.md.old\`.
-    - These backups can be deleted once you've confirmed that your templates were correctly imported
+    - These backups can be deleted once you've confirmed that your templates were correctly imported.
   - Templates now support built in variables 🎉 and more. For full documentation and features, see the [README](https://github.com/joplin/plugin-templates#readme).`);
-      
+
 const createTemplatesFolder = async (utils: DateAndTimeUtils): Promise<string> => {
     const folderTitle = `Imported Templates - ${utils.getCurrentTime(utils.getDateFormat())}`;
     return createFolder(folderTitle);
