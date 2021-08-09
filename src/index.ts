@@ -157,10 +157,12 @@ joplin.plugins.register({
         // Create templates menu
         await joplin.views.menus.create("templates", "Templates", [
             {
-                commandName: "createNoteFromTemplate"
+                commandName: "createNoteFromTemplate",
+                accelerator: "Alt+Ctrl+Shift+N"
             },
             {
-                commandName: "createTodoFromTemplate"
+                commandName: "createTodoFromTemplate",
+                accelerator: "Alt+Ctrl+Shift+T"
             },
             {
                 commandName: "insertTemplate",
