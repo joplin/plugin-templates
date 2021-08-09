@@ -4,15 +4,14 @@ import { createFolder } from "./utils/folders";
 import { applyTagToNote, getAnyTagWithTitle } from "./utils/tags";
 
 const README_BODY = (
-    `**Templates successfully imported!**
+    `**✅ Legacy Templates successfully imported!**
 
-  Here are some quick tips for getting started with the templates plugin:
-  - You can rename this notebook if you want, or shift your templates to any other notebook.
-  - All notes or to-dos with the \`template\` tag are used as templates.
-  - You can delete this readme or notebook if you've shifted your templates to any other notebook.
-  - Your templates are still present in your templates directory but are renamed from \`.md\` to \`.md.old\`.
-    - These backups can be delete once you've confirmed that your templates have been safely imported
-  - For full documentation and features, please refer to the official [readme](https://github.com/joplin/plugin-templates#readme).`);
+ Quick tips for the Templates Plugin:
+  - All notes or to-dos with the \`template\` tag are considered templates, so this import folder can be renamed / reorganized / deleted.
+  - To create a new template, create a new note or to-do and add tag \`template\`.
+  - Your legacy templates are still in your Joplin directory but have been renamed from \`.md\` to \`.md.old\`.
+    - These backups can be deleted once you've confirmed that your templates were correctly imported.
+  - Templates now support built in variables 🎉 and more. For full documentation and features, see the [README](https://github.com/joplin/plugin-templates#readme).`);
 
 const createTemplatesFolder = async (utils: DateAndTimeUtils): Promise<string> => {
     const folderTitle = `Imported Templates - ${utils.getCurrentTime(utils.getDateFormat())}`;
