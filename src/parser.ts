@@ -97,7 +97,7 @@ export class Parser {
             return compiledTemplate(context);
         } catch (err) {
             console.error("Error in parsing template.", err);
-            await joplin.views.dialogs.showMessageBox("There was an error parsing this template, please review it and try again.");
+            await joplin.views.dialogs.showMessageBox(`There was an error parsing this template, please review it and try again.\n\n${err}`);
             return "";
         }
     }
