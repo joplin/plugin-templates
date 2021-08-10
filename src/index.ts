@@ -4,7 +4,7 @@ import { Parser } from "./parser";
 import { DateAndTimeUtils } from "./utils/dateAndTime";
 import { getTemplateFromId, getUserTemplateSelection, Note } from "./utils/templates";
 import { setDefaultTemplatesView } from "./views/defaultTemplates";
-import { JoplinCommand } from "./types";
+import { TemplateAction, performAction } from "./actions";
 import { loadLegacyTemplates } from "./legacyTemplates";
 import * as open from "open";
 
@@ -44,16 +44,16 @@ joplin.plugins.register({
 
 
         // Utility Functions
-        const executeCommandWithParsedTemplate = async (command: JoplinCommand, template: Note | null) => {
+        const performActionWithParsedTemplate = async (action: TemplateAction, template: Note | null) => {
             const parsedTemplate = await parser.parseTemplate(template);
             if (parsedTemplate) {
-                await joplin.commands.execute(command, parsedTemplate);
+                await performAction(action, parsedTemplate);
             }
         }
 
-        const getTemplateAndExecuteCommand = async (command: JoplinCommand) => {
+        const getTemplateAndPerformAction = async (action: TemplateAction) => {
             const template: Note = JSON.parse(await getUserTemplateSelection());
-            await executeCommandWithParsedTemplate(command, template);
+            await performActionWithParsedTemplate(action, template);
         }
 
 
@@ -62,7 +62,7 @@ joplin.plugins.register({
             name: "createNoteFromTemplate",
             label: "Create note from template",
             execute: async () => {
-                await getTemplateAndExecuteCommand(JoplinCommand.NewNote);
+                await getTemplateAndPerformAction(TemplateAction.NewNote);
             }
         });
 
@@ -70,7 +70,7 @@ joplin.plugins.register({
             name: "createTodoFromTemplate",
             label: "Create to-do from template",
             execute: async () => {
-                await getTemplateAndExecuteCommand(JoplinCommand.NewTodo);
+                await getTemplateAndPerformAction(TemplateAction.NewTodo);
             }
         });
 
@@ -78,7 +78,7 @@ joplin.plugins.register({
             name: "insertTemplate",
             label: "Insert template",
             execute: async () => {
-                await getTemplateAndExecuteCommand(JoplinCommand.InsertText);
+                await getTemplateAndPerformAction(TemplateAction.InsertText);
             }
         });
 
@@ -127,7 +127,7 @@ joplin.plugins.register({
             execute: async () => {
                 const template = await getTemplateFromId(await joplin.settings.value("defaultNoteTemplateId"));
                 if (template) {
-                    return await executeCommandWithParsedTemplate(JoplinCommand.NewNote, template);
+                    return await performActionWithParsedTemplate(TemplateAction.NewNote, template);
                 }
                 await joplin.views.dialogs.showMessageBox("No default note template is set.");
             }
@@ -139,7 +139,7 @@ joplin.plugins.register({
             execute: async () => {
                 const template = await getTemplateFromId(await joplin.settings.value("defaultTodoTemplateId"));
                 if (template) {
-                    return await executeCommandWithParsedTemplate(JoplinCommand.NewTodo, template);
+                    return await performActionWithParsedTemplate(TemplateAction.NewTodo, template);
                 }
                 await joplin.views.dialogs.showMessageBox("No default to-do template is set.");
             }
