@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.0](https://github.com/joplin/plugin-templates/compare/v1.0.0...v1.1.0) (2021-08-11)
+
+
+### Features
+
+* add keyboard shortcuts for createNoteFromTemplate, createTodoFromTemplate ([941d2d2](https://github.com/joplin/plugin-templates/commit/941d2d239e462597cc20b12ca2374038463320b9)), closes [#18](https://github.com/joplin/plugin-templates/issues/18)
+
+
+### Bug Fixes
+
+* don't create provisional notes/todos while using templates ([3399aea](https://github.com/joplin/plugin-templates/commit/3399aead0ec33998997c373703d80e29282d579c))
+* **legacy-templates:** improve the readme note ([#19](https://github.com/joplin/plugin-templates/issues/19)) ([7215777](https://github.com/joplin/plugin-templates/commit/7215777607f40845716cf8d4c94f3cdd3920c4ca))
+* **parser:** display error message when template can't be parsed ([7dfcdf2](https://github.com/joplin/plugin-templates/commit/7dfcdf2d6fc4847f0aad45639361566f882e492c)), closes [#15](https://github.com/joplin/plugin-templates/issues/15)
+
 ## 1.0.0 (2021-08-06)
 
 
