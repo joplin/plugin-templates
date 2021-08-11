@@ -37,6 +37,7 @@ export class DateAndTimeUtils {
     }
 
     public getBeginningOfWeek(startIndex: number): number {
+        // startIndex: 0 for Sunday, 1 for Monday
         const currentDate = new Date();
         const day = currentDate.getDay();
         const diff = day >= startIndex ? day - startIndex : 6 - day;
