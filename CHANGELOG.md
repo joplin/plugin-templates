@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.1](https://github.com/joplin/plugin-templates/compare/v1.1.0...v1.1.1) (2021-08-11)
+
+
+### Bug Fixes
+
+* **release:** add scripts to sync version with manifest.json ([f849fe6](https://github.com/joplin/plugin-templates/commit/f849fe680a5e785b2d9dadee4939de511cef0574))
+* **version:** update the version in manifest ([d5635f1](https://github.com/joplin/plugin-templates/commit/d5635f1c627c8d65800f35883b1e27c7e4b2847a))
+
 ## [1.1.0](https://github.com/joplin/plugin-templates/compare/v1.0.0...v1.1.0) (2021-08-11)
 
 
