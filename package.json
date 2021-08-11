@@ -8,6 +8,15 @@
     "lint": "eslint 'src/**/*.{ts,json}'",
     "release": "standard-version"
   },
+  "standard-version": {
+    "skip": {
+      "commit": true,
+      "tag": true
+    },
+    "scripts": {
+      "postchangelog": "node scripts/syncVersion.js"
+    }
+  },
   "license": "MIT",
   "keywords": [
     "joplin-plugin"
