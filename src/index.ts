@@ -7,6 +7,7 @@ import { setDefaultTemplatesView } from "./views/defaultTemplates";
 import { TemplateAction, performAction } from "./actions";
 import { loadLegacyTemplates } from "./legacyTemplates";
 import * as open from "open";
+import { Logger } from "./logger";
 
 const DOCUMENTATION_URL = "https://github.com/joplin/plugin-templates#readme";
 
@@ -35,12 +36,15 @@ joplin.plugins.register({
         const userLocale = await joplin.settings.globalValue("locale");
         const userDateFormat = await joplin.settings.globalValue("dateFormat");
         const userTimeFormat = await joplin.settings.globalValue("timeFormat");
+        const profileDir = await joplin.settings.globalValue("profileDir");
+
         const dateAndTimeUtils = new DateAndTimeUtils(userLocale, userDateFormat, userTimeFormat);
-        const parser = new Parser(dateAndTimeUtils, dialogViewHandle);
+        const logger = new Logger(profileDir);
+        const parser = new Parser(dateAndTimeUtils, dialogViewHandle, logger);
 
 
         // Asynchronously load legacy templates
-        loadLegacyTemplates(dateAndTimeUtils);
+        loadLegacyTemplates(dateAndTimeUtils, profileDir);
 
 
         // Utility Functions
