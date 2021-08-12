@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.2](https://github.com/joplin/plugin-templates/compare/v1.1.1...v1.1.2) (2021-08-12)
+
+
+### Bug Fixes
+
+* display sorted templates in the selector ([3f9a35c](https://github.com/joplin/plugin-templates/commit/3f9a35c7ef6eb3420c6aa0012604947b8c08ab09)), closes [#24](https://github.com/joplin/plugin-templates/issues/24)
+* **template-variables:** log the necessary info if variables form is unable to load ([74d1124](https://github.com/joplin/plugin-templates/commit/74d1124e0f865f41acefe6657ab2155b4a41c63c))
+
 ### [1.1.1](https://github.com/joplin/plugin-templates/compare/v1.1.0...v1.1.1) (2021-08-11)
 
 
