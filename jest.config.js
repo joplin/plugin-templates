@@ -5,5 +5,6 @@ module.exports = {
     moduleFileExtensions: ["ts", "js", "json", "node"],
     moduleNameMapper: {
         "^@templates/(.*)$": "<rootDir>/src/$1"
-    }
+    },
+    globalSetup: "./tests/jest-setup.js"
 };

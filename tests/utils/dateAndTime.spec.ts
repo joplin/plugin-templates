@@ -4,7 +4,7 @@ describe("Date and time utils", () => {
     const dateFormat = "DD/MM/YYYY";
     const timeFormat = "HH:mm";
     const userLocale = "en_GB";
-    const testTime = 1628787894117; // Thursday 12 August 2021, 22:34:54
+    const testTime = 1628787894117; // Thursday 12 August 2021, 17:04:54 UTC
 
     beforeAll(() => {
         jest.useFakeTimers("modern");
@@ -24,12 +24,12 @@ describe("Date and time utils", () => {
 
     test("should correctly get current time with default format", () => {
         const utils = new DateAndTimeUtils(userLocale, dateFormat, timeFormat);
-        expect(utils.getCurrentTime()).toEqual("12/08/2021 22:34");
+        expect(utils.getCurrentTime()).toEqual("12/08/2021 17:04");
     });
 
     test("should correctly get current time with custom format", () => {
         const utils = new DateAndTimeUtils(userLocale, dateFormat, timeFormat);
-        expect(utils.getCurrentTime("MMMM Do YYYY, h:mm:ss a")).toEqual("August 12th 2021, 10:34:54 pm");
+        expect(utils.getCurrentTime("MMMM Do YYYY, h:mm:ss a")).toEqual("August 12th 2021, 5:04:54 pm");
     });
 
     test("should correctly get beginning of week date", () => {
