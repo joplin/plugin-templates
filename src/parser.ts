@@ -1,5 +1,6 @@
 import joplin from "api";
 import * as Handlebars from "handlebars/dist/handlebars";
+import { Logger } from "./logger";
 import { DateAndTimeUtils } from "./utils/dateAndTime";
 import { Note } from "./utils/templates";
 import { setTemplateVariablesView } from "./views/templateVariables";
@@ -13,10 +14,12 @@ const frontmatter = require("front-matter");
 export class Parser {
     private utils: DateAndTimeUtils;
     private dialog: string;
+    private logger: Logger;
 
-    constructor(dateAndTimeUtils: DateAndTimeUtils, dialogViewHandle: string) {
+    constructor(dateAndTimeUtils: DateAndTimeUtils, dialogViewHandle: string, logger: Logger) {
         this.utils = dateAndTimeUtils;
         this.dialog = dialogViewHandle;
+        this.logger = logger;
     }
 
     private getDefaultContext() {
@@ -68,7 +71,24 @@ export class Parser {
             return null;
         }
 
-        const userResponse = dialogResponse.formData.variables;
+        let userResponse;
+
+        // There's a try catch block here because a user experienced an error
+        // due to the following line. I've added a try catch block to log the
+        // necessary info to find the root cause of the error in case it happens again.
+        // Reference -> https://github.com/joplin/plugin-templates/issues/6
+        try {
+            userResponse = dialogResponse.formData.variables;
+        } catch (err) {
+            console.error("Template variables form was not able to load properly.", err);
+            console.error("DEBUG INFO", variables, dialogResponse, title);
+
+            const message = (`Template variables form was not able to load properly.\n${err}\nDEBUG INFO\nvariables: ${JSON.stringify(variables)}\ndialogResponse: ${JSON.stringify(dialogResponse)}\ntitle: ${JSON.stringify(title)}`);
+            this.logger.log(message);
+
+            throw new Error(err);
+        }
+
         return this.mapUserResponseToVariables(variables, userResponse);
     }
 
