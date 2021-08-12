@@ -105,4 +105,4 @@ You can define the templates you use the most as default templates. Currently yo
 See [CHANGELOG.md](https://github.com/joplin/plugin-templates/blob/master/CHANGELOG.md).
 
 ## Contributing
-Contributions to this plugin are most welcome. Feel free to open a pull request or an issue. Make sure to use [conventional commit messages](https://github.com/pvdlg/conventional-commit-types) if you're creating a pull request.
+Contributions to this plugin are most welcome. Feel free to open a pull request or an issue. Make sure to use [conventional commit messages](https://www.conventionalcommits.org/en/v1.0.0/) if you're creating a pull request.
