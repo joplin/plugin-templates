@@ -31,7 +31,12 @@ const getAllTemplates = async () => {
         templates = templates.concat(await getAllNotesWithTag(tag.id));
     }
 
-    return removeDuplicateTemplates(templates);
+    templates = removeDuplicateTemplates(templates);
+    templates.sort((a, b) => {
+        return a.title > b.title ? 1 : -1;
+    });
+
+    return templates;
 }
 
 export const getUserTemplateSelection = async (property?: NoteProperty): Promise<string | null> => {
