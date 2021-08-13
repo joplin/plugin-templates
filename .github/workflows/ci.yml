@@ -32,3 +32,15 @@ jobs:
         run: npm install
       - name: Run check
         run: npm run dist
+  unit-tests:
+    runs-on:  ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-18.04]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+      - name: Install dependencies
+        run: npm install
+      - name: Run check
+        run: npm test
