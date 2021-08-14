@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.3](https://github.com/joplin/plugin-templates/compare/v1.1.2...v1.1.3) (2021-08-14)
+
+
+### Bug Fixes
+
+* reduce the width of input fields ([7acc4b8](https://github.com/joplin/plugin-templates/commit/7acc4b857b4a707747d1fbd7fd01142615608828)), closes [#28](https://github.com/joplin/plugin-templates/issues/28)
+
 ### [1.1.2](https://github.com/joplin/plugin-templates/compare/v1.1.1...v1.1.2) (2021-08-12)
 
 
