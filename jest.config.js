@@ -4,7 +4,8 @@ module.exports = {
     testRegex: "/tests/.*\\.(test|spec)?\\.(ts|tsx)$",
     moduleFileExtensions: ["ts", "js", "json", "node"],
     moduleNameMapper: {
-        "^@templates/(.*)$": "<rootDir>/src/$1"
+        "^@templates/(.*)$": "<rootDir>/src/$1",
+        "^api$": "<rootDir>/tests/mock-joplin-api.ts"
     },
     globalSetup: "./tests/jest-setup.js"
 };
