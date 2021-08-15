@@ -165,8 +165,16 @@ joplin.plugins.register({
                 accelerator: "Alt+Ctrl+Shift+N"
             },
             {
+                commandName: "createNoteFromDefaultTemplate",
+                accelerator: "Alt+Shift+N"
+            },
+            {
                 commandName: "createTodoFromTemplate",
                 accelerator: "Alt+Ctrl+Shift+T"
+            },
+            {
+                commandName: "createTodoFromDefaultTemplate",
+                accelerator: "Alt+Shift+T"
             },
             {
                 commandName: "insertTemplate",
@@ -183,14 +191,6 @@ joplin.plugins.register({
                     },
                     {
                         commandName: "setDefaultTodoTemplate"
-                    },
-                    {
-                        commandName: "createNoteFromDefaultTemplate",
-                        accelerator: "Alt+Shift+N"
-                    },
-                    {
-                        commandName: "createTodoFromDefaultTemplate",
-                        accelerator: "Alt+Shift+T"
                     }
                 ]
             },
