@@ -94,6 +94,8 @@ The currently supported custom variable types are:
 | `boolean` | show_summary: boolean |
 | `enum` (dropdown list) | color: enum(Red, Yellow) |
 
+You can't use special characters ("@", ",", "#", "+", "(", etc.) or spaces in variable names. However, you can use "_" in variable names.
+
 > **NOTE**: If you declare a custom variable with same name as the built-in variables, the custom variable value will be used.
 
 Internally, [Handlebars.Js](https://handlebarsjs.com/) is used to compile the templates. You can write templates to be compatible with `Handlebars`.

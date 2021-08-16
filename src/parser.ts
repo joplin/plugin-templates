@@ -59,10 +59,23 @@ export class Parser {
         return variableValues;
     }
 
+    private checkVariableNames(variableNames: string[]) {
+        for (const variable of variableNames) {
+            try {
+                const compiledBody = Handlebars.compile(`{{ ${variable} }}`);
+                compiledBody({});
+            } catch {
+                throw new Error(`Variable name "${variable}" is invalid.\n\nPlease avoid using special characters ("@", ",", "#", "+", "(", etc.) or spaces in variable names. However, you can use "_" in variable names.`);
+            }
+        }
+    }
+
     private async getVariableInputs(title: string, variables: Record<string, string>) {
         if (Object.keys(variables).length == 0) {
             return {};
         }
+
+        this.checkVariableNames(Object.keys(variables));
 
         await setTemplateVariablesView(this.dialog, title, variables);
         const dialogResponse = (await joplin.views.dialogs.open(this.dialog));
