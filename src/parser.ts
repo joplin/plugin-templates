@@ -65,7 +65,7 @@ export class Parser {
                 const compiledBody = Handlebars.compile(`{{ ${variable} }}`);
                 compiledBody({});
             } catch {
-                throw new Error(`Variable name "${variable}" is invalid. Please avoid using special characters or spaces in variable names.`);
+                throw new Error(`Variable name "${variable}" is invalid.\n\nPlease avoid using special characters ("@", ",", "#", "+", "(", etc.) or spaces in variable names. However, you can use "_" in variable names.`);
             }
         }
     }
