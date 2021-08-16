@@ -23,6 +23,12 @@ describe("Get user template selection", () => {
         return 0;
     });
 
+    jest.spyOn(joplin.settings, "globalValue").mockImplementation(async (setting: string) => {
+        if (setting === "locale") {
+            return "en_GB";
+        }
+    });
+
     const expectTemplatesSelector = (templates: DropdownOption[], selectedValue: DropdownOption) => {
         jest.spyOn(joplin.commands, "execute").mockImplementation(async (cmd: string, props: Record<string, unknown>) => {
             expect(cmd).toEqual("showPrompt");
@@ -280,5 +286,52 @@ describe("Get user template selection", () => {
         const res = await getUserTemplateSelection("body");
         testExpectedCalls(joplin.commands.execute, 1);
         expect(res).toEqual(selectedTemplate.value);
+    });
+
+    test("should sort the templates correctly", async () => {
+        setTemplateTagsAndNotes([
+            {
+                id: "tag-id-1",
+                title: "template",
+                notes: [
+                    {
+                        id: "note-id-1",
+                        title: "Template 1",
+                        body: "Template Body"
+                    },
+                    {
+                        id: "note-id-10",
+                        title: "Template 10",
+                        body: "Template Body"
+                    },
+                    {
+                        id: "note-id-2",
+                        title: "Template 2",
+                        body: "Template Body"
+                    }
+                ]
+            }
+        ]);
+
+        const templateOptions = [
+            {
+                label: "Template 1",
+                value: "Template Body"
+            },
+            {
+                label: "Template 2",
+                value: "Template Body"
+            },
+            {
+                label: "Template 10",
+                value: "Template Body"
+            }
+        ];
+        const selectedTemplate = null;
+
+        expectTemplatesSelector(templateOptions, selectedTemplate);
+        const res = await getUserTemplateSelection("body");
+        testExpectedCalls(joplin.commands.execute, 1);
+        expect(res).toEqual(null);
     });
 });
