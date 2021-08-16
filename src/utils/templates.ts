@@ -32,8 +32,12 @@ const getAllTemplates = async () => {
     }
 
     templates = removeDuplicateTemplates(templates);
+
+    let userLocale: string = await joplin.settings.globalValue("locale");
+    userLocale = userLocale.split("_").join("-");
+
     templates.sort((a, b) => {
-        return a.title > b.title ? 1 : -1;
+        return a.title.localeCompare(b.title, [userLocale, "en-US"], { sensitivity: "accent", numeric: true });
     });
 
     return templates;
