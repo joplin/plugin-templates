@@ -20,6 +20,7 @@ This plugin allows you to create templates in Joplin and use them to create new 
   - [Template variables](#template-variables)
     - [Built in variables](#built-in-variables)
     - [Custom variables](#custom-variables)
+    - [Special variables](#special-variables)
   - [Default Templates](#default-templates)
 - [Changelog](#changelog)
 - [Contributing](#contributing)
@@ -94,11 +95,44 @@ The currently supported custom variable types are:
 | `boolean` | show_summary: boolean |
 | `enum` (dropdown list) | color: enum(Red, Yellow) |
 
-You can't use special characters ("@", ",", "#", "+", "(", etc.) or spaces in variable names. However, you can use "_" in variable names.
+**Points to note**
+- You can't use special characters ("@", ",", "#", "+", "(", etc.) or spaces in variable names. However, you can use "_" in variable names.
+- If you declare a custom variable with same name as the built-in variables, the custom variable value will be used.
+- Internally, [Handlebars.Js](https://handlebarsjs.com/) is used to compile the templates. You can write templates to be compatible with `Handlebars`.
 
-> **NOTE**: If you declare a custom variable with same name as the built-in variables, the custom variable value will be used.
+#### Special variables
 
-Internally, [Handlebars.Js](https://handlebarsjs.com/) is used to compile the templates. You can write templates to be compatible with `Handlebars`.
+These are the variables that have a specific purpose other than being used in templates. Some of the important features of these special variables are
+
+- Both built-in and custom variables can be used while defining these variables.
+- The values of these variables can be used in the template body just like built-in and custom variables.
+
+Currently there are two special variables.
+
+| Variable | Purpose | Example |
+| --- | --- | --- |
+| `template_title` | Title of the note/to-do created using this template. | template_title: Standup - {{ date }} |
+| `template_tags` | Comma separated tags to be applied to the note/to-do created  using this template. | template_tags: spec, {{ project }} |
+
+**Points to note**
+- If `template_title` is not provided, the title of the template will be used as a fallback value.
+- If a tag specified in `template_tags` doesn't exist already, it will be created.
+- You can't use these variable names i.e. `template_title` and `template_tags` for custom varaibles. In general, please avoid defining custom variables with `template_` prefix.
+
+**Example of a template using special variables**
+
+```markdown
+---
+project: enum(project 1, project 2)
+template_title: Weekly Meet - {{ project }} - {{ date }}
+template_tags: meeting notes, {{ project }}
+
+---
+
+## {{ template_title }}
+
+This note contains the meeting minutes of the weekly meet held on {{ datetime }} for {{ project }}.
+```
 
 ### Default Templates
 You can define the templates you use the most as default templates. Currently you can have two default templates. One for `notes` and one for `to-dos`. You can also assign keyboard shortcuts to these defaults, so that you can quickly create a new note/to-do with the respective default template.
