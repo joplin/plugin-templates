@@ -13,24 +13,14 @@ const performInsertTextAction = async (template: NewNote) => {
     await joplin.commands.execute("insertText", template.body);
 }
 
-const performNewNoteAction = async (template: NewNote) => {
+const performNewNoteAction = async (template: NewNote, isTodo: 0 | 1) => {
     const currentFolder = await getSelectedFolder();
-    const note = await joplin.data.post(["notes"], null, { body: template.body, parent_id: currentFolder, title: template.title });
+    const note = await joplin.data.post(["notes"], null, { body: template.body, parent_id: currentFolder, title: template.title, is_todo: isTodo });
+    await joplin.commands.execute("openNote", note.id);
     for (const tag of template.tags) {
         const tagId = (await getAnyTagWithTitle(tag)).id;
         await applyTagToNote(tagId, note.id);
     }
-    await joplin.commands.execute("openNote", note.id);
-}
-
-const performNewTodoAction = async (template: NewNote) => {
-    const currentFolder = await getSelectedFolder();
-    const note = await joplin.data.post(["notes"], null, { body: template.body, parent_id: currentFolder, is_todo: 1, title: template.title });
-    for (const tag of template.tags) {
-        const tagId = (await getAnyTagWithTitle(tag)).id;
-        await applyTagToNote(tagId, note.id);
-    }
-    await joplin.commands.execute("openNote", note.id);
 }
 
 export const performAction = async (action: TemplateAction, template: NewNote): Promise<void> => {
@@ -39,10 +29,10 @@ export const performAction = async (action: TemplateAction, template: NewNote): 
             await performInsertTextAction(template);
             break;
         case TemplateAction.NewNote:
-            await performNewNoteAction(template);
+            await performNewNoteAction(template, 0);
             break;
         case TemplateAction.NewTodo:
-            await performNewTodoAction(template);
+            await performNewNoteAction(template, 1);
             break;
     }
 }
