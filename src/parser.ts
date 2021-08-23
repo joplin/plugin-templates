@@ -151,10 +151,78 @@ export class Parser {
         return meta;
     }
 
+    private preProcessTemplateBody(templateBody: string) {
+        /**
+         * This function is supposed to do the following preprocessing.
+         * 1. Wrap the value of template_title and template_tags with double quotes if it isn't already.
+         */
+
+        templateBody = templateBody.trimStart();
+
+        const getVariableDefinitionsBlock = () => {
+            const allLines = templateBody.split("\n");
+
+            if (allLines.length === 0 || allLines[0] !== "---") {
+                return null;
+            }
+
+            const allMatchesAfterFirstMatch = allLines.map((val, index) => {
+                if (index && val === "---") {
+                    return index;
+                } else {
+                    return null;
+                }
+            }).filter(val => !!val);
+
+            if (!allMatchesAfterFirstMatch.length) {
+                return null;
+            }
+
+            const blockEndIndex = allMatchesAfterFirstMatch[0];
+            return allLines.slice(0, blockEndIndex + 1).join("\n");
+        }
+
+        const wrapInQuotes = (definitionsBlock: string, properties: string[]) => {
+            for (const prop of properties) {
+                const pattern = new RegExp(`^ *${prop}:.*`, "gm");
+                const matches = definitionsBlock.match(pattern);
+                if (!matches) {
+                    continue;
+                }
+
+                const firstMatch = matches[0];
+
+                // Don't do anything if it already contains a double quote
+                if (firstMatch.indexOf("\"") !== -1) {
+                    continue;
+                }
+
+                const splitVal = firstMatch.split(":");
+                const wrappedString = `${splitVal[0]}: "${splitVal.slice(1).join(":").trim()}"`;
+
+                definitionsBlock = definitionsBlock.replace(firstMatch, wrappedString);
+            }
+
+            return definitionsBlock;
+        }
+
+        let variableDefinitionsBlock = getVariableDefinitionsBlock();
+        if (!variableDefinitionsBlock) {
+            return templateBody;
+        }
+
+        const templateContentBlock = templateBody.substr(variableDefinitionsBlock.length, templateBody.length - variableDefinitionsBlock.length);
+        variableDefinitionsBlock = wrapInQuotes(variableDefinitionsBlock, this.specialVariableNames);
+
+        return `${variableDefinitionsBlock}${templateContentBlock}`;
+    }
+
     public async parseTemplate(template: Note | null): Promise<NewNote> {
         if (!template) {
             return null;
         }
+
+        template.body = this.preProcessTemplateBody(template.body);
 
         try {
             const processedTemplate = frontmatter(template.body);
