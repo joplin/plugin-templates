@@ -184,7 +184,7 @@ export class Parser {
 
         const wrapInQuotes = (definitionsBlock: string, properties: string[]) => {
             for (const prop of properties) {
-                const pattern = new RegExp(`^ *${prop}:.*`, "gm");
+                const pattern = new RegExp(`^[^\S\n]*${prop}[^\S\n]*:.*`, "gm");
                 const matches = definitionsBlock.match(pattern);
                 if (!matches) {
                     continue;
