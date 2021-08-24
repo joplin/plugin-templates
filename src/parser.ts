@@ -184,6 +184,7 @@ export class Parser {
 
         const wrapInQuotes = (definitionsBlock: string, properties: string[]) => {
             for (const prop of properties) {
+                // eslint-disable-next-line no-useless-escape
                 const pattern = new RegExp(`^[^\S\n]*${prop}[^\S\n]*:.*`, "gm");
                 const matches = definitionsBlock.match(pattern);
                 if (!matches) {
