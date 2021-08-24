@@ -15,9 +15,6 @@
     "skip": {
       "commit": true,
       "tag": true
-    },
-    "scripts": {
-      "postchangelog": "node scripts/syncVersion.js"
     }
   },
   "license": "MIT",
