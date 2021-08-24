@@ -7,7 +7,9 @@
     "update": "npm install -g generator-joplin && yo joplin --update",
     "lint": "eslint '{src,tests}/**/*.{ts,json}'",
     "release": "standard-version",
-    "test": "jest"
+    "test": "jest",
+    "announce": "node scripts/announceRelease.js",
+    "postpublish": "npm run announce"
   },
   "standard-version": {
     "skip": {
