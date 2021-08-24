@@ -11,10 +11,20 @@ import { setTemplateVariablesView } from "./views/templateVariables";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const frontmatter = require("front-matter");
 
+export interface NewNote {
+    title: string;
+    tags: string[];
+    body: string;
+}
+
+const NOTE_TITLE_VARIABLE_NAME = "template_title";
+const NOTE_TAGS_VARIABLE_NAME = "template_tags";
+
 export class Parser {
     private utils: DateAndTimeUtils;
     private dialog: string;
     private logger: Logger;
+    private specialVariableNames = [NOTE_TITLE_VARIABLE_NAME, NOTE_TAGS_VARIABLE_NAME];
 
     constructor(dateAndTimeUtils: DateAndTimeUtils, dialogViewHandle: string, logger: Logger) {
         this.utils = dateAndTimeUtils;
@@ -105,33 +115,161 @@ export class Parser {
         return this.mapUserResponseToVariables(variables, userResponse);
     }
 
-    public async parseTemplate(template: Note | null): Promise<string> {
-        if (!template) {
-            return "";
+    private parseSpecialVariables(specialVariables: Record<string, unknown>, customVariableInputs: Record<string, string>) {
+        const res: Record<string, string> = {};
+        const context = {
+            ...this.getDefaultContext(),
+            ...customVariableInputs
+        };
+
+        for (const variable of Object.keys(specialVariables)) {
+            if (typeof specialVariables[variable] !== "string") {
+                throw new Error(`${variable} should be a string, found ${typeof specialVariables[variable]}.`);
+            }
+
+            const compiledText = Handlebars.compile(specialVariables[variable]);
+            res[variable] = compiledText(context);
         }
+
+        return res;
+    }
+
+    private getNoteMetadata(parsedSpecialVariables: Record<string, string>) {
+        const meta = {
+            title: parsedSpecialVariables.fallback_note_title,
+            tags: []
+        };
+
+        if (NOTE_TITLE_VARIABLE_NAME in parsedSpecialVariables) {
+            meta.title = parsedSpecialVariables[NOTE_TITLE_VARIABLE_NAME];
+        }
+
+        if (NOTE_TAGS_VARIABLE_NAME in parsedSpecialVariables) {
+            meta.tags = parsedSpecialVariables[NOTE_TAGS_VARIABLE_NAME].split(",").map(t => t.trim());
+        }
+
+        return meta;
+    }
+
+    private preProcessTemplateBody(templateBody: string) {
+        /**
+         * This function is supposed to do the following preprocessing.
+         * 1. Wrap the value of template_title and template_tags with double quotes if it isn't already.
+         */
+
+        templateBody = templateBody.trimStart();
+
+        const getVariableDefinitionsBlock = () => {
+            const allLines = templateBody.split("\n");
+
+            if (allLines.length === 0 || allLines[0] !== "---") {
+                return null;
+            }
+
+            const allMatchesAfterFirstMatch = allLines.map((val, index) => {
+                if (index && val === "---") {
+                    return index;
+                } else {
+                    return null;
+                }
+            }).filter(val => !!val);
+
+            if (!allMatchesAfterFirstMatch.length) {
+                return null;
+            }
+
+            const blockEndIndex = allMatchesAfterFirstMatch[0];
+            return allLines.slice(0, blockEndIndex + 1).join("\n");
+        }
+
+        const wrapInQuotes = (definitionsBlock: string, properties: string[]) => {
+            for (const prop of properties) {
+                // eslint-disable-next-line no-useless-escape
+                const pattern = new RegExp(`^[^\S\n]*${prop}[^\S\n]*:.*`, "gm");
+                const matches = definitionsBlock.match(pattern);
+                if (!matches) {
+                    continue;
+                }
+
+                const firstMatch = matches[0];
+
+                // Don't do anything if it already contains a double quote
+                if (firstMatch.indexOf("\"") !== -1) {
+                    continue;
+                }
+
+                const splitVal = firstMatch.split(":");
+                const wrappedString = `${splitVal[0]}: "${splitVal.slice(1).join(":").trim()}"`;
+
+                definitionsBlock = definitionsBlock.replace(firstMatch, wrappedString);
+            }
+
+            return definitionsBlock;
+        }
+
+        let variableDefinitionsBlock = getVariableDefinitionsBlock();
+        if (!variableDefinitionsBlock) {
+            return templateBody;
+        }
+
+        const templateContentBlock = templateBody.substr(variableDefinitionsBlock.length, templateBody.length - variableDefinitionsBlock.length);
+        variableDefinitionsBlock = wrapInQuotes(variableDefinitionsBlock, this.specialVariableNames);
+
+        return `${variableDefinitionsBlock}${templateContentBlock}`;
+    }
+
+    public async parseTemplate(template: Note | null): Promise<NewNote> {
+        if (!template) {
+            return null;
+        }
+
+        template.body = this.preProcessTemplateBody(template.body);
 
         try {
             const processedTemplate = frontmatter(template.body);
             const templateVariables = processedTemplate.attributes;
 
-            const variableInputs = await this.getVariableInputs(template.title, templateVariables);
-            if (variableInputs === null) {
-                return "";
+            const customVariables = {};
+            const specialVariables = {
+                fallback_note_title: template.title
+            };
+
+            for (const variable of Object.keys(templateVariables)) {
+                if (this.specialVariableNames.includes(variable)) {
+                    specialVariables[variable] = templateVariables[variable];
+                } else {
+                    customVariables[variable] = templateVariables[variable];
+                }
             }
+
+            const variableInputs = await this.getVariableInputs(template.title, customVariables);
+            if (variableInputs === null) {
+                return null;
+            }
+
+            const parsedSpecialVariables = this.parseSpecialVariables(specialVariables, variableInputs);
+            const newNoteMeta = this.getNoteMetadata(parsedSpecialVariables);
+
+            // Remove the fallback property because it's not actually a variable defined by the user.
+            delete parsedSpecialVariables.fallback_note_title;
 
             const context = {
                 ...this.getDefaultContext(),
-                ...variableInputs
+                ...variableInputs,
+                ...parsedSpecialVariables
             };
 
             const templateBody = processedTemplate.body;
             const compiledTemplate = Handlebars.compile(templateBody);
 
-            return compiledTemplate(context);
+            return {
+                ...newNoteMeta,
+                body: compiledTemplate(context)
+            };
         } catch (err) {
             console.error("Error in parsing template.", err);
             await joplin.views.dialogs.showMessageBox(`There was an error parsing this template, please review it and try again.\n\n${err}`);
-            return "";
+            return null;
         }
     }
 }
