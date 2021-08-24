@@ -56,7 +56,7 @@ const createJoplinReleasePost = async (release) => {
     const response = await axios.post(
         `${DISCOURSE_URL}/posts.json`,
         {
-            topic_id: TEMPLATE_PLUGIN_TOPIC_ID,
+            topic_id: `${TEMPLATE_PLUGIN_TOPIC_ID}`,
             raw: postContent
         },
         {
