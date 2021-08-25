@@ -20,6 +20,7 @@ This plugin allows you to create templates in Joplin and use them to create new 
   - [Template variables](#template-variables)
     - [Built in variables](#built-in-variables)
     - [Custom variables](#custom-variables)
+      - [Advanced Usage](#advanced-usage)
     - [Special variables](#special-variables)
   - [Default Templates](#default-templates)
 - [Changelog](#changelog)
@@ -47,11 +48,11 @@ Create templates by creating a new note or to-do in any notebook that:
 ### Using templates
 You can access the templates options in `Tools` > `Templates`.
 
-## Features
+# Features
 
-### Template variables
+## Template variables
 
-#### Built in variables
+### Built in variables
 Built in variables are inserted automatically, without interaction from you. For example, in the following template, the date will be automatically added:
 
 ```markdown
@@ -73,7 +74,7 @@ The currently supported built in template variables are:
 
 > **NOTE**: All dates are formatted based on your Joplin settings in `General > Date Format`
 
-#### Custom variables
+### Custom variables
 You can also define custom variables in your template that prompt you to enter a value when you use the template. For example in the following example the name and color variables will prompt you each time you use the template:
 
 ```markdown
@@ -100,7 +101,36 @@ The currently supported custom variable types are:
 - If you declare a custom variable with same name as the built-in variables, the custom variable value will be used.
 - Internally, [Handlebars.Js](https://handlebarsjs.com/) is used to compile the templates. You can write templates to be compatible with `Handlebars`.
 
-#### Special variables
+#### Advanced Usage
+You can also define a `label` for each custom variable. Label is something that appears instead of the variable name in the variables input dialog. You can use the following syntax to do so.
+
+```markdown
+---
+name: text
+project:
+  label: Select a project
+  type: enum(project 1, project 2, project 3)
+show_summary:
+  label: Add summary in note?
+  type: boolean
+
+---
+
+Hi {{ name }},
+This is a report for {{ project }}.
+
+{{#if show_summary}}
+## Summary
+> Enter the summary here.
+{{/if}}
+
+
+```
+
+**Points to note**
+- The indentation should be `2 spaces` exactly. Don't use tabs for indentation otherwise it can result in errors.
+
+### Special variables
 
 These are the variables that have a specific purpose other than being used in templates. Some of the important features of these special variables are
 
@@ -134,7 +164,7 @@ template_tags: meeting notes, {{ project }}
 This note contains the meeting minutes of the weekly meet held on {{ datetime }} for {{ project }}.
 ```
 
-### Default Templates
+## Default Templates
 You can define the templates you use the most as default templates. Currently you can have two default templates. One for `notes` and one for `to-dos`. You can also assign keyboard shortcuts to these defaults, so that you can quickly create a new note/to-do with the respective default template.
 
 ## Changelog

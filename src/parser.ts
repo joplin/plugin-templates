@@ -3,6 +3,8 @@ import * as Handlebars from "handlebars/dist/handlebars";
 import { Logger } from "./logger";
 import { DateAndTimeUtils } from "./utils/dateAndTime";
 import { Note } from "./utils/templates";
+import { getVariableFromDefinition } from "./variables/parser";
+import { CustomVariable } from "./variables/types/base";
 import { setTemplateVariablesView } from "./views/templateVariables";
 
 // Can't use import for this library because the types in the library
@@ -46,26 +48,11 @@ export class Parser {
         }
     }
 
-    private mapUserResponseToVariables(variables: Record<string, string>, response: Record<string, string>) {
+    private mapUserResponseToVariables(variableObjects: Record<string, CustomVariable>, response: Record<string, string>) {
         const variableValues = {};
-
-        Object.keys(response).map(variable => {
-            const variableType = variables[variable].trim();
-            const variableResponse = response[variable];
-
-            if (variableType == "boolean") {
-                variableValues[variable] = variableResponse === "true";
-                return;
-            }
-
-            if (variableType == "number") {
-                variableValues[variable] = Number.parseFloat(variableResponse);
-                return;
-            }
-
-            variableValues[variable] = variableResponse;
+        Object.keys(response).map(variableName => {
+            variableValues[variableName] = variableObjects[variableName].processInput(response[variableName]);
         });
-
         return variableValues;
     }
 
@@ -80,14 +67,19 @@ export class Parser {
         }
     }
 
-    private async getVariableInputs(title: string, variables: Record<string, string>) {
+    private async getVariableInputs(title: string, variables: Record<string, unknown>) {
         if (Object.keys(variables).length == 0) {
             return {};
         }
 
         this.checkVariableNames(Object.keys(variables));
 
-        await setTemplateVariablesView(this.dialog, title, variables);
+        const variableObjects: Record<string, CustomVariable> = {};
+        Object.keys(variables).map(variableName => {
+            variableObjects[variableName] = getVariableFromDefinition(variableName, variables[variableName]);
+        });
+
+        await setTemplateVariablesView(this.dialog, title, variableObjects);
         const dialogResponse = (await joplin.views.dialogs.open(this.dialog));
 
         if (dialogResponse.id === "cancel") {
@@ -112,7 +104,7 @@ export class Parser {
             throw new Error(err);
         }
 
-        return this.mapUserResponseToVariables(variables, userResponse);
+        return this.mapUserResponseToVariables(variableObjects, userResponse);
     }
 
     private parseSpecialVariables(specialVariables: Record<string, unknown>, customVariableInputs: Record<string, string>) {
