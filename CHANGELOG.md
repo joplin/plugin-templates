@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0](https://github.com/joplin/plugin-templates/compare/v1.1.4...v2.0.0) (2021-08-26)
+
+
+### Features
+
+* add support for adding labels for custom variables ([b138110](https://github.com/joplin/plugin-templates/commit/b1381101c708b34756b0460bacee8e0bda7024ab)), closes [#30](https://github.com/joplin/plugin-templates/issues/30)
+* allow specifying title and tags in templates ([c36dea0](https://github.com/joplin/plugin-templates/commit/c36dea071cb1a4b2e20b79f5114a8b9d10e4bbc1))
+* use `dropdown` instead of `enum` for better user experience ([c009fc9](https://github.com/joplin/plugin-templates/commit/c009fc955703f757c4e9544eece61553af16a433)), closes [#7](https://github.com/joplin/plugin-templates/issues/7)
+
+
+### Bug Fixes
+
+* auto wrap special variable values in double quotes ([720eea2](https://github.com/joplin/plugin-templates/commit/720eea2fbcdb58921558e9f496e5c0304414ccf4))
+* ignore eslint errors for \S ([dd98f44](https://github.com/joplin/plugin-templates/commit/dd98f44ded164f17d166d1442e7447c15e33b849))
+* **parser:** update the regex used to find special variables ([cb3d677](https://github.com/joplin/plugin-templates/commit/cb3d67738fd5cf3a4bf58f1c3a8d75d5dfccb2d0))
+
 ### [1.1.4](https://github.com/joplin/plugin-templates/compare/v1.1.3...v1.1.4) (2021-08-16)
 
 
