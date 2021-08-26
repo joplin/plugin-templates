@@ -2,7 +2,7 @@ import { encode } from "html-entities";
 import { CustomVariable, InvalidDefinitionError } from "./base";
 
 export class EnumCustomVariable extends CustomVariable {
-    static definitionName = "enum";
+    static definitionName = "dropdown";
     private options: string[];
 
     constructor(name: string, label: string, options: string[]) {
@@ -19,6 +19,10 @@ export class EnumCustomVariable extends CustomVariable {
 
     private static getOptionsFromType(type: string) {
         type = type.trim();
+
+        if (type.startsWith("dropdown(") && type.endsWith(")")) {
+            return type.substr(9, type.length - 10).split(",").map(o => o.trim());
+        }
 
         if (type.startsWith("enum(") && type.endsWith(")")) {
             return type.substr(5, type.length - 6).split(",").map(o => o.trim());

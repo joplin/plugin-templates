@@ -80,7 +80,7 @@ You can also define custom variables in your template that prompt you to enter a
 ```markdown
 ---
 name: text
-color: enum(Red, Yellow, Green)
+color: dropdown(Red, Yellow, Green)
 
 ---
 
@@ -94,7 +94,7 @@ The currently supported custom variable types are:
 | `text` | name: text |
 | `number` | count: number |
 | `boolean` | show_summary: boolean |
-| `enum` (dropdown list) | color: enum(Red, Yellow) |
+| `dropdown` | color: dropdown(Red, Yellow) |
 
 **Points to note**
 - You can't use special characters ("@", ",", "#", "+", "(", etc.) or spaces in variable names. However, you can use "_" in variable names.
@@ -109,7 +109,7 @@ You can also define a `label` for each custom variable. Label is something that 
 name: text
 project:
   label: Select a project
-  type: enum(project 1, project 2, project 3)
+  type: dropdown(project 1, project 2, project 3)
 show_summary:
   label: Add summary in note?
   type: boolean
@@ -153,7 +153,7 @@ Currently there are two special variables.
 
 ```markdown
 ---
-project: enum(project 1, project 2)
+project: dropdown(project 1, project 2)
 template_title: Weekly Meet - {{ project }} - {{ date }}
 template_tags: meeting notes, {{ project }}
 
