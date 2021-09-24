@@ -94,6 +94,8 @@ The currently supported custom variable types are:
 | `text` | name: text |
 | `number` | count: number |
 | `boolean` | show_summary: boolean |
+| `date` | meeting_date: date |
+| `time` | meeting_time: time |
 | `dropdown` | color: dropdown(Red, Yellow) |
 
 **Points to note**
