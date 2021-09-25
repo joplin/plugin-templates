@@ -2,6 +2,7 @@ import joplin from "api";
 import * as Handlebars from "handlebars/dist/handlebars";
 import { Logger } from "./logger";
 import { DateAndTimeUtils } from "./utils/dateAndTime";
+import { doesFolderExist } from "./utils/folders";
 import { Note } from "./utils/templates";
 import { getVariableFromDefinition } from "./variables/parser";
 import { CustomVariable } from "./variables/types/base";
@@ -17,16 +18,18 @@ export interface NewNote {
     title: string;
     tags: string[];
     body: string;
+    folder: string | null;
 }
 
 const NOTE_TITLE_VARIABLE_NAME = "template_title";
 const NOTE_TAGS_VARIABLE_NAME = "template_tags";
+const NOTE_FOLDER_VARIABLE_NAME = "template_notebook";
 
 export class Parser {
     private utils: DateAndTimeUtils;
     private dialog: string;
     private logger: Logger;
-    private specialVariableNames = [NOTE_TITLE_VARIABLE_NAME, NOTE_TAGS_VARIABLE_NAME];
+    private specialVariableNames = [NOTE_TITLE_VARIABLE_NAME, NOTE_TAGS_VARIABLE_NAME, NOTE_FOLDER_VARIABLE_NAME];
 
     constructor(dateAndTimeUtils: DateAndTimeUtils, dialogViewHandle: string, logger: Logger) {
         this.utils = dateAndTimeUtils;
@@ -126,10 +129,11 @@ export class Parser {
         return res;
     }
 
-    private getNoteMetadata(parsedSpecialVariables: Record<string, string>) {
+    private async getNoteMetadata(parsedSpecialVariables: Record<string, string>) {
         const meta = {
             title: parsedSpecialVariables.fallback_note_title,
-            tags: []
+            tags: [],
+            folder: null
         };
 
         if (NOTE_TITLE_VARIABLE_NAME in parsedSpecialVariables) {
@@ -138,6 +142,15 @@ export class Parser {
 
         if (NOTE_TAGS_VARIABLE_NAME in parsedSpecialVariables) {
             meta.tags = parsedSpecialVariables[NOTE_TAGS_VARIABLE_NAME].split(",").map(t => t.trim());
+        }
+
+        if (NOTE_FOLDER_VARIABLE_NAME in parsedSpecialVariables) {
+            const folderId = parsedSpecialVariables[NOTE_FOLDER_VARIABLE_NAME].trim();
+            if (await doesFolderExist(folderId)) {
+                meta.folder = folderId;
+            } else {
+                throw new Error(`There is no notebook with ID: ${folderId}`);
+            }
         }
 
         return meta;
@@ -240,7 +253,7 @@ export class Parser {
             }
 
             const parsedSpecialVariables = this.parseSpecialVariables(specialVariables, variableInputs);
-            const newNoteMeta = this.getNoteMetadata(parsedSpecialVariables);
+            const newNoteMeta = await this.getNoteMetadata(parsedSpecialVariables);
 
             // Remove the fallback property because it's not actually a variable defined by the user.
             delete parsedSpecialVariables.fallback_note_title;

@@ -1,5 +1,5 @@
 import joplin from "api";
-import { SettingItemType } from "api/types";
+import { MenuItemLocation, SettingItemType } from "api/types";
 import { Parser } from "./parser";
 import { DateAndTimeUtils } from "./utils/dateAndTime";
 import { getTemplateFromId, getUserTemplateSelection, Note } from "./utils/templates";
@@ -157,6 +157,14 @@ joplin.plugins.register({
             }
         });
 
+        await joplin.commands.register({
+            name: "copyFolderID",
+            label: "Copy notebook ID",
+            execute: async (folderId: string) => {
+                await joplin.clipboard.writeText(folderId);
+            }
+        });
+
 
         // Create templates menu
         await joplin.views.menus.create("templates", "Templates", [
@@ -198,5 +206,9 @@ joplin.plugins.register({
                 commandName: "showPluginDocumentation"
             }
         ]);
+
+
+        // Folder context menu
+        await joplin.views.menuItems.create("templates_folderid", "copyFolderID", MenuItemLocation.FolderContextMenu);
     },
 });

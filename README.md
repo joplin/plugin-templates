@@ -145,11 +145,13 @@ Currently there are two special variables.
 | --- | --- | --- |
 | `template_title` | Title of the note/to-do created using this template. | template_title: Standup - {{ date }} |
 | `template_tags` | Comma separated tags to be applied to the note/to-do created  using this template. | template_tags: spec, {{ project }} |
+| `template_notebook` | The ID of the target notebook for this template. Whenever a new note/to-do will be created by this template, it will be created in this target notebook. | template_notebook: 82d2384b025f44588e4d3851a1237028 |
 
 **Points to note**
 - If `template_title` is not provided, the title of the template will be used as a fallback value.
 - If a tag specified in `template_tags` doesn't exist already, it will be created.
 - You can't use these variable names i.e. `template_title` and `template_tags` for custom varaibles. In general, please avoid defining custom variables with `template_` prefix.
+- To get the ID of a notebook, you can right click on that notebook and click on `Copy notebook ID`.
 
 **Example of a template using special variables**
 
