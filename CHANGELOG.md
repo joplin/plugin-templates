@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.1.0](https://github.com/joplin/plugin-templates/compare/v2.0.0...v2.1.0) (2021-09-25)
+
+
+### Features
+
+* allow setting a target notebook for a template ([add6534](https://github.com/joplin/plugin-templates/commit/add65341a3fda5220a7fa0a4ce0c4359800dea48))
+* introduce date and time variable types ([55cc646](https://github.com/joplin/plugin-templates/commit/55cc646ab0ec369ae029b8b77395d4c3da5483a2)), closes [#43](https://github.com/joplin/plugin-templates/issues/43)
+
 ## [2.0.0](https://github.com/joplin/plugin-templates/compare/v1.1.4...v2.0.0) (2021-08-26)
 
 
