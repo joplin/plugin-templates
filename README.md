@@ -150,7 +150,7 @@ Currently there are two special variables.
 **Points to note**
 - If `template_title` is not provided, the title of the template will be used as a fallback value.
 - If a tag specified in `template_tags` doesn't exist already, it will be created.
-- You can't use these variable names i.e. `template_title` and `template_tags` for custom varaibles. In general, please avoid defining custom variables with `template_` prefix.
+- You can't use these variable names i.e. `template_title` and `template_tags` for custom variables. In general, please avoid defining custom variables with `template_` prefix.
 - To get the ID of a notebook, you can right click on that notebook and click on `Copy notebook ID`.
 
 **Example of a template using special variables**
