@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.1.1](https://github.com/joplin/plugin-templates/compare/v2.1.0...v2.1.1) (2021-10-02)
+
+
+### Bug Fixes
+
+* bugs in copyFolderID command ([#47](https://github.com/joplin/plugin-templates/issues/47)) ([78a93e6](https://github.com/joplin/plugin-templates/commit/78a93e68c9398763ebbf61a903bd6bea40231669))
+
 ## [2.1.0](https://github.com/joplin/plugin-templates/compare/v2.0.0...v2.1.0) (2021-09-25)
 
 
