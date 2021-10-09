@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.2.0](https://github.com/joplin/plugin-templates/compare/v2.1.2...v2.2.0) (2021-10-09)
+
+
+### Features
+
+* enable template_tags variable while inserting templates ([2f9863f](https://github.com/joplin/plugin-templates/commit/2f9863f72e540747372111da98f2cf5b828e167e)), closes [#48](https://github.com/joplin/plugin-templates/issues/48)
+
 ### [2.1.2](https://github.com/joplin/plugin-templates/compare/v2.1.1...v2.1.2) (2021-10-09)
 
 
