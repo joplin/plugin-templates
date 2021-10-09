@@ -13,6 +13,12 @@ const DOCUMENTATION_URL = "https://github.com/joplin/plugin-templates#readme";
 
 joplin.plugins.register({
     onStart: async function() {
+        // Register setting section
+        await joplin.settings.registerSection("templatesPlugin", {
+            label: "Templates",
+        });
+
+
         // Register all settings
         await joplin.settings.registerSettings({
             "defaultNoteTemplateId": {
@@ -26,6 +32,14 @@ joplin.plugins.register({
                 type: SettingItemType.String,
                 value: null,
                 label: "Default to-do template ID"
+            },
+            "applyTagsWhileInserting": {
+                public: true,
+                type: SettingItemType.Bool,
+                value: true,
+                label: "Apply tags while inserting template",
+                description: "Apply tags using 'template_tags' variable while inserting template to notes/to-dos.",
+                section: "templatesPlugin"
             }
         });
 

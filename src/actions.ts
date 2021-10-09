@@ -11,6 +11,15 @@ export enum TemplateAction {
 
 const performInsertTextAction = async (template: NewNote) => {
     await joplin.commands.execute("insertText", template.body);
+
+    const applyTags = await joplin.settings.value("applyTagsWhileInserting")
+    if (applyTags) {
+        const noteId = (await joplin.workspace.selectedNote()).id;
+        for (const tag of template.tags) {
+            const tagId = (await getAnyTagWithTitle(tag)).id;
+            await applyTagToNote(tagId, noteId);
+        }
+    }
 }
 
 const performNewNoteAction = async (template: NewNote, isTodo: 0 | 1) => {

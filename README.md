@@ -152,6 +152,7 @@ Currently there are two special variables.
 - If a tag specified in `template_tags` doesn't exist already, it will be created.
 - You can't use these variable names i.e. `template_title` and `template_tags` for custom variables. In general, please avoid defining custom variables with `template_` prefix.
 - To get the ID of a notebook, you can right click on that notebook and click on `Copy notebook ID`.
+- While you are inserting the template in an existing note/to-do, `template_tags` variable is used to apply those tags to the note the template is inserted in. However, you can disable using `template_tags` while inserting templates from the plugin settings.
 
 **Example of a template using special variables**
 
