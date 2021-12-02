@@ -12,5 +12,6 @@ export default {
     settings: {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         globalValue: async (setting: string): Promise<string> => { return ""; }
-    }
+    },
+    require: (): unknown => { return ""; }
 };
