@@ -23,7 +23,7 @@ describe("Template parser", () => {
         jest.useRealTimers();
     })
 
-    test("should parser built-in variables correctly", async () => {
+    test("should parse built-in variables correctly", async () => {
         const parsedTemplate = await parser.parseTemplate({
             id: "note-id",
             title: "Template Title",
