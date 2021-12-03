@@ -14,6 +14,8 @@ import { DateCustomVariable } from "@templates/variables/types/date";
 import { TimeCustomVariable } from "@templates/variables/types/time";
 import { EnumCustomVariable } from "@templates/variables/types/enum";
 
+import * as folderUtils from "@templates/utils/folders";
+
 describe("Template parser", () => {
     const dateFormat = "DD/MM/YYYY";
     const timeFormat = "HH:mm";
@@ -25,6 +27,7 @@ describe("Template parser", () => {
     const parser = new Parser(dateAndTimeUtils, "variable-dialog", logger);
 
     const testVariableTypes = (variableTypes: { [name: string]: typeof CustomVariable | typeof EnumCustomVariable }, extraValidations?: (varDict: { [name: string]: CustomVariable }) => void) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         jest.spyOn(templateVariableViews, "setTemplateVariablesView").mockImplementation(async (handle: string, title: string, variableDict: { [name: string]: CustomVariable }) => {
             for (const [name, variable] of Object.entries(variableDict)) {
                 expect(variable instanceof variableTypes[name]).toBeTruthy();
@@ -37,6 +40,7 @@ describe("Template parser", () => {
     };
 
     const handleVariableDialog = (id: "cancel" | "ok", variables: { [name: string]: string }) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         jest.spyOn(joplin.views.dialogs, "open").mockImplementation(async (handle: string) => {
             if (id === "cancel") {
                 return {
@@ -277,5 +281,135 @@ describe("Template parser", () => {
             variable_two: val2
             variable_three: opt1
         `);
+    });
+
+    test("should parse special variables correctly", async () => {
+        const template = {
+            id: "note-id",
+            title: "Some Template",
+            body: dedent`
+                ---
+                title: dropdown(Title 1, Title 2)
+                project: dropdown(project 1, project 2)
+                notebook_id:\n  label: Select notebook ID\n  type: dropdown(82d2384b025f4458, 8e4d3851a1237028)
+                template_title: Scrum - {{ project }} - {{ title }}
+                template_tags: scrum, {{ project }}
+                template_notebook: {{ notebook_id }}
+
+                ---
+
+                title: {{ title }}
+                project: {{ project }}
+                notebook_id: {{ notebook_id }}
+                template_title: {{ template_title }}
+                template_tags: {{ template_tags }}
+                template_notebook: {{ template_notebook }}
+            `
+        };
+        testVariableTypes({
+            title: EnumCustomVariable,
+            project: EnumCustomVariable,
+            notebook_id: EnumCustomVariable
+        }, (v) => {
+            expect(v.notebook_id.toHTML()).toContain("Select notebook ID");
+        });
+
+        handleVariableDialog("ok", {
+            title: "Title 1",
+            project: "Project 2",
+            notebook_id: "8e4d3851a1237028"
+        });
+        jest.spyOn(folderUtils, "doesFolderExist").mockImplementation(async (folderId: string) => {
+            return folderId === "8e4d3851a1237028";
+        });
+        const parsedTemplate = await parser.parseTemplate(template);
+        expect(parsedTemplate.folder).toEqual("8e4d3851a1237028");
+        expect(parsedTemplate.tags).toStrictEqual(["scrum", "Project 2"]);
+        expect(parsedTemplate.title).toEqual("Scrum - Project 2 - Title 1");
+        expect(parsedTemplate.body).toEqual(dedent`
+            title: Title 1
+            project: Project 2
+            notebook_id: 8e4d3851a1237028
+            template_title: Scrum - Project 2 - Title 1
+            template_tags: scrum, Project 2
+            template_notebook: 8e4d3851a1237028
+        `);
+    });
+
+    test("should show an error message if value of a special variable is not a string", async () => {
+        const template = {
+            id: "note-id",
+            title: "Some Template",
+            body: dedent`
+                ---
+                template_title:\n  label: Enter the value of title\n  type: text
+
+                ---
+
+                title: {{ template_title }}
+            `
+        };
+
+        let errorMessageShown = false;
+        jest.spyOn(joplin.views.dialogs, "showMessageBox").mockImplementation(async () => {
+            errorMessageShown = true;
+            return 0;
+        });
+        const parsedTemplate = await parser.parseTemplate(template);
+        expect(errorMessageShown).toBeTruthy();
+        expect(parsedTemplate).toBeNull();
+    });
+
+    test("should show an error message if notebook defined in templates_notebook doesn't exist", async () => {
+        const template = {
+            id: "note-id",
+            title: "Some Template",
+            body: dedent`
+                ---
+                template_notebook: nasdjnkasjdnashbd
+
+                ---
+
+                notebook: {{ template_notebook }}
+            `
+        };
+
+        let errorMessageShown = false;
+        jest.spyOn(joplin.views.dialogs, "showMessageBox").mockImplementation(async (message: string) => {
+            errorMessageShown = true;
+            expect(message).toContain("There is no notebook with ID: nasdjnkasjdnashbd");
+            return 0;
+        });
+        jest.spyOn(folderUtils, "doesFolderExist").mockImplementation(async () => {
+            return false;
+        });
+        const parsedTemplate = await parser.parseTemplate(template);
+        expect(errorMessageShown).toBeTruthy();
+        expect(parsedTemplate).toBeNull();
+    });
+
+    test("should show an error message if an invalid variable name is defined", async () => {
+        const template = {
+            id: "note-id",
+            title: "Some Template",
+            body: dedent`
+                ---
+                invalid@var: text
+
+                ---
+
+                error: {{ invalid@var }}
+            `
+        };
+
+        let errorMessageShown = false;
+        jest.spyOn(joplin.views.dialogs, "showMessageBox").mockImplementation(async (message: string) => {
+            errorMessageShown = true;
+            expect(message).toContain("Variable name \"invalid@var\" is invalid.");
+            return 0;
+        });
+        const parsedTemplate = await parser.parseTemplate(template);
+        expect(errorMessageShown).toBeTruthy();
+        expect(parsedTemplate).toBeNull();
     });
 });
