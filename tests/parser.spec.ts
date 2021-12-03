@@ -6,6 +6,8 @@ import { Logger } from "@templates/logger";
 import { Parser } from "@templates/parser";
 
 import * as templateVariableViews from "@templates/views/templateVariables";
+import * as folderUtils from "@templates/utils/folders";
+
 import { CustomVariable } from "@templates/variables/types/base";
 import { TextCustomVariable } from "@templates/variables/types/text";
 import { BooleanCustomVariable } from "@templates/variables/types/boolean";
@@ -13,8 +15,6 @@ import { NumberCustomVariable } from "@templates/variables/types/number";
 import { DateCustomVariable } from "@templates/variables/types/date";
 import { TimeCustomVariable } from "@templates/variables/types/time";
 import { EnumCustomVariable } from "@templates/variables/types/enum";
-
-import * as folderUtils from "@templates/utils/folders";
 
 describe("Template parser", () => {
     const dateFormat = "DD/MM/YYYY";
