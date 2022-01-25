@@ -10,7 +10,7 @@ export const setTemplateVariablesView = async (viewHandle: string, title: string
         viewHandle,
         `
         <h2> ${encode(title)} </h2>
-        <form name="variables">
+        <form class="variablesForm" name="variables">
             ${variablesFormInputHtml.join("")}
         </form>
         `
