@@ -412,4 +412,31 @@ describe("Template parser", () => {
         expect(errorMessageShown).toBeTruthy();
         expect(parsedTemplate).toBeNull();
     });
+
+    test("should skip empty values in tags special variable", async () => {
+        const template = {
+            id: "note-id",
+            title: "Some Template",
+            body: dedent`
+                ---
+                genre: text
+                status: dropdown(, finished, unfinished)
+                template_tags: books, {{genre}},{{status}}
+
+                ---
+            `
+        };
+        testVariableTypes({
+            genre: TextCustomVariable,
+            status: EnumCustomVariable
+        });
+
+        handleVariableDialog("ok", {
+            genre: "",
+            status: "finished"
+        });
+        const parsedTemplate = await parser.parseTemplate(template);
+        expect(parsedTemplate.title).toEqual("Some Template");
+        expect(parsedTemplate.tags).toStrictEqual(["books", "finished"]);
+    });
 });

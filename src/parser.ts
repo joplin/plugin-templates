@@ -141,7 +141,7 @@ export class Parser {
         }
 
         if (NOTE_TAGS_VARIABLE_NAME in parsedSpecialVariables) {
-            meta.tags = parsedSpecialVariables[NOTE_TAGS_VARIABLE_NAME].split(",").map(t => t.trim());
+            meta.tags = parsedSpecialVariables[NOTE_TAGS_VARIABLE_NAME].split(",").map(t => t.trim()).filter(t => t !== "");
         }
 
         if (NOTE_FOLDER_VARIABLE_NAME in parsedSpecialVariables) {
