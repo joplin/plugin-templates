@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.2.1](https://github.com/joplin/plugin-templates/compare/v2.2.0...v2.2.1) (2022-01-25)
+
+
+### Bug Fixes
+
+* **#55:** handle empty tags in special variables ([2aec687](https://github.com/joplin/plugin-templates/commit/2aec687b6348a91f8a1e5f90305c8709fd428bf1)), closes [#55](https://github.com/joplin/plugin-templates/issues/55)
+* set a max height for variables form ([0aa28b4](https://github.com/joplin/plugin-templates/commit/0aa28b4674d3907c2dc6c5078c67c87af4243f7b))
+
 ## [2.2.0](https://github.com/joplin/plugin-templates/compare/v2.1.2...v2.2.0) (2021-10-09)
 
 
