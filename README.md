@@ -4,7 +4,7 @@
     <center>
         <img src="https://github.com/joplin/plugin-templates/actions/workflows/ci.yml/badge.svg">
         <a href="https://npmjs.com/package/joplin-plugin-templates"><img src="https://badge.fury.io/js/joplin-plugin-templates.svg" alt="npm version"></a>
-        <img src="https://img.shields.io/badge/dynamic/json?color=brightgreen&label=downloads&query=%24.downloads&url=https%3A%2F%2Fjoplin-plugin-downloads.vercel.app%2Fapi">
+        <img src="https://img.shields.io/badge/dynamic/json?color=brightgreen&label=downloads&query=%24.totalDownloads&url=https%3A%2F%2Fjoplin-plugin-downloads.vercel.app%2Fapi%3Fplugin%3Djoplin.plugin.templates">
     </center>
 </h1>
 
