@@ -25,6 +25,7 @@ This plugin allows you to create templates in Joplin and use them to create new 
     - [Special variables](#special-variables)
   - [Default Templates](#default-templates)
 - [Changelog](#changelog)
+- [Supporting](#supporting)
 - [Contributing](#contributing)
 
 ## Installing Plugin
@@ -175,6 +176,9 @@ You can define the templates you use the most as default templates. Currently yo
 
 ## Changelog
 See [CHANGELOG.md](https://github.com/joplin/plugin-templates/blob/master/CHANGELOG.md).
+
+## Supporting
+You can support the development of this plugin through [PayPal](https://paypal.me/nishantwrp). Also, do consider supporting the development of the main Joplin app through the official [donate page](https://joplinapp.org/donate/).
 
 ## Contributing
 Contributions to this plugin are most welcome. Feel free to open a pull request or an issue. Make sure to use [conventional commit messages](https://www.conventionalcommits.org/en/v1.0.0/) if you're creating a pull request.
