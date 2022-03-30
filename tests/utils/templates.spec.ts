@@ -29,6 +29,12 @@ describe("Get user template selection", () => {
         }
     });
 
+    jest.spyOn(joplin.settings, "value").mockImplementation(async (setting: string) => {
+        if (setting === "getTemplatesByTagsOrNotebook") {
+            return "tag";
+        }
+    });
+
     const expectTemplatesSelector = (templates: DropdownOption[], selectedValue: DropdownOption) => {
         jest.spyOn(joplin.commands, "execute").mockImplementation(async (cmd: string, props: Record<string, unknown>) => {
             expect(cmd).toEqual("showPrompt");
