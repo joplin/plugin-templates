@@ -30,7 +30,7 @@ describe("Get user template selection", () => {
     });
 
     jest.spyOn(joplin.settings, "value").mockImplementation(async (setting: string) => {
-        if (setting === "getTemplatesByTagsOrNotebook") {
+        if (setting === "templatesSource") {
             return "tag";
         }
     });
