@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.3.0](https://github.com/joplin/plugin-templates/compare/v2.2.1...v2.3.0) (2022-06-04)
+
+
+### Features
+
+* allow using notebook for storing templates ([#63](https://github.com/joplin/plugin-templates/issues/63)) ([fd8c40c](https://github.com/joplin/plugin-templates/commit/fd8c40c2a8d8b479e3e238f2b443bc5bedd82abf)), closes [#62](https://github.com/joplin/plugin-templates/issues/62)
+
+
+### Bug Fixes
+
+* do not bundle .env with npm package ([51cc799](https://github.com/joplin/plugin-templates/commit/51cc799430c09e54fd33072d2bfa7bf71e01f16e))
+
 ### [2.2.1](https://github.com/joplin/plugin-templates/compare/v2.2.0...v2.2.1) (2022-01-25)
 
 
