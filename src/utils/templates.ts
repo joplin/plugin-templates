@@ -27,9 +27,9 @@ const removeDuplicateTemplates = (templates: Note[]) => {
 const getAllTemplates = async () => {
     let templates: Note[] = [];
 
-    const templateStoredAs = await joplin.settings.value("getTemplatesByTagsOrNotebook")
+    const templatesSource = await joplin.settings.value("templatesSource");
 
-    if (templateStoredAs == "tag"){
+    if (templatesSource == "tag"){
         const templateTags = await getAllTagsWithTitle("template");
 
         for (const tag of templateTags) {

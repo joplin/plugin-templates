@@ -175,9 +175,10 @@ This note contains the meeting minutes of the weekly meet held on {{ datetime }}
 ## Default Templates
 You can define the templates you use the most as default templates. Currently you can have two default templates. One for `notes` and one for `to-dos`. You can also assign keyboard shortcuts to these defaults, so that you can quickly create a new note/to-do with the respective default template.
 
-## Using Notebooks or Tags for Templates
-You can use either notebooks or tags to define templates by selecting the option in the dropdown on the settings page. Tag mode is the current behavior, where any note or todo tagged with a "template" tag is considered a template. In Notebook mode, any note or todo placed in a folder titled "Templates" will be considered a template instead.
+## Using Notebooks to store templates
+Now, the plugin also supports using notebooks to store templates instead of tags. You can start using notebooks to store your templates by going to the plugin settings and selecting `Notebook` instead of `Tag`.
 
+Now, any note or todo placed in a notebook titled "Templates" will be considered a template.
 
 ## Changelog
 See [CHANGELOG.md](https://github.com/joplin/plugin-templates/blob/master/CHANGELOG.md).
