@@ -1,4 +1,5 @@
 import joplin from "api";
+import { getAllNotesInFolder } from "./folders";
 import { getAllNotesWithTag, getAllTagsWithTitle } from "./tags";
 
 export interface Note {
@@ -25,10 +26,17 @@ const removeDuplicateTemplates = (templates: Note[]) => {
 
 const getAllTemplates = async () => {
     let templates: Note[] = [];
-    const templateTags = await getAllTagsWithTitle("template");
 
-    for (const tag of templateTags) {
-        templates = templates.concat(await getAllNotesWithTag(tag.id));
+    const templatesSource = await joplin.settings.value("templatesSource");
+
+    if (templatesSource == "tag"){
+        const templateTags = await getAllTagsWithTitle("template");
+
+        for (const tag of templateTags) {
+            templates = templates.concat(await getAllNotesWithTag(tag.id));
+        }
+    } else {
+        templates = templates.concat(await getAllNotesInFolder("Templates"));
     }
 
     templates = removeDuplicateTemplates(templates);

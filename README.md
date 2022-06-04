@@ -24,6 +24,7 @@ This plugin allows you to create templates in Joplin and use them to create new 
       - [Advanced Usage](#advanced-usage)
     - [Special variables](#special-variables)
   - [Default Templates](#default-templates)
+  - [Using Notebooks or Tags for Templates](#using-notebooks-or-tags-for-templates)
 - [Changelog](#changelog)
 - [Supporting](#supporting)
 - [Contributing](#contributing)
@@ -173,6 +174,11 @@ This note contains the meeting minutes of the weekly meet held on {{ datetime }}
 
 ## Default Templates
 You can define the templates you use the most as default templates. Currently you can have two default templates. One for `notes` and one for `to-dos`. You can also assign keyboard shortcuts to these defaults, so that you can quickly create a new note/to-do with the respective default template.
+
+## Using Notebooks to store templates
+Now, the plugin also supports using notebooks to store templates instead of tags. You can start using notebooks to store your templates by going to the plugin settings and selecting `Notebook` instead of `Tag`.
+
+Now, any note or todo placed in a notebook titled "Templates" will be considered a template.
 
 ## Changelog
 See [CHANGELOG.md](https://github.com/joplin/plugin-templates/blob/master/CHANGELOG.md).
