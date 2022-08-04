@@ -41,6 +41,12 @@ export class Parser {
         Handlebars.registerHelper("custom_datetime", (options) => {
             return this.utils.getCurrentTime(options.fn(this));
         });
+        Handlebars.registerHelper("upper_datetime", (options) => {
+            return this.utils.getCurrentTime(options.fn(this)).toUpperCase();
+        });
+        Handlebars.registerHelper("lower_datetime", (options) => {
+            return this.utils.getCurrentTime(options.fn(this)).toLowerCase();
+        });
 
         return {
             date: this.utils.getCurrentTime(this.utils.getDateFormat()),
