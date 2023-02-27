@@ -1,5 +1,5 @@
 import joplin from "api";
-import { MenuItemLocation, SettingItemType } from "api/types";
+import { ContentScriptType, MenuItemLocation, SettingItemType } from "api/types";
 import { Parser } from "./parser";
 import { DateAndTimeUtils } from "./utils/dateAndTime";
 import { getTemplateFromId, getUserTemplateSelection, Note } from "./utils/templates";
@@ -243,5 +243,11 @@ joplin.plugins.register({
 
         // Folder context menu
         await joplin.views.menuItems.create("templates_folderid", "copyFolderID", MenuItemLocation.FolderContextMenu);
+
+        await joplin.contentScripts.register(ContentScriptType.CodeMirrorPlugin, 'dummy', './dummyContentScript.js');
+
+        await joplin.contentScripts.onMessage('dummy', () => {
+            joplin.commands.execute("createNoteFromDefaultTemplate")
+        })
     },
 });
