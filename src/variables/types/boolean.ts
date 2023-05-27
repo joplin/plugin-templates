@@ -1,3 +1,4 @@
+import { DateAndTimeUtils } from "@templates/utils/dateAndTime";
 import { encode } from "html-entities";
 import { CustomVariable } from "./base";
 
@@ -15,7 +16,8 @@ export class BooleanCustomVariable extends CustomVariable {
         );
     }
 
-    public processInput(input: string): boolean {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    public processInput(input: string, dateAndTimeUtils: DateAndTimeUtils): boolean {
         return input === "true";
     }
 }

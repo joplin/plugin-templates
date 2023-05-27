@@ -1,3 +1,4 @@
+import { DateAndTimeUtils } from "@templates/utils/dateAndTime";
 import { encode } from "html-entities";
 
 export class InvalidDefinitionError extends Error {}
@@ -31,8 +32,8 @@ export class CustomVariable {
         );
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    public processInput(input: string): any {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
+    public processInput(input: string, dateAndTimeUtils: DateAndTimeUtils): any {
         return input;
     }
 

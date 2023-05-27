@@ -54,7 +54,7 @@ export class Parser {
     private mapUserResponseToVariables(variableObjects: Record<string, CustomVariable>, response: Record<string, string>) {
         const variableValues = {};
         Object.keys(response).map(variableName => {
-            variableValues[variableName] = variableObjects[variableName].processInput(response[variableName]);
+            variableValues[variableName] = variableObjects[variableName].processInput(response[variableName], this.utils);
         });
         return variableValues;
     }

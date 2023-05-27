@@ -188,7 +188,7 @@ describe("Template parser", () => {
         expect(parsedTemplate.tags.length).toEqual(0);
         expect(parsedTemplate.title).toEqual("Template");
         expect(parsedTemplate.body).toEqual(dedent`
-            2021-12-03 20:43
+            03/12/2021 20:43
         `);
     });
 
@@ -438,5 +438,44 @@ describe("Template parser", () => {
         const parsedTemplate = await parser.parseTemplate(template);
         expect(parsedTemplate.title).toEqual("Some Template");
         expect(parsedTemplate.tags).toStrictEqual(["books", "finished"]);
+    });
+
+    test("should format custom date and time variable according to user config", async () => {
+        const dateFormat = "DD.MM.YYYY";
+        const timeFormat = "HH.mm";
+        const dateAndTimeUtils = new DateAndTimeUtils(userLocale, dateFormat, timeFormat);
+        const parser = new Parser(dateAndTimeUtils, "variable-dialog", logger);
+
+        const template = {
+            id: "note-id",
+            title: "Some Template",
+            body: dedent`
+                ---
+                some_date: date
+                some_time: time
+
+                ---
+
+                some_date: {{ some_date }}
+                some_time: {{ some_time }}
+            `
+        };
+        testVariableTypes({
+            some_date: DateCustomVariable,
+            some_time: TimeCustomVariable
+        });
+
+        handleVariableDialog("ok", {
+            some_date: "2023-05-09",
+            some_time: "17:25"
+        });
+        const parsedTemplate = await parser.parseTemplate(template);
+        expect(parsedTemplate.folder).toBeNull();
+        expect(parsedTemplate.tags.length).toEqual(0);
+        expect(parsedTemplate.title).toEqual("Some Template");
+        expect(parsedTemplate.body).toEqual(dedent`
+            some_date: 09.05.2023
+            some_time: 17.25
+        `);
     });
 });
