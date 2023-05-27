@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.4.0](https://github.com/joplin/plugin-templates/compare/v2.3.0...v2.4.0) (2023-05-27)
+
+
+### Features
+
+* **#68:** format date and time variables according to user preferences ([581a1da](https://github.com/joplin/plugin-templates/commit/581a1da21e7f8adbce1729c3dd5324c991c3abb2)), closes [#68](https://github.com/joplin/plugin-templates/issues/68)
+* add license ([a63591c](https://github.com/joplin/plugin-templates/commit/a63591cef001b768efbb97de6cc75fb21d87866c))
+
 ## [2.3.0](https://github.com/joplin/plugin-templates/compare/v2.2.1...v2.3.0) (2022-06-04)
 
 
