@@ -72,9 +72,11 @@ const createJoplinReleasePost = async (release) => {
 
 const announceRelease = async () => {
     const release = await getLatestRelease();
+
     const githubReleaseUrl = await createGithubRelease(release);
-    const discoursePostUrl = await createJoplinReleasePost(release);
     console.log("GitHub release created at", githubReleaseUrl);
+
+    const discoursePostUrl = await createJoplinReleasePost(release);
     console.log("Discourse post created at", discoursePostUrl);
 }
 
