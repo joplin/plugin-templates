@@ -38,9 +38,7 @@ export class Parser {
     }
 
     private getDefaultContext() {
-        Handlebars.registerHelper("custom_datetime", (options) => {
-            return this.utils.getCurrentTime(options.fn(this));
-        });
+        this.registerHelpers()
 
         return {
             date: this.utils.getCurrentTime(this.utils.getDateFormat()),
@@ -276,5 +274,11 @@ export class Parser {
             await joplin.views.dialogs.showMessageBox(`There was an error parsing this template, please review it and try again.\n\n${err}`);
             return null;
         }
+    }
+
+    private registerHelpers() {
+        Handlebars.registerHelper("custom_datetime", (options) => {
+            return this.utils.getCurrentTime(options.fn(this));
+        });
     }
 }
