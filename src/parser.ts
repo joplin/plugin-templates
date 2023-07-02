@@ -280,5 +280,32 @@ export class Parser {
         Handlebars.registerHelper("custom_datetime", (options) => {
             return this.utils.getCurrentTime(options.fn(this));
         });
+
+        Handlebars.registerHelper("compare", function (v1, operator, v2, options) {
+            switch (operator) {
+                case "==":
+                    return (v1 == v2) ? options.fn(this) : options.inverse(this);
+                case "===":
+                    return (v1 === v2) ? options.fn(this) : options.inverse(this);
+                case "!=":
+                    return (v1 != v2) ? options.fn(this) : options.inverse(this);
+                case "!==":
+                    return (v1 !== v2) ? options.fn(this) : options.inverse(this);
+                case "<":
+                    return (v1 < v2) ? options.fn(this) : options.inverse(this);
+                case "<=":
+                    return (v1 <= v2) ? options.fn(this) : options.inverse(this);
+                case ">":
+                    return (v1 > v2) ? options.fn(this) : options.inverse(this);
+                case ">=":
+                    return (v1 >= v2) ? options.fn(this) : options.inverse(this);
+                case "&&":
+                    return (v1 && v2) ? options.fn(this) : options.inverse(this);
+                case "||":
+                    return (v1 || v2) ? options.fn(this) : options.inverse(this);
+                default:
+                    return options.inverse(this);
+            }
+        });
     }
 }
