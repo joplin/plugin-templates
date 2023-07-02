@@ -284,24 +284,42 @@ export class Parser {
         Handlebars.registerHelper("compare", function (v1, operator, v2, options) {
             switch (operator) {
                 case "==":
+                case "eq":
+                case "equals":
                     return (v1 == v2) ? options.fn(this) : options.inverse(this);
                 case "===":
+                case "seq":
+                case "strictly-equals":
                     return (v1 === v2) ? options.fn(this) : options.inverse(this);
                 case "!=":
+                case "ne":
+                case "not-equals":
                     return (v1 != v2) ? options.fn(this) : options.inverse(this);
                 case "!==":
+                case "sne":
+                case "strictly-not-equals":
                     return (v1 !== v2) ? options.fn(this) : options.inverse(this);
                 case "<":
+                case "lt":
+                case "less-than":
                     return (v1 < v2) ? options.fn(this) : options.inverse(this);
                 case "<=":
+                case "lte":
+                case "less-than-equals":
                     return (v1 <= v2) ? options.fn(this) : options.inverse(this);
                 case ">":
+                case "gt":
+                case "greater-than":
                     return (v1 > v2) ? options.fn(this) : options.inverse(this);
                 case ">=":
+                case "gte":
+                case "greater-than-equals":
                     return (v1 >= v2) ? options.fn(this) : options.inverse(this);
                 case "&&":
+                case "and":
                     return (v1 && v2) ? options.fn(this) : options.inverse(this);
                 case "||":
+                case "or":
                     return (v1 || v2) ? options.fn(this) : options.inverse(this);
                 default:
                     return options.inverse(this);
