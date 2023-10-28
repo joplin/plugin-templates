@@ -7,6 +7,7 @@ import { Note } from "./utils/templates";
 import { getVariableFromDefinition } from "./variables/parser";
 import { CustomVariable } from "./variables/types/base";
 import { setTemplateVariablesView } from "./views/templateVariables";
+import { HelperFactory } from "./helpers";
 
 // Can't use import for this library because the types in the library
 // are declared incorrectly which result in typescript errors.
@@ -38,8 +39,6 @@ export class Parser {
     }
 
     private getDefaultContext() {
-        this.registerHelpers()
-
         return {
             date: this.utils.getCurrentTime(this.utils.getDateFormat()),
             time: this.utils.getCurrentTime(this.utils.getTimeFormat()),
@@ -229,6 +228,8 @@ export class Parser {
         template.body = this.preProcessTemplateBody(template.body);
 
         try {
+            HelperFactory.registerHelpers(this.utils);
+
             const processedTemplate = frontmatter(template.body);
             const templateVariables = processedTemplate.attributes;
 
@@ -274,56 +275,5 @@ export class Parser {
             await joplin.views.dialogs.showMessageBox(`There was an error parsing this template, please review it and try again.\n\n${err}`);
             return null;
         }
-    }
-
-    private registerHelpers() {
-        Handlebars.registerHelper("custom_datetime", (options) => {
-            return this.utils.getCurrentTime(options.fn(this));
-        });
-
-        Handlebars.registerHelper("compare", function (v1, operator, v2, options) {
-            switch (operator) {
-                case "==":
-                case "eq":
-                case "equals":
-                    return (v1 == v2) ? options.fn(this) : options.inverse(this);
-                case "===":
-                case "seq":
-                case "strictly-equals":
-                    return (v1 === v2) ? options.fn(this) : options.inverse(this);
-                case "!=":
-                case "ne":
-                case "not-equals":
-                    return (v1 != v2) ? options.fn(this) : options.inverse(this);
-                case "!==":
-                case "sne":
-                case "strictly-not-equals":
-                    return (v1 !== v2) ? options.fn(this) : options.inverse(this);
-                case "<":
-                case "lt":
-                case "less-than":
-                    return (v1 < v2) ? options.fn(this) : options.inverse(this);
-                case "<=":
-                case "lte":
-                case "less-than-equals":
-                    return (v1 <= v2) ? options.fn(this) : options.inverse(this);
-                case ">":
-                case "gt":
-                case "greater-than":
-                    return (v1 > v2) ? options.fn(this) : options.inverse(this);
-                case ">=":
-                case "gte":
-                case "greater-than-equals":
-                    return (v1 >= v2) ? options.fn(this) : options.inverse(this);
-                case "&&":
-                case "and":
-                    return (v1 && v2) ? options.fn(this) : options.inverse(this);
-                case "||":
-                case "or":
-                    return (v1 || v2) ? options.fn(this) : options.inverse(this);
-                default:
-                    return options.inverse(this);
-            }
-        });
     }
 }
