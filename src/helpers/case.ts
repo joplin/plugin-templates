@@ -2,7 +2,7 @@ import { HandlebarsHelper, HelperConstructorBlock } from "./helper";
 
 export const caseHelper: HelperConstructorBlock = ctx => {
     return new HandlebarsHelper("case", (type, rawV1): string => {
-        const v1 = new String(rawV1);
+        const v1 = new String(rawV1).toString();
 
         switch (type) {
             case "upper":

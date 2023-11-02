@@ -478,4 +478,273 @@ describe("Template parser", () => {
             some_time: 17.25
         `);
     });
+
+    // Math helper.
+    test("should support math helper", async () => {
+        const template = {
+            id: "note-id",
+            title: "Some Template",
+            body: dedent`
+                ---
+                num1: text
+                num2: number
+
+                ---
+
+                {{ math num1 "+" num2 }}
+                {{ math num2 "**" 2 }}
+                {{ math 2 "-" num1 }}
+                {{ math num1 "/" 2 }}
+                {{ math num2 "*" num1 }}
+                {{ math (math num1 "+" num2) "%" 3 }}
+                {{ math num2 "/" (math num1 "-" num1) }}
+            `
+        };
+        testVariableTypes({
+            num1: TextCustomVariable,
+            num2: NumberCustomVariable,
+        });
+
+        handleVariableDialog("ok", {
+            num1: "11",
+            num2: "4"
+        });
+        const parsedTemplate = await parser.parseTemplate(template);
+        expect(parsedTemplate.folder).toBeNull();
+        expect(parsedTemplate.tags.length).toEqual(0);
+        expect(parsedTemplate.title).toEqual("Some Template");
+        expect(parsedTemplate.body).toEqual(dedent`
+            15
+            16
+            -9
+            5.5
+            44
+            0
+            Infinity
+        `);
+    });
+
+    test("should show error with invalid usage of math helpers", async () => {
+        const invalidTemplates = [];
+        invalidTemplates.push(dedent`
+            ---
+            num1: text
+
+            ---
+
+            {{ math num1 "+" num1 }}
+        `);
+
+        invalidTemplates.push(dedent`
+            ---
+            num1: boolean
+
+            ---
+
+            {{ math num1 "+" num1 }}
+        `);
+
+        invalidTemplates.push(dedent`
+            {{ math 2 "%" 0 }}
+        `);
+        testVariableTypes({
+            num1: CustomVariable,
+        });
+
+        handleVariableDialog("ok", {
+            num1: "true",
+        });
+
+        let errorMessagesShown = 0;
+        jest.spyOn(joplin.views.dialogs, "showMessageBox").mockImplementation(async () => {
+            errorMessagesShown++;
+            return 0;
+        });
+
+        for (const body of invalidTemplates) {
+            await parser.parseTemplate({
+                id: "some-id",
+                title: "some template",
+                body,
+            });
+        }
+
+        expect(errorMessagesShown).toEqual(invalidTemplates.length);
+    });
+
+    // Repeat helper.
+    test("should support repeat helper", async () => {
+        const template = {
+            id: "note-id",
+            title: "Some Template",
+            body: dedent`
+                ---
+                num1: number
+                var1: text
+
+                ---
+
+                {{#repeat num1 }}
+                {{ var1 }}
+
+                {{#if (compare repeat_index "==" 0)}}
+                Test
+                {{else}}
+                {{#repeat 2}}
+                Hi {{ repeat_index }}
+                {{/repeat}}
+                {{/if}}
+
+                {{/repeat}}eof
+            `
+        };
+        testVariableTypes({
+            num1: NumberCustomVariable,
+            var1: TextCustomVariable,
+        });
+
+        handleVariableDialog("ok", {
+            num1: "3",
+            var1: "v"
+        });
+        const parsedTemplate = await parser.parseTemplate(template);
+        expect(parsedTemplate.folder).toBeNull();
+        expect(parsedTemplate.tags.length).toEqual(0);
+        expect(parsedTemplate.title).toEqual("Some Template");
+        expect(parsedTemplate.body).toEqual(dedent`
+            v
+
+            Test
+
+            v
+
+            Hi 0
+            Hi 1
+
+            v
+
+            Hi 0
+            Hi 1
+
+            eof
+        `);
+    });
+
+    test("should show error with invalid usage of repeat helper", async () => {
+        const invalidTemplates = [];
+        invalidTemplates.push(dedent`
+            ---
+            var1: text
+
+            ---
+
+            {{#repeat var1 }}
+            Hi
+            {{/repeat}}
+        `);
+
+        invalidTemplates.push(dedent`
+            ---
+            var1: text
+
+            ---
+
+            {{#repeat (compare var1 "==" var1) }}
+            Hi
+            {{/repeat}}
+        `);
+        testVariableTypes({
+            var1: TextCustomVariable,
+        });
+
+        handleVariableDialog("ok", {
+            var1: "abc",
+        });
+
+        let errorMessagesShown = 0;
+        jest.spyOn(joplin.views.dialogs, "showMessageBox").mockImplementation(async () => {
+            errorMessagesShown++;
+            return 0;
+        });
+
+        for (const body of invalidTemplates) {
+            await parser.parseTemplate({
+                id: "some-id",
+                title: "some template",
+                body,
+            });
+        }
+
+        expect(errorMessagesShown).toEqual(invalidTemplates.length);
+    });
+
+    // Case helper.
+    test("should support case helper", async () => {
+        const template = {
+            id: "note-id",
+            title: "Some Template",
+            body: dedent`
+                ---
+                var1: text
+
+                ---
+
+                {{ case "upper" var1 }}
+                {{ case "lower" var1 }}
+                {{ case "upper" (condition false "!") }}
+            `
+        };
+        testVariableTypes({
+            var1: TextCustomVariable,
+        });
+
+        handleVariableDialog("ok", {
+            var1: "Variable"
+        });
+        const parsedTemplate = await parser.parseTemplate(template);
+        expect(parsedTemplate.folder).toBeNull();
+        expect(parsedTemplate.tags.length).toEqual(0);
+        expect(parsedTemplate.title).toEqual("Some Template");
+        expect(parsedTemplate.body).toEqual(dedent`
+            VARIABLE
+            variable
+            TRUE
+        `);
+    });
+
+    test("should show error with invalid usage of case helper", async () => {
+        const invalidTemplates = [];
+        invalidTemplates.push(dedent`
+            ---
+            var1: text
+
+            ---
+
+            {{ case "random" var1 }}
+        `);
+
+        testVariableTypes({
+            var1: TextCustomVariable,
+        });
+
+        handleVariableDialog("ok", {
+            var1: "abc",
+        });
+
+        let errorMessagesShown = 0;
+        jest.spyOn(joplin.views.dialogs, "showMessageBox").mockImplementation(async () => {
+            errorMessagesShown++;
+            return 0;
+        });
+
+        for (const body of invalidTemplates) {
+            await parser.parseTemplate({
+                id: "some-id",
+                title: "some template",
+                body,
+            });
+        }
+
+        expect(errorMessagesShown).toEqual(invalidTemplates.length);
+    });
 });

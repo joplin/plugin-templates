@@ -11,7 +11,7 @@ export interface AttributeDefinition {
 }
 
 interface RawAttributes {
-    [attr: string]: string
+    [attr: string]: unknown
 }
 
 export interface ParsedAttributes {
@@ -21,19 +21,19 @@ export interface ParsedAttributes {
 export class AttributeParser {
     constructor(private schema: AttributeDefinition[]) {}
 
-    private parseAttribute(attr: AttributeDefinition, rawValue: string) {
+    private parseAttribute(attr: AttributeDefinition, rawValue: unknown) {
         switch (attr.valueType) {
             case AttributeValueType.Boolean:
-                return new Boolean(rawValue);
+                return !!rawValue;
             case AttributeValueType.Number: {
-                const v = Number.parseFloat(rawValue);
-                if (Number.isNaN(v)) {
+                const v = typeof rawValue === "string" ? Number.parseFloat(rawValue) : rawValue;
+                if (typeof v !== "number" || Number.isNaN(v)) {
                     throw new Error(`Can't convert "${rawValue}" to number while parsing ${attr.name}.`);
                 }
                 return v;
             }
             case AttributeValueType.String:
-                return new String(rawValue);
+                return new String(rawValue).toString();
         }
     }
 
