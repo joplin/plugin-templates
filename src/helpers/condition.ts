@@ -13,7 +13,7 @@ export const conditionHelper: HelperConstructorBlock = ctx => {
             case "or":
                 return (v1 || v2);
             default:
-                throw new Error(`Invalid comparison operator used with condition: ${operator}`);
+                throw new Error(`Invalid operator used with condition: ${operator}`);
         }
     });
 };

@@ -6,6 +6,8 @@ import { customDatetimeHelper } from "./custom_datetime";
 import { compareHelper } from "./compare";
 import { mathHelper } from "./math";
 import { conditionHelper } from "./condition";
+import { repeatHelper } from "./repeat";
+import { advancedDatetimeHelper } from "./advanced_datetime";
 
 export class HelperFactory {
     private static helpers: HelperConstructorBlock[] = [
@@ -13,6 +15,8 @@ export class HelperFactory {
         compareHelper,
         mathHelper,
         conditionHelper,
+        repeatHelper,
+        advancedDatetimeHelper,
     ];
 
     static registerHelpers(dateAndTimeUtils: DateAndTimeUtils): void {

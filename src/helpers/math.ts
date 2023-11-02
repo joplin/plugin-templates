@@ -18,6 +18,11 @@ export const mathHelper: HelperConstructorBlock = ctx => {
                 return v1 * v2;
             case "/":
                 return v1 / v2;
+            case "**":
+                return v1 ** v2;
+            case "%":
+                if (!v2) throw new Error("% operator used with 0");
+                return v1 % v2;
             default:
                 throw new Error(`Invalid operator used with math: ${operator}`);
         }
