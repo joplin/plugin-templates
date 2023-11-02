@@ -8,6 +8,7 @@ import { mathHelper } from "./math";
 import { conditionHelper } from "./condition";
 import { repeatHelper } from "./repeat";
 import { advancedDatetimeHelper } from "./advanced_datetime";
+import { caseHelper } from "./case";
 
 export class HelperFactory {
     private static helpers: HelperConstructorBlock[] = [
@@ -17,6 +18,7 @@ export class HelperFactory {
         conditionHelper,
         repeatHelper,
         advancedDatetimeHelper,
+        caseHelper,
     ];
 
     static registerHelpers(dateAndTimeUtils: DateAndTimeUtils): void {
