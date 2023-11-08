@@ -39,4 +39,29 @@ describe("Date and time utils", () => {
         expect(bows).toEqual("08/08/2021");
         expect(bowm).toEqual("09/08/2021");
     });
+
+    test("should correctly parse date", () => {
+        const utils = new DateAndTimeUtils(userLocale, dateFormat, timeFormat);
+        const parsedDate = utils.parseDate("2023/19/12", "YYYY/DD/MM");
+        expect(parsedDate.date).toEqual(19);
+        expect(parsedDate.month).toEqual(11);
+        expect(parsedDate.year).toEqual(2023);
+    });
+
+    test("should throw error if couldn't parse date", () => {
+        const utils = new DateAndTimeUtils(userLocale, dateFormat, timeFormat);
+        expect(() => utils.parseDate("abc", "YYYY/DD/MM")).toThrow();
+    });
+
+    test("should correctly parse time", () => {
+        const utils = new DateAndTimeUtils(userLocale, dateFormat, timeFormat);
+        const parsedTime = utils.parseTime("04:45 pm", "HH:mm a");
+        expect(parsedTime.hours).toEqual(16);
+        expect(parsedTime.minutes).toEqual(45);
+    });
+
+    test("should throw error if couldn't parse time", () => {
+        const utils = new DateAndTimeUtils(userLocale, dateFormat, timeFormat);
+        expect(() => utils.parseTime("04:61 pm", "HH:mm a")).toThrow();
+    });
 });

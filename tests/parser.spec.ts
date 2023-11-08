@@ -910,8 +910,8 @@ describe("Template parser", () => {
         expect(errorMessagesShown).toEqual(invalidTemplates.length);
     });
 
-    // Advanced datetime helper.
-    test("should support advanced datetime helper", async () => {
+    // Datetime helper.
+    test("should support datetime helper", async () => {
         const template = {
             id: "note-id",
             title: "Some Template",
@@ -921,12 +921,12 @@ describe("Template parser", () => {
 
                 ---
 
-                {{ advanced_datetime }}
-                {{ advanced_datetime format="[]YYYY[-]MM[-]DD[ ]HH[:]mm[:]ss" }}
-                {{ advanced_datetime delta_years="2" delta_months=-1 }}
-                {{ advanced_datetime delta_days=(math -1 "*" var1) }}
-                {{ advanced_datetime delta_days=1 delta_hours=(math -24 "*" var1) delta_minutes="56" }}
-                {{ advanced_datetime delta_seconds=8 format="HH:mm:ss" }}
+                {{ datetime }}
+                {{ datetime format="[]YYYY[-]MM[-]DD[ ]HH[:]mm[:]ss" }}
+                {{ datetime delta_years="2" delta_months=-1 }}
+                {{ datetime delta_days=(math -1 "*" var1) }}
+                {{ datetime delta_days=1 delta_hours=(math -24 "*" var1) delta_minutes="56" }}
+                {{ datetime delta_seconds=8 format="HH:mm:ss" }}
             `
         };
         testVariableTypes({
@@ -950,10 +950,10 @@ describe("Template parser", () => {
         `);
     });
 
-    test("should show error with invalid usage of advanced datetime helper", async () => {
+    test("should show error with invalid usage of datetime helper", async () => {
         const invalidTemplates = [];
         invalidTemplates.push(dedent`
-            {{ advanced_datetime delta_hours="abc" }}
+            {{ datetime delta_hours="abc" }}
         `);
 
         let errorMessagesShown = 0;

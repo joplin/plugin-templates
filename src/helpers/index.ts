@@ -7,7 +7,7 @@ import { compareHelper } from "./compare";
 import { mathHelper } from "./math";
 import { conditionHelper } from "./condition";
 import { repeatHelper } from "./repeat";
-import { advancedDatetimeHelper } from "./advanced_datetime";
+import { datetimeHelper } from "./datetime";
 import { caseHelper } from "./case";
 
 export class HelperFactory {
@@ -17,7 +17,7 @@ export class HelperFactory {
         mathHelper,
         conditionHelper,
         repeatHelper,
-        advancedDatetimeHelper,
+        datetimeHelper,
         caseHelper,
     ];
 
