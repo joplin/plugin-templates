@@ -7,6 +7,7 @@ import { Note } from "./utils/templates";
 import { getVariableFromDefinition } from "./variables/parser";
 import { CustomVariable } from "./variables/types/base";
 import { setTemplateVariablesView } from "./views/templateVariables";
+import { HelperFactory } from "./helpers";
 
 // Can't use import for this library because the types in the library
 // are declared incorrectly which result in typescript errors.
@@ -38,10 +39,6 @@ export class Parser {
     }
 
     private getDefaultContext() {
-        Handlebars.registerHelper("custom_datetime", (options) => {
-            return this.utils.getCurrentTime(options.fn(this));
-        });
-
         return {
             date: this.utils.getCurrentTime(this.utils.getDateFormat()),
             time: this.utils.getCurrentTime(this.utils.getTimeFormat()),
@@ -231,6 +228,8 @@ export class Parser {
         template.body = this.preProcessTemplateBody(template.body);
 
         try {
+            HelperFactory.registerHelpers(this.utils);
+
             const processedTemplate = frontmatter(template.body);
             const templateVariables = processedTemplate.attributes;
 

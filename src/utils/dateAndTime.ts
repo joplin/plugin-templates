@@ -1,5 +1,19 @@
 import * as moment from "moment";
 
+// These are meant to parse the date and time formats
+// supported by Joplin. It doesn't support seconds or
+// milliseconds.
+interface ParsedDate {
+    date: number;
+    month: number;
+    year: number;
+}
+
+interface ParsedTime {
+    hours: number;
+    minutes: number;
+}
+
 export class DateAndTimeUtils {
     private locale: string;
     private dateFormat: string;
@@ -42,5 +56,32 @@ export class DateAndTimeUtils {
         const day = currentDate.getDay();
         const diff = day >= startIndex ? day - startIndex : 6 - day;
         return new Date().setDate(currentDate.getDate() - diff);
+    }
+
+    public parseDate(input: string, format: string): ParsedDate {
+        const date = moment(input, format, true);
+
+        if (!date.isValid()) {
+            throw new Error(`Was not able to parse ${input} according to format ${format}`);
+        }
+
+        return {
+            date: date.date(),
+            month: date.month(),
+            year: date.year(),
+        };
+    }
+
+    public parseTime(input: string, format: string): ParsedTime {
+        const time = moment(input, format, true);
+
+        if (!time.isValid()) {
+            throw new Error(`Was not able to parse ${input} according to format ${format}`);
+        }
+
+        return {
+            hours: time.hours(),
+            minutes: time.minutes(),
+        };
     }
 }
