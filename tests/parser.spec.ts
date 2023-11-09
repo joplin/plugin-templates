@@ -927,6 +927,8 @@ describe("Template parser", () => {
                 {{ datetime delta_days=(math -1 "*" var1) }}
                 {{ datetime delta_days=1 delta_hours=(math -24 "*" var1) delta_minutes="56" }}
                 {{ datetime delta_seconds=8 format="HH:mm:ss" }}
+                {{ datetime set_date=bowm delta_days="1" format="DD/MM/YYYY, dddd" }}
+                {{ datetime set_time="23:33" delta_minutes="-33" format="HH:mm:ss" }}
             `
         };
         testVariableTypes({
@@ -947,6 +949,8 @@ describe("Template parser", () => {
             23/07/2021 17:04
             24/07/2021 18:00
             17:05:02
+            10/08/2021, Tuesday
+            23:00:00
         `);
     });
 
@@ -954,6 +958,12 @@ describe("Template parser", () => {
         const invalidTemplates = [];
         invalidTemplates.push(dedent`
             {{ datetime delta_hours="abc" }}
+        `);
+        invalidTemplates.push(dedent`
+            {{ datetime set_time="23:62" delta_minutes="-33" format="HH:mm:ss" }}
+        `);
+        invalidTemplates.push(dedent`
+            {{ datetime set_date="23:33" }}
         `);
 
         let errorMessagesShown = 0;
