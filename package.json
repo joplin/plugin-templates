@@ -8,6 +8,7 @@
     "lint": "eslint '{src,tests}/**/*.{ts,json}'",
     "release": "standard-version",
     "test": "jest",
+    "coverage": "jest --coverage",
     "announce": "node scripts/announceRelease.js",
     "postpublish": "npm run announce"
   },

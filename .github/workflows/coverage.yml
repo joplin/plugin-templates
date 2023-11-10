@@ -1,0 +1,25 @@
+name: Coverage Report
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  coverage:
+    runs-on:  ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+      - name: Install dependencies
+        run: npm install
+      - name: Generage coverage report
+        run: npm run coverage
+      - name: push changes to remote
+        run: |
+          git config --global user.name "Albus"
+          git config --global user.email "bot@nishantwrp.com"
+          git add .; git commit -m "chore: update coverage report"
+          git push
