@@ -8,6 +8,7 @@ import { TemplateAction, performAction } from "./actions";
 import { loadLegacyTemplates } from "./legacyTemplates";
 import * as open from "open";
 import { Logger } from "./logger";
+import { PromiseGroup } from "./utils/promises";
 
 const DOCUMENTATION_URL = "https://github.com/joplin/plugin-templates#readme";
 
@@ -41,7 +42,7 @@ joplin.plugins.register({
                 description: "Apply tags using 'template_tags' variable while inserting template to notes/to-dos.",
                 section: "templatesPlugin"
             },
-            "templatesSource":{
+            "templatesSource": {
                 public: true,
                 type: SettingItemType.String,
                 isEnum: true,
@@ -58,12 +59,18 @@ joplin.plugins.register({
 
 
         // Global variables
-        const dialogViewHandle = await joplin.views.dialogs.create("dialog");
+        const joplinGlobalApis = new PromiseGroup();
 
-        const userLocale = await joplin.settings.globalValue("locale");
-        const userDateFormat = await joplin.settings.globalValue("dateFormat");
-        const userTimeFormat = await joplin.settings.globalValue("timeFormat");
-        const profileDir = await joplin.settings.globalValue("profileDir");
+        joplinGlobalApis.set("dialogViewHandle", joplin.views.dialogs.create("dialog"));
+        joplinGlobalApis.set("userLocale", joplin.settings.globalValue("locale"));
+        joplinGlobalApis.set("userDateFormat", joplin.settings.globalValue("dateFormat"));
+        joplinGlobalApis.set("userTimeFormat", joplin.settings.globalValue("timeFormat"));
+        joplinGlobalApis.set("profileDir", joplin.settings.globalValue("profileDir"));
+
+        const {
+            dialogViewHandle, userLocale, userDateFormat,
+            userTimeFormat, profileDir
+        } = await joplinGlobalApis.groupAll();
 
         const dateAndTimeUtils = new DateAndTimeUtils(userLocale, userDateFormat, userTimeFormat);
         const logger = new Logger(profileDir);
@@ -89,31 +96,33 @@ joplin.plugins.register({
 
 
         // Register all commands
-        await joplin.commands.register({
+        const joplinCommands = new PromiseGroup();
+
+        joplinCommands.add(joplin.commands.register({
             name: "createNoteFromTemplate",
             label: "Create note from template",
             execute: async () => {
                 await getTemplateAndPerformAction(TemplateAction.NewNote);
             }
-        });
+        }));
 
-        await joplin.commands.register({
+        joplinCommands.add(joplin.commands.register({
             name: "createTodoFromTemplate",
             label: "Create to-do from template",
             execute: async () => {
                 await getTemplateAndPerformAction(TemplateAction.NewTodo);
             }
-        });
+        }));
 
-        await joplin.commands.register({
+        joplinCommands.add(joplin.commands.register({
             name: "insertTemplate",
             label: "Insert template",
             execute: async () => {
                 await getTemplateAndPerformAction(TemplateAction.InsertText);
             }
-        });
+        }));
 
-        await joplin.commands.register({
+        joplinCommands.add(joplin.commands.register({
             name: "showDefaultTemplates",
             label: "Show default templates",
             execute: async () => {
@@ -126,9 +135,9 @@ joplin.plugins.register({
                 await setDefaultTemplatesView(dialogViewHandle, noteTemplateTitle, todoTemplateTitle);
                 await joplin.views.dialogs.open(dialogViewHandle);
             }
-        });
+        }));
 
-        await joplin.commands.register({
+        joplinCommands.add(joplin.commands.register({
             name: "setDefaultNoteTemplate",
             label: "Set default note template",
             execute: async () => {
@@ -138,9 +147,9 @@ joplin.plugins.register({
                     await joplin.views.dialogs.showMessageBox("Default note template set successfully!");
                 }
             }
-        });
+        }));
 
-        await joplin.commands.register({
+        joplinCommands.add(joplin.commands.register({
             name: "setDefaultTodoTemplate",
             label: "Set default to-do template",
             execute: async () => {
@@ -150,9 +159,9 @@ joplin.plugins.register({
                     await joplin.views.dialogs.showMessageBox("Default to-do template set successfully!");
                 }
             }
-        });
+        }));
 
-        await joplin.commands.register({
+        joplinCommands.add(joplin.commands.register({
             name: "createNoteFromDefaultTemplate",
             label: "Create note from default template",
             execute: async () => {
@@ -162,9 +171,9 @@ joplin.plugins.register({
                 }
                 await joplin.views.dialogs.showMessageBox("No default note template is set.");
             }
-        });
+        }));
 
-        await joplin.commands.register({
+        joplinCommands.add(joplin.commands.register({
             name: "createTodoFromDefaultTemplate",
             label: "Create to-do from default template",
             execute: async () => {
@@ -174,17 +183,17 @@ joplin.plugins.register({
                 }
                 await joplin.views.dialogs.showMessageBox("No default to-do template is set.");
             }
-        });
+        }));
 
-        await joplin.commands.register({
+        joplinCommands.add(joplin.commands.register({
             name: "showPluginDocumentation",
             label: "Help",
             execute: async () => {
                 open(DOCUMENTATION_URL);
             }
-        });
+        }));
 
-        await joplin.commands.register({
+        joplinCommands.add(joplin.commands.register({
             name: "copyFolderID",
             label: "Copy notebook ID",
             execute: async (folderId: string) => {
@@ -196,7 +205,7 @@ joplin.plugins.register({
 
                 await joplin.commands.execute("editor.focus");
             }
-        });
+        }));
 
 
         // Create templates menu
@@ -239,6 +248,8 @@ joplin.plugins.register({
                 commandName: "showPluginDocumentation"
             }
         ]);
+
+        await joplinCommands.groupAll();
 
 
         // Folder context menu

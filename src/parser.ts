@@ -36,6 +36,7 @@ export class Parser {
         this.utils = dateAndTimeUtils;
         this.dialog = dialogViewHandle;
         this.logger = logger;
+        HelperFactory.registerHelpers(this.utils);
     }
 
     private getDefaultContext() {
@@ -228,8 +229,6 @@ export class Parser {
         template.body = this.preProcessTemplateBody(template.body);
 
         try {
-            HelperFactory.registerHelpers(this.utils);
-
             const processedTemplate = frontmatter(template.body);
             const templateVariables = processedTemplate.attributes;
 

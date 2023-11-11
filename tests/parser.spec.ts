@@ -68,6 +68,11 @@ describe("Template parser", () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
+
+        // Parser sets handlebars helpers only once in constructor block
+        // and it outlives the scope of the parser as the helpers are set on
+        // Handlebars level. So, just reset to default before running each test.
+        new Parser(dateAndTimeUtils, "variable-dialog", logger);
     });
 
     test("should parse built-in variables correctly", async () => {
