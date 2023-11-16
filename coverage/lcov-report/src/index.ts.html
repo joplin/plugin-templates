@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/85</span>
+                <span class='fraction'>0/90</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/83</span>
+                <span class='fraction'>0/88</span>
             </div>
         
             
@@ -304,7 +304,18 @@
 <a name='L245'></a><a href='#L245'>245</a>
 <a name='L246'></a><a href='#L246'>246</a>
 <a name='L247'></a><a href='#L247'>247</a>
-<a name='L248'></a><a href='#L248'>248</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L248'></a><a href='#L248'>248</a>
+<a name='L249'></a><a href='#L249'>249</a>
+<a name='L250'></a><a href='#L250'>250</a>
+<a name='L251'></a><a href='#L251'>251</a>
+<a name='L252'></a><a href='#L252'>252</a>
+<a name='L253'></a><a href='#L253'>253</a>
+<a name='L254'></a><a href='#L254'>254</a>
+<a name='L255'></a><a href='#L255'>255</a>
+<a name='L256'></a><a href='#L256'>256</a>
+<a name='L257'></a><a href='#L257'>257</a>
+<a name='L258'></a><a href='#L258'>258</a>
+<a name='L259'></a><a href='#L259'>259</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -314,6 +325,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -366,9 +378,15 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -391,9 +409,11 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -545,6 +565,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -561,6 +583,7 @@
 <span class="cstat-no" title="statement not covered" >import { loadLegacyTemplates } from "./legacyTemplates";</span>
 <span class="cstat-no" title="statement not covered" >import * as open from "open";</span>
 <span class="cstat-no" title="statement not covered" >import { Logger } from "./logger";</span>
+<span class="cstat-no" title="statement not covered" >import { PromiseGroup } from "./utils/promises";</span>
 &nbsp;
 const DOCUMENTATION_URL = <span class="cstat-no" title="statement not covered" >"https://github.com/joplin/plugin-templates#readme";</span>
 &nbsp;
@@ -594,7 +617,7 @@ const DOCUMENTATION_URL = <span class="cstat-no" title="statement not covered" >
                 description: "Apply tags using 'template_tags' variable while inserting template to notes/to-dos.",
                 section: "templatesPlugin"
             },
-            "templatesSource":{
+            "templatesSource": {
                 public: true,
                 type: SettingItemType.String,
                 isEnum: true,
@@ -611,12 +634,18 @@ const DOCUMENTATION_URL = <span class="cstat-no" title="statement not covered" >
 &nbsp;
 &nbsp;
         // Global variables
-        const dialogViewHandle = <span class="cstat-no" title="statement not covered" >await joplin.views.dialogs.create("dialog");</span>
+        const joplinGlobalApis = <span class="cstat-no" title="statement not covered" >new PromiseGroup();</span>
 &nbsp;
-        const userLocale = <span class="cstat-no" title="statement not covered" >await joplin.settings.globalValue("locale");</span>
-        const userDateFormat = <span class="cstat-no" title="statement not covered" >await joplin.settings.globalValue("dateFormat");</span>
-        const userTimeFormat = <span class="cstat-no" title="statement not covered" >await joplin.settings.globalValue("timeFormat");</span>
-        const profileDir = <span class="cstat-no" title="statement not covered" >await joplin.settings.globalValue("profileDir");</span>
+<span class="cstat-no" title="statement not covered" >        joplinGlobalApis.set("dialogViewHandle", joplin.views.dialogs.create("dialog"));</span>
+<span class="cstat-no" title="statement not covered" >        joplinGlobalApis.set("userLocale", joplin.settings.globalValue("locale"));</span>
+<span class="cstat-no" title="statement not covered" >        joplinGlobalApis.set("userDateFormat", joplin.settings.globalValue("dateFormat"));</span>
+<span class="cstat-no" title="statement not covered" >        joplinGlobalApis.set("userTimeFormat", joplin.settings.globalValue("timeFormat"));</span>
+<span class="cstat-no" title="statement not covered" >        joplinGlobalApis.set("profileDir", joplin.settings.globalValue("profileDir"));</span>
+&nbsp;
+        const {
+            dialogViewHandle, userLocale, userDateFormat,
+            userTimeFormat, profileDir
+        } = <span class="cstat-no" title="statement not covered" >await joplinGlobalApis.groupAll();</span>
 &nbsp;
         const dateAndTimeUtils = <span class="cstat-no" title="statement not covered" >new DateAndTimeUtils(userLocale, userDateFormat, userTimeFormat);</span>
         const logger = <span class="cstat-no" title="statement not covered" >new Logger(profileDir);</span>
@@ -642,31 +671,33 @@ const DOCUMENTATION_URL = <span class="cstat-no" title="statement not covered" >
 &nbsp;
 &nbsp;
         // Register all commands
-<span class="cstat-no" title="statement not covered" >        await joplin.commands.register({</span>
+        const joplinCommands = <span class="cstat-no" title="statement not covered" >new PromiseGroup();</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        joplinCommands.add(joplin.commands.register({</span>
             name: "createNoteFromTemplate",
             label: "Create note from template",
             execute: <span class="fstat-no" title="function not covered" >async () =</span>&gt;<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" > {</span></span>
 <span class="cstat-no" title="statement not covered" >                await getTemplateAndPerformAction(TemplateAction.NewNote);</span>
             }
-        });
+        }));
 &nbsp;
-<span class="cstat-no" title="statement not covered" >        await joplin.commands.register({</span>
+<span class="cstat-no" title="statement not covered" >        joplinCommands.add(joplin.commands.register({</span>
             name: "createTodoFromTemplate",
             label: "Create to-do from template",
             execute: <span class="fstat-no" title="function not covered" >async () =</span>&gt;<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" > {</span></span>
 <span class="cstat-no" title="statement not covered" >                await getTemplateAndPerformAction(TemplateAction.NewTodo);</span>
             }
-        });
+        }));
 &nbsp;
-<span class="cstat-no" title="statement not covered" >        await joplin.commands.register({</span>
+<span class="cstat-no" title="statement not covered" >        joplinCommands.add(joplin.commands.register({</span>
             name: "insertTemplate",
             label: "Insert template",
             execute: <span class="fstat-no" title="function not covered" >async () =</span>&gt;<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" > {</span></span>
 <span class="cstat-no" title="statement not covered" >                await getTemplateAndPerformAction(TemplateAction.InsertText);</span>
             }
-        });
+        }));
 &nbsp;
-<span class="cstat-no" title="statement not covered" >        await joplin.commands.register({</span>
+<span class="cstat-no" title="statement not covered" >        joplinCommands.add(joplin.commands.register({</span>
             name: "showDefaultTemplates",
             label: "Show default templates",
             execute: <span class="fstat-no" title="function not covered" >async () =</span>&gt;<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" > {</span></span>
@@ -679,9 +710,9 @@ const DOCUMENTATION_URL = <span class="cstat-no" title="statement not covered" >
 <span class="cstat-no" title="statement not covered" >                await setDefaultTemplatesView(dialogViewHandle, noteTemplateTitle, todoTemplateTitle);</span>
 <span class="cstat-no" title="statement not covered" >                await joplin.views.dialogs.open(dialogViewHandle);</span>
             }
-        });
+        }));
 &nbsp;
-<span class="cstat-no" title="statement not covered" >        await joplin.commands.register({</span>
+<span class="cstat-no" title="statement not covered" >        joplinCommands.add(joplin.commands.register({</span>
             name: "setDefaultNoteTemplate",
             label: "Set default note template",
             execute: <span class="fstat-no" title="function not covered" >async () =</span>&gt;<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" > {</span></span>
@@ -691,9 +722,9 @@ const DOCUMENTATION_URL = <span class="cstat-no" title="statement not covered" >
 <span class="cstat-no" title="statement not covered" >                    await joplin.views.dialogs.showMessageBox("Default note template set successfully!");</span>
                 }
             }
-        });
+        }));
 &nbsp;
-<span class="cstat-no" title="statement not covered" >        await joplin.commands.register({</span>
+<span class="cstat-no" title="statement not covered" >        joplinCommands.add(joplin.commands.register({</span>
             name: "setDefaultTodoTemplate",
             label: "Set default to-do template",
             execute: <span class="fstat-no" title="function not covered" >async () =</span>&gt;<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" > {</span></span>
@@ -703,9 +734,9 @@ const DOCUMENTATION_URL = <span class="cstat-no" title="statement not covered" >
 <span class="cstat-no" title="statement not covered" >                    await joplin.views.dialogs.showMessageBox("Default to-do template set successfully!");</span>
                 }
             }
-        });
+        }));
 &nbsp;
-<span class="cstat-no" title="statement not covered" >        await joplin.commands.register({</span>
+<span class="cstat-no" title="statement not covered" >        joplinCommands.add(joplin.commands.register({</span>
             name: "createNoteFromDefaultTemplate",
             label: "Create note from default template",
             execute: <span class="fstat-no" title="function not covered" >async () =</span>&gt;<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" > {</span></span>
@@ -715,9 +746,9 @@ const DOCUMENTATION_URL = <span class="cstat-no" title="statement not covered" >
                 }
 <span class="cstat-no" title="statement not covered" >                await joplin.views.dialogs.showMessageBox("No default note template is set.");</span>
             }
-        });
+        }));
 &nbsp;
-<span class="cstat-no" title="statement not covered" >        await joplin.commands.register({</span>
+<span class="cstat-no" title="statement not covered" >        joplinCommands.add(joplin.commands.register({</span>
             name: "createTodoFromDefaultTemplate",
             label: "Create to-do from default template",
             execute: <span class="fstat-no" title="function not covered" >async () =</span>&gt;<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" > {</span></span>
@@ -727,17 +758,17 @@ const DOCUMENTATION_URL = <span class="cstat-no" title="statement not covered" >
                 }
 <span class="cstat-no" title="statement not covered" >                await joplin.views.dialogs.showMessageBox("No default to-do template is set.");</span>
             }
-        });
+        }));
 &nbsp;
-<span class="cstat-no" title="statement not covered" >        await joplin.commands.register({</span>
+<span class="cstat-no" title="statement not covered" >        joplinCommands.add(joplin.commands.register({</span>
             name: "showPluginDocumentation",
             label: "Help",
             execute: <span class="fstat-no" title="function not covered" >async () =</span>&gt;<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" > {</span></span>
 <span class="cstat-no" title="statement not covered" >                open(DOCUMENTATION_URL);</span>
             }
-        });
+        }));
 &nbsp;
-<span class="cstat-no" title="statement not covered" >        await joplin.commands.register({</span>
+<span class="cstat-no" title="statement not covered" >        joplinCommands.add(joplin.commands.register({</span>
             name: "copyFolderID",
             label: "Copy notebook ID",
             execute: <span class="fstat-no" title="function not covered" >async (f</span>olderId: string) =&gt;<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" > {</span></span>
@@ -749,7 +780,7 @@ const DOCUMENTATION_URL = <span class="cstat-no" title="statement not covered" >
 &nbsp;
 <span class="cstat-no" title="statement not covered" >                await joplin.commands.execute("editor.focus");</span>
             }
-        });
+        }));
 &nbsp;
 &nbsp;
         // Create templates menu
@@ -793,6 +824,8 @@ const DOCUMENTATION_URL = <span class="cstat-no" title="statement not covered" >
             }
         ]);
 &nbsp;
+<span class="cstat-no" title="statement not covered" >        await joplinCommands.groupAll();</span>
+&nbsp;
 &nbsp;
         // Folder context menu
 <span class="cstat-no" title="statement not covered" >        await joplin.views.menuItems.create("templates_folderid", "copyFolderID", MenuItemLocation.FolderContextMenu);</span>
@@ -805,7 +838,7 @@ const DOCUMENTATION_URL = <span class="cstat-no" title="statement not covered" >
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Fri Nov 10 2023 17:06:13 GMT+0000 (Coordinated Universal Time)
+                at Thu Nov 16 2023 20:18:35 GMT+0000 (Coordinated Universal Time)
             </div>
         </div>
         <script src="../prettify.js"></script>

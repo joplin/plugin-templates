@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for src/variables/parser.ts</title>
+    <title>Code coverage report for src/utils/promises.ts</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../../prettify.css" />
     <link rel="stylesheet" href="../../base.css" />
@@ -19,34 +19,34 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../index.html">All files</a> / <a href="index.html">src/variables</a> parser.ts</h1>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">src/utils</a> promises.ts</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">94.12% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>16/17</span>
+                <span class='fraction'>0/16</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>1/2</span>
+                <span class='fraction'>0/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>1/1</span>
+                <span class='fraction'>0/5</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">94.12% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>16/17</span>
+                <span class='fraction'>0/14</span>
             </div>
         
             
@@ -55,7 +55,7 @@
             Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
         </p>
     </div>
-    <div class='status-line high'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -88,78 +88,66 @@
 <a name='L29'></a><a href='#L29'>29</a>
 <a name='L30'></a><a href='#L30'>30</a>
 <a name='L31'></a><a href='#L31'>31</a>
-<a name='L32'></a><a href='#L32'>32</a>
-<a name='L33'></a><a href='#L33'>33</a>
-<a name='L34'></a><a href='#L34'>34</a>
-<a name='L35'></a><a href='#L35'>35</a>
-<a name='L36'></a><a href='#L36'>36</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">39x</span>
-<span class="cline-any cline-yes">102x</span>
-<span class="cline-any cline-yes">102x</span>
-<span class="cline-any cline-yes">39x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">63x</span>
-<span class="cline-any cline-yes">63x</span>
+<a name='L32'></a><a href='#L32'>32</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { CustomVariable, InvalidDefinitionError } from "./types/base";
-import { BooleanCustomVariable } from "./types/boolean";
-import { DateCustomVariable } from "./types/date";
-import { EnumCustomVariable } from "./types/enum";
-import { InvalidCustomVariable } from "./types/invalid";
-import { NumberCustomVariable } from "./types/number";
-import { TextCustomVariable } from "./types/text";
-import { TimeCustomVariable } from "./types/time";
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/* eslint-disable @typescript-eslint/no-explicit-any */
+<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >export class P</span></span>romiseGroup {
+    private <span class="cstat-no" title="statement not covered" >promises: { [key: string]: Promise&lt;any&gt; } = {};</span>
+    private <span class="cstat-no" title="statement not covered" >unnamedPromises: Promise&lt;any&gt;[] = [];</span>
 &nbsp;
-// NOTE - InvalidCustomVariable should be at the last of the list
-// because it accepts any definition.
-const VARIABLE_TYPES = [
-    TextCustomVariable,
-    NumberCustomVariable,
-    BooleanCustomVariable,
-    DateCustomVariable,
-    TimeCustomVariable,
-    EnumCustomVariable,
-    InvalidCustomVariable
-];
+    public <span class="fstat-no" title="function not covered" >add(</span>promise: Promise&lt;any&gt;): void {
+<span class="cstat-no" title="statement not covered" >        this.unnamedPromises.push(promise);</span>
+    }
 &nbsp;
-export const getVariableFromDefinition = (name: string, definition: unknown): CustomVariable =&gt; {
-    for (const variableType of VARIABLE_TYPES) {
-        try {
-            const variable = variableType.createFromDefinition(name, definition);
-            return variable;
-        } catch (err) {
-            <span class="missing-if-branch" title="else path not taken" >E</span>if (err instanceof InvalidDefinitionError) {
-                continue;
-            }
-&nbsp;
-<span class="cstat-no" title="statement not covered" >            throw err;</span>
+    public <span class="fstat-no" title="function not covered" >set(</span>key: string, promise: Promise&lt;any&gt;): void {
+<span class="cstat-no" title="statement not covered" >        if (key in this.promises) {</span>
+<span class="cstat-no" title="statement not covered" >            throw new Error(`key: ${key} already in use`);</span>
         }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        this.promises[key] = promise;</span>
+    }
+&nbsp;
+    public async <span class="fstat-no" title="function not covered" >groupAll(</span>): Promise&lt;{[key: string]: any}&gt; {
+        const namedPromises = <span class="cstat-no" title="statement not covered" >Object.entries(this.promises);</span>
+        const allPromises = <span class="cstat-no" title="statement not covered" >[...this.unnamedPromises, ...namedPromises.map(<span class="fstat-no" title="function not covered" >np </span>=&gt; <span class="cstat-no" title="statement not covered" >np[1])</span>];</span>
+&nbsp;
+        const resolvedPromises = <span class="cstat-no" title="statement not covered" >await Promise.all(allPromises);</span>
+&nbsp;
+        const res = <span class="cstat-no" title="statement not covered" >{};</span>
+<span class="cstat-no" title="statement not covered" >        for (let i = <span class="cstat-no" title="statement not covered" >0;</span> i &lt; namedPromises.length; i++) {</span>
+<span class="cstat-no" title="statement not covered" >            res[namedPromises[i][0]] = resolvedPromises[this.unnamedPromises.length + i];</span>
+        }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        return res;</span>
     }
 }
 &nbsp;</pre></td></tr></table></pre>
