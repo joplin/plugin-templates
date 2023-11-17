@@ -1,11 +1,14 @@
-name: Coverage report
+name: Coverage
 on:
   push:
     branches:
       - master
-
+    paths:
+      - src/**
+      - tests/**
+      - .github/workflows/coverage.yml
 jobs:
-  coverage:
+  publish:
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:
@@ -17,9 +20,16 @@ jobs:
         run: npm install
       - name: Generage coverage report
         run: npm run coverage
-      - name: Push changes
-        run: |
-          git config --global user.name "Albus"
-          git config --global user.email "bot@nishantwrp.com"
-          git add .; git commit -m "chore: update coverage report"
-          git push
+      - name: Push to store repository
+        uses: cpina/github-action-push-to-another-repository@main
+        env:
+          SSH_DEPLOY_KEY: {{ secrets.STORE_DEPLOY_KEY }}
+        with:
+          source-directory: 'coverage'
+          target-directory: 'coverage'
+          destination-github-username: 'nishantwrp'
+          destination-repository-name: 'joplin-plugin-templates-store'
+          create-target-branch-if-needed: true
+          user-name: 'Albus'
+          user-email: 'bot@nishantwrp.com'
+          target-branch: main
