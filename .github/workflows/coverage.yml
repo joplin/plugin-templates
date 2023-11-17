@@ -30,6 +30,7 @@ jobs:
           destination-github-username: 'nishantwrp'
           destination-repository-name: 'joplin-plugin-templates-store'
           create-target-branch-if-needed: true
+          commit-message: 'chore: update coverage report (ORIGIN_COMMIT)'
           user-name: 'Albus'
           user-email: 'bot@nishantwrp.com'
           target-branch: main
