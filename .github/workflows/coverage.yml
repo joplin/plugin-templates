@@ -23,7 +23,7 @@ jobs:
       - name: Push to store repository
         uses: cpina/github-action-push-to-another-repository@main
         env:
-          SSH_DEPLOY_KEY: {{ secrets.STORE_DEPLOY_KEY }}
+          SSH_DEPLOY_KEY: ${{ secrets.STORE_DEPLOY_KEY }}
         with:
           source-directory: 'coverage'
           target-directory: 'coverage'
