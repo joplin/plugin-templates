@@ -17,5 +17,10 @@ export default {
         globalValue: async (setting: string): Promise<string> => { return ""; },
         value: async (setting: string): Promise<string> => { return ""; }
     },
-    require: (): unknown => { return ""; }
+    require: (): unknown => { return ""; },
+    data: {
+        post: async (path: unknown, query?: any, body?: any, files?: any[]): Promise<any> => {
+            return Promise.resolve({});
+        }
+    }
 };
