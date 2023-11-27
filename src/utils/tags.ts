@@ -8,6 +8,8 @@ export interface Tag {
 }
 
 export const getAllTagsWithTitle = async (title: string): Promise<Tag[]> => {
+    if(!title) return [];
+
     return (await fetchAllItems(["search"], { query: title, type: "tag" })).map(tag => {
         return {
             id: tag.id,
@@ -17,6 +19,8 @@ export const getAllTagsWithTitle = async (title: string): Promise<Tag[]> => {
 }
 
 export const getAnyTagWithTitle = async (title: string): Promise<Tag> => {
+    if(!title) throw new Error("empty title");
+
     const existingTags = await getAllTagsWithTitle(title);
     if (existingTags.length) {
         return existingTags[0];
@@ -30,9 +34,14 @@ export const getAnyTagWithTitle = async (title: string): Promise<Tag> => {
 }
 
 export const getAllNotesWithTag = async (tagId: string): Promise<Note[]> => {
+    if(!tagId) return [];
+
     return fetchAllItems(["tags", tagId, "notes"], { fields: ["id", "title", "body"] });
 }
 
 export const applyTagToNote = async (tagId: string, noteId: string): Promise<void> => {
+    if(!tagId) throw new Error("empty tag id");
+    if(!noteId) throw new Error("empty note id");
+
     await joplin.data.post(["tags", tagId, "notes"], null, { id: noteId });
 }
