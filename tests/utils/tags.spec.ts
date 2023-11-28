@@ -153,8 +153,8 @@ describe("applyTagToNote", () => {
     });
 
     test("should call the post api with given arguments", async () => {
-        const tagId: string = "54";
-        const noteId: string = "23";
+        const tagId = "54";
+        const noteId = "23";
 
         const mockPost = jest.spyOn(joplin.data, "post");
         mockPost.mockResolvedValue({});
