@@ -142,13 +142,14 @@ These are the variables that have a specific purpose other than being used in te
 - Both built-in and custom variables can be used while defining these variables.
 - The values of these variables can be used in the template body just like built-in and custom variables.
 
-Currently there are two special variables.
+Currently there are four special variables.
 
 | Variable | Purpose | Example |
 | --- | --- | --- |
 | `template_title` | Title of the note/to-do created using this template. | template_title: Standup - {{ date }} |
 | `template_tags` | Comma separated tags to be applied to the note/to-do created  using this template. | template_tags: spec, {{ project }} |
 | `template_notebook` | The ID of the target notebook for this template. Whenever a new note/to-do will be created by this template, it will be created in this target notebook. | template_notebook: 82d2384b025f44588e4d3851a1237028 |
+| `template_auto_incremented_prefix` | Adds an automatically incremented ID with "prefix string-incremented id: " format to the the title as a prefix. | template_auto_incremented_prefix: "prefix string" |
 
 **Points to note**
 - If `template_title` is not provided, the title of the template will be used as a fallback value.

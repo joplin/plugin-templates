@@ -1,7 +1,13 @@
+import { Path } from "api/types";
+
 export default {
     commands: {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         execute: async (cmd: string, props: unknown): Promise<unknown> => { return ""; }
+    },
+    data: {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        get: async (path: Path, query?: unknown): Promise<unknown> => { return { items: [], has_more: false }; }
     },
     views: {
         dialogs: {
