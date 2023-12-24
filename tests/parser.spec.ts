@@ -344,7 +344,6 @@ describe("Template parser", () => {
     test("should parse auto incremented prefix special variables correctly", async () => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         jest.spyOn(joplin.data, "get").mockImplementation(async (path, query) => {
-            console.log("GET CALLED");
             return { items: [], has_more: false };
         });
         const parsedTemplate = await parser.parseTemplate({
@@ -363,7 +362,6 @@ describe("Template parser", () => {
     test("should parse auto incremented prefix special variables and increment title correctly", async () => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         jest.spyOn(joplin.data, "get").mockImplementation(async (path, query) => {
-            console.log("GET CALLED");
             return {
                 items: [{
                     id: "notebook id",
