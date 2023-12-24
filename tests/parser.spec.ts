@@ -341,6 +341,50 @@ describe("Template parser", () => {
         `);
     });
 
+    test("should parse auto incremented prefix special variables correctly", async () => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        jest.spyOn(joplin.data, "get").mockImplementation(async (path, query) => {
+            console.log("GET CALLED");
+            return { items: [], has_more: false };
+        });
+        const parsedTemplate = await parser.parseTemplate({
+            id: "note-id",
+            title: "Some template",
+            body: dedent`
+                ---
+                template_auto_incremented_prefix: "TEST"
+
+                ---
+            `
+        });
+        expect(parsedTemplate.title).toEqual("TEST-1: Some template");
+    });
+
+    test("should parse auto incremented prefix special variables and increment title correctly", async () => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        jest.spyOn(joplin.data, "get").mockImplementation(async (path, query) => {
+            console.log("GET CALLED");
+            return {
+                items: [{
+                    id: "notebook id",
+                    title: "TEST-100: Some template",
+                }],
+                has_more: false
+            };
+        });
+        const parsedTemplate = await parser.parseTemplate({
+            id: "note-id",
+            title: "Some template",
+            body: dedent`
+                ---
+                template_auto_incremented_prefix: "TEST"
+
+                ---
+            `
+        });
+        expect(parsedTemplate.title).toEqual("TEST-101: Some template");
+    });
+
     test("should show an error message if value of a special variable is not a string", async () => {
         const template = {
             id: "note-id",

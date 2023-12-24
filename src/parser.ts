@@ -25,12 +25,18 @@ export interface NewNote {
 const NOTE_TITLE_VARIABLE_NAME = "template_title";
 const NOTE_TAGS_VARIABLE_NAME = "template_tags";
 const NOTE_FOLDER_VARIABLE_NAME = "template_notebook";
+const AUTO_INCREMENTED_PREFIX_VARIABLE_NAME = "template_auto_incremented_prefix";
 
 export class Parser {
     private utils: DateAndTimeUtils;
     private dialog: string;
     private logger: Logger;
-    private specialVariableNames = [NOTE_TITLE_VARIABLE_NAME, NOTE_TAGS_VARIABLE_NAME, NOTE_FOLDER_VARIABLE_NAME];
+    private specialVariableNames = [
+        NOTE_TITLE_VARIABLE_NAME,
+        NOTE_TAGS_VARIABLE_NAME,
+        NOTE_FOLDER_VARIABLE_NAME,
+        AUTO_INCREMENTED_PREFIX_VARIABLE_NAME
+    ];
 
     constructor(dateAndTimeUtils: DateAndTimeUtils, dialogViewHandle: string, logger: Logger) {
         this.utils = dateAndTimeUtils;
@@ -136,6 +142,34 @@ export class Parser {
 
         if (NOTE_TITLE_VARIABLE_NAME in parsedSpecialVariables) {
             meta.title = parsedSpecialVariables[NOTE_TITLE_VARIABLE_NAME];
+        }
+
+        if (AUTO_INCREMENTED_PREFIX_VARIABLE_NAME in parsedSpecialVariables) {
+            const prefix = parsedSpecialVariables[AUTO_INCREMENTED_PREFIX_VARIABLE_NAME];
+            const prefixRegexp = new RegExp(`^${prefix}-([0-9]+): `);
+
+            let maximum = 0;
+            let pageNumber = 0;
+            let response: { items: { id: string, title: string }[], has_more: boolean };
+            do {
+                response = await joplin.data.get(["search"], {
+                    query: `title:"^${prefix}"`,
+                    fields: ["id", "title"],
+                    page: pageNumber++,
+                });
+
+                for (const item of response.items ?? []) {
+                    const match = item.title.match(prefixRegexp);
+                    if (match) {
+                        const id = parseInt(match[1]);
+                        if (!Number.isNaN(id) && maximum < id) {
+                            maximum = id;
+                        }
+                    }
+                }
+            } while (response && response.has_more);
+
+            meta.title = `${prefix}-${maximum + 1}: ${meta.title}`;
         }
 
         if (NOTE_TAGS_VARIABLE_NAME in parsedSpecialVariables) {
