@@ -58,7 +58,7 @@ describe("Template parser", () => {
     };
 
     beforeAll(() => {
-        jest.useFakeTimers("modern");
+        jest.useFakeTimers();
         jest.setSystemTime(testTime);
     });
 
