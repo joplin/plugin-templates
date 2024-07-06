@@ -13,8 +13,8 @@
     "platforms": ["desktop"],
     "screenshots": [
         {
-          "src": "img/showcase1.png",
-          "label": "Screenshot: Showing the Template menue"
+            "src": "img/showcase1.png",
+            "label": "Screenshot: Showing the Template menue"
         },
         {
             "src": "img/showcase2.png",
@@ -27,5 +27,5 @@
     ],
     "icons": {
         "256": "img/icon_256.png"
-      }
+    }
 }
