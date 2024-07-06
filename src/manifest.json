@@ -11,4 +11,21 @@
     "keywords": ["template", "tempaltes"],
     "categories": ["productivity"],
     "platforms": ["desktop"],
+    "screenshots": [
+        {
+          "src": "img/showcase1.png",
+          "label": "Screenshot: Showing the Template menue"
+        },
+        {
+            "src": "img/showcase2.png",
+            "label": "Screenshot: Enter the template variables"
+        },
+        {
+            "src": "img/showcase3.png",
+            "label": "Screenshot: Example Template Note"
+        }
+    ],
+    "icons": {
+        "256": "img/icon_256.png"
+      }
 }
