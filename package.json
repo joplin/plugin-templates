@@ -2,15 +2,16 @@
   "name": "joplin-plugin-templates",
   "version": "2.4.0",
   "scripts": {
-    "dist": "webpack --joplin-plugin-config buildMain && webpack --joplin-plugin-config buildExtraScripts && webpack --joplin-plugin-config createArchive",
+    "dist": "webpack --env joplin-plugin-config=buildMain && webpack --env joplin-plugin-config=buildExtraScripts && webpack --env joplin-plugin-config=createArchive",
     "prepare": "npm run dist",
-    "update": "npm install -g generator-joplin && yo joplin --update",
+    "update": "npm install -g generator-joplin && yo joplin --node-package-manager npm --update --force",
     "lint": "eslint '{src,tests}/**/*.{ts,json}'",
     "release": "standard-version",
     "test": "jest",
     "coverage": "jest --coverage",
     "announce": "node scripts/announceRelease.js",
-    "postpublish": "npm run announce"
+    "postpublish": "npm run announce",
+    "updateVersion": "webpack --env joplin-plugin-config=updateVersion"
   },
   "standard-version": {
     "skip": {
@@ -27,27 +28,28 @@
     "fs": false
   },
   "devDependencies": {
-    "@types/jest": "^27.0.0",
-    "@types/node": "^14.0.14",
+    "@joplin/lib": "~2.9",
+    "@types/jest": "^29.5.12",
+    "@types/node": "^18.7.13",
     "@typescript-eslint/eslint-plugin": "^4.26.0",
     "@typescript-eslint/parser": "^4.26.0",
     "axios": "^0.21.1",
     "chalk": "^4.1.0",
-    "copy-webpack-plugin": "^6.1.0",
+    "copy-webpack-plugin": "^11.0.0",
     "dedent": "^0.7.0",
     "dotenv": "^10.0.0",
     "eslint": "^7.27.0",
-    "fs-extra": "^9.0.1",
-    "glob": "^7.1.6",
-    "jest": "^27.0.6",
+    "fs-extra": "^10.1.0",
+    "glob": "^8.0.3",
+    "jest": "^29.7.0",
     "on-build-webpack": "^0.1.0",
     "standard-version": "^9.3.1",
-    "tar": "^6.0.5",
-    "ts-jest": "^27.0.4",
-    "ts-loader": "^7.0.5",
-    "typescript": "^3.9.3",
-    "webpack": "^4.43.0",
-    "webpack-cli": "^3.3.11",
+    "tar": "^6.1.11",
+    "ts-jest": "^29.1.5",
+    "ts-loader": "^9.3.1",
+    "typescript": "^4.8.2",
+    "webpack": "^5.74.0",
+    "webpack-cli": "^4.10.0",
     "yargs": "^16.2.0"
   },
   "dependencies": {
@@ -56,5 +58,8 @@
     "html-entities": "^2.3.2",
     "moment": "^2.29.1",
     "open": "^8.2.1"
-  }
+  },
+  "files": [
+    "publish"
+  ]
 }
