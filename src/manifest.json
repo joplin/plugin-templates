@@ -6,7 +6,9 @@
     "name": "Templates",
     "description": "This plugin allows you to create and use templates in Joplin.",
     "author": "Nishant Mittal",
-    "homepage_url": "https://github.com/joplin/plugin-templates",
+    "homepage_url": "https://github.com/joplin/plugin-templates/blob/master/README.md",
     "repository_url": "https://github.com/joplin/plugin-templates",
-    "keywords": []
+    "keywords": ["template", "tempaltes"],
+    "categories": ["productivity"],
+    "platforms": ["desktop"],
 }
