@@ -1,5 +1,5 @@
 <h1 align="center">
-    Templates Plugin
+    Templates Plugin <img src=img/icon_32.png>
     <br/>
     <center>
         <img src="https://github.com/joplin/plugin-templates/actions/workflows/ci.yml/badge.svg">
@@ -9,6 +9,8 @@
 </h1>
 
 This plugin allows you to create templates in Joplin and use them to create new notes and to-dos.
+
+<img src=img/main.png>
 
 ## Table of contents
 
