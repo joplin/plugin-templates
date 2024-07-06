@@ -7,7 +7,7 @@ describe("Date and time utils", () => {
     const testTime = 1628787894117; // Thursday 12 August 2021, 17:04:54 UTC
 
     beforeAll(() => {
-        jest.useFakeTimers("modern");
+        jest.useFakeTimers();
         jest.setSystemTime(testTime);
     });
 
