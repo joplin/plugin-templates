@@ -3,7 +3,8 @@ import { MenuItemLocation, SettingItemType } from "api/types";
 import { Parser } from "./parser";
 import { DateAndTimeUtils } from "./utils/dateAndTime";
 import { getFolderFromId, getSelectedFolder, getUserFolderSelection, Folder } from "./utils/folders";
-import { getTemplateFromId, getUserDefaultTemplateTypeSelection, getUserTemplateSelection, setDefaultTemplate, Note, DefaultTemplatesConfigSetting } from "./utils/templates";
+import { clearDefaultTemplates, getNotebookDefaultTemplatesConfig, getUserDefaultTemplateTypeSelection, setDefaultTemplate, DefaultTemplatesConfigSetting } from "./utils/defaultTemplates";
+import { getTemplateFromId, getUserTemplateSelection, Note } from "./utils/templates";
 import { setDefaultTemplatesView, DefaultTemplatesDisplayData, NotebookDefaultTemplatesDisplayData } from "./views/defaultTemplates";
 import { TemplateAction, performAction } from "./actions";
 import { loadLegacyTemplates } from "./legacyTemplates";
@@ -109,8 +110,11 @@ joplin.plugins.register({
                 promiseGroup.set("todoTemplate", getTemplateFromId(defaultTemplateTodoId));
                 const { notebook, noteTemplate, todoTemplate } = await promiseGroup.groupAll();
 
-                // TODO: We can remove the deleted notebooks from settings storage.
-                if (notebook === null) return null;
+                if (notebook === null || (noteTemplate === null && todoTemplate === null)) {
+                    // Async remove of the obsolete config
+                    clearDefaultTemplates(notebookId);
+                    return null;
+                }
                 return {
                     notebookTitle: notebook.title,
                     defaultNoteTemplateTitle: noteTemplate ? noteTemplate.title : null,
@@ -160,9 +164,7 @@ joplin.plugins.register({
             execute: async () => {
                 const noteTemplate = await getTemplateFromId(await joplin.settings.value("defaultNoteTemplateId"));
                 const todoTemplate = await getTemplateFromId(await joplin.settings.value("defaultTodoTemplateId"));
-
-                let defaultTemplatesConfig: DefaultTemplatesConfigSetting | null = await joplin.settings.value("defaultTemplatesConfig");
-                if (defaultTemplatesConfig === null) defaultTemplatesConfig = {};
+                const defaultTemplatesConfig = await getNotebookDefaultTemplatesConfig();
 
                 const globalDefaultTemplates: DefaultTemplatesDisplayData = {
                     defaultNoteTemplateTitle: noteTemplate ? noteTemplate.title : null,
@@ -209,15 +211,26 @@ joplin.plugins.register({
         }));
 
         joplinCommands.add(joplin.commands.register({
+            name: "clearDefaultTemplatesForNotebook",
+            label: "Clear default templates for notebook",
+            execute: async () => {
+                const folder: Folder | null = JSON.parse(await getUserFolderSelection());
+                if (folder === null) return;
+
+                await clearDefaultTemplates(folder.id);
+                await joplin.views.dialogs.showMessageBox(`Default templates for "${folder.title}" cleared successfully!`);
+            }
+        }));
+
+        joplinCommands.add(joplin.commands.register({
             name: "createNoteFromDefaultTemplate",
             label: "Create note from default template",
             execute: async () => {
                 let defaultTemplate: Note | null = null;
 
-                let defaultTemplatesConfig: DefaultTemplatesConfigSetting | null = await joplin.settings.value("defaultTemplatesConfig");
-                if (defaultTemplatesConfig === null) defaultTemplatesConfig = {};
-
+                const defaultTemplatesConfig = await getNotebookDefaultTemplatesConfig();
                 const currentFolderId = await getSelectedFolder();
+
                 if (currentFolderId in defaultTemplatesConfig) {
                     defaultTemplate = await getTemplateFromId(defaultTemplatesConfig[currentFolderId].defaultNoteTemplateId);
                 }
@@ -239,10 +252,9 @@ joplin.plugins.register({
             execute: async () => {
                 let defaultTemplate: Note | null = null;
 
-                let defaultTemplatesConfig: DefaultTemplatesConfigSetting | null = await joplin.settings.value("defaultTemplatesConfig");
-                if (defaultTemplatesConfig === null) defaultTemplatesConfig = {};
-
+                const defaultTemplatesConfig = await getNotebookDefaultTemplatesConfig();
                 const currentFolderId = await getSelectedFolder();
+
                 if (currentFolderId in defaultTemplatesConfig) {
                     defaultTemplate = await getTemplateFromId(defaultTemplatesConfig[currentFolderId].defaultTodoTemplateId);
                 }
@@ -314,7 +326,10 @@ joplin.plugins.register({
                     },
                     {
                         commandName: "setDefaultTemplateForNotebook"
-                    }
+                    },
+                    {
+                        commandName: "clearDefaultTemplatesForNotebook"
+                    },
                 ]
             },
             {
