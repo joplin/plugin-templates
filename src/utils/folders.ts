@@ -14,6 +14,19 @@ export const getSelectedFolder = async (): Promise<string> => {
     return folder.id;
 }
 
+export const getFolderFromId = async (folderId: string | null): Promise<Folder | null> => {
+    if (!folderId) {
+        return null;
+    }
+
+    try {
+        return await joplin.data.get([ "folders", folderId ], { fields: ["id", "title"] });
+    } catch (error) {
+        console.error("There was an error loading a folder from id", error);
+        return null;
+    }
+}
+
 export const createFolder = async (title: string): Promise<string> => {
     const folder = await joplin.data.post(["folders"], null, { title: title });
     return folder.id;

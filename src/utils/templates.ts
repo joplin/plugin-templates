@@ -10,8 +10,8 @@ export interface Note {
 
 export interface DefaultTemplatesConfigSetting {
     [notebookId: string]: {
-        default_note_template: string | null;
-        default_todo_template: string | null;
+        defaultNoteTemplateId: string | null;
+        defaultTodoTemplateId: string | null;
     }
 }
 
@@ -164,21 +164,21 @@ export const setDefaultTemplate = async (notebookId: string | null, templateId: 
 
         if (!(notebookId in defaultTemplatesConfig)) {
             defaultTemplatesConfig[notebookId] = {
-                default_note_template: null,
-                default_todo_template: null
+                defaultNoteTemplateId: null,
+                defaultTodoTemplateId: null
             };
         }
 
         switch (defaultType) {
             case DefaultTemplateType.Note:
-                defaultTemplatesConfig[notebookId].default_note_template = templateId;
+                defaultTemplatesConfig[notebookId].defaultNoteTemplateId = templateId;
                 break;
             case DefaultTemplateType.Todo:
-                defaultTemplatesConfig[notebookId].default_todo_template = templateId;
+                defaultTemplatesConfig[notebookId].defaultTodoTemplateId = templateId;
                 break;
             case DefaultTemplateType.Both:
-                defaultTemplatesConfig[notebookId].default_note_template = templateId;
-                defaultTemplatesConfig[notebookId].default_todo_template = templateId;
+                defaultTemplatesConfig[notebookId].defaultNoteTemplateId = templateId;
+                defaultTemplatesConfig[notebookId].defaultTodoTemplateId = templateId;
                 break;
             default:
                 break;

@@ -3,12 +3,15 @@ export class PromiseGroup {
     private promises: { [key: string]: Promise<any> } = {};
     private unnamedPromises: Promise<any>[] = [];
 
+    // TODO: This has become too hacky. Refactor it.
+    public static UNNAMED_KEY = "__unnamed__";
+
     public add(promise: Promise<any>): void {
         this.unnamedPromises.push(promise);
     }
 
     public set(key: string, promise: Promise<any>): void {
-        if (key in this.promises) {
+        if (key in this.promises || key === PromiseGroup.UNNAMED_KEY) {
             throw new Error(`key: ${key} already in use`);
         }
 
@@ -26,6 +29,7 @@ export class PromiseGroup {
             res[namedPromises[i][0]] = resolvedPromises[this.unnamedPromises.length + i];
         }
 
+        res[PromiseGroup.UNNAMED_KEY] = resolvedPromises.slice(0, this.unnamedPromises.length);
         return res;
     }
 }

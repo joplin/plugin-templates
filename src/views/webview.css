@@ -3,6 +3,16 @@ body {
     font-size: 14px;
 }
 
+table {
+    border-style: solid;
+    border-collapse: collapse;
+}
+
+th, td {
+    border-style: solid;
+    padding: 5px;
+}
+
 .variableName {
     font-weight: bold;
     margin-bottom: 5px;
