@@ -20,17 +20,19 @@ export interface NewNote {
     tags: string[];
     body: string;
     folder: string | null;
+    todo_due: number | null;
 }
 
 const NOTE_TITLE_VARIABLE_NAME = "template_title";
 const NOTE_TAGS_VARIABLE_NAME = "template_tags";
 const NOTE_FOLDER_VARIABLE_NAME = "template_notebook";
+const TODO_DUE_VARIABLE_NAME = "template_todo_alarm";
 
 export class Parser {
     private utils: DateAndTimeUtils;
     private dialog: string;
     private logger: Logger;
-    private specialVariableNames = [NOTE_TITLE_VARIABLE_NAME, NOTE_TAGS_VARIABLE_NAME, NOTE_FOLDER_VARIABLE_NAME];
+    private specialVariableNames = [NOTE_TITLE_VARIABLE_NAME, NOTE_TAGS_VARIABLE_NAME, NOTE_FOLDER_VARIABLE_NAME, TODO_DUE_VARIABLE_NAME];
 
     constructor(dateAndTimeUtils: DateAndTimeUtils, dialogViewHandle: string, logger: Logger) {
         this.utils = dateAndTimeUtils;
@@ -131,7 +133,8 @@ export class Parser {
         const meta = {
             title: parsedSpecialVariables.fallback_note_title,
             tags: [],
-            folder: null
+            folder: null,
+            todo_due: null,
         };
 
         if (NOTE_TITLE_VARIABLE_NAME in parsedSpecialVariables) {
@@ -149,6 +152,11 @@ export class Parser {
             } else {
                 throw new Error(`There is no notebook with ID: ${folderId}`);
             }
+        }
+
+        if (TODO_DUE_VARIABLE_NAME in parsedSpecialVariables) {
+            const rawTodoDue = parsedSpecialVariables[TODO_DUE_VARIABLE_NAME].trim()
+            meta.todo_due = this.utils.formatLocalToJoplinCompatibleUnixTime(rawTodoDue, this.utils.getDateTimeFormat());
         }
 
         return meta;
