@@ -78,7 +78,7 @@ export const datetimeHelper: HelperConstructorBlock = (ctx) => {
             const parsedTime = ctx.dateAndTimeUtils.parseTime(attrs[SET_TIME] as string, ctx.dateAndTimeUtils.getTimeFormat());
             now.set("hours", parsedTime.hours);
             now.set("minutes", parsedTime.minutes);
-            now.set("seconds", 0);
+            now.set("seconds", parsedTime.seconds);
             now.set("milliseconds", 0);
         }
 
