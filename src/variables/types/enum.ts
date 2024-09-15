@@ -35,7 +35,7 @@ export class EnumCustomVariable extends CustomVariable {
         if (typeof definition === "string") {
             const options = this.getOptionsFromType(definition);
             return new this(name, name, options);
-        } else if (typeof definition === "object") {
+        } else if (typeof definition === "object" && definition !== null) {
             if ("type" in definition) {
                 const variableType = definition["type"];
                 if (typeof variableType === "string") {

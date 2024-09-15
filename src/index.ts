@@ -98,12 +98,12 @@ joplin.plugins.register({
         }
 
         const getTemplateAndPerformAction = async (action: TemplateAction) => {
-            const template: Note = JSON.parse(await getUserTemplateSelection());
+            const template: Note = JSON.parse(await getUserTemplateSelection() || "null");
             await performActionWithParsedTemplate(action, template);
         }
 
         const getNotebookDefaultTemplatesDisplayData = async (settings: DefaultTemplatesConfigSetting): Promise<NotebookDefaultTemplatesDisplayData[]> => {
-            const getDisplayDataForNotebook = async (notebookId: string, defaultTemplateNoteId: string, defaultTemplateTodoId: string): Promise<NotebookDefaultTemplatesDisplayData | null> => {
+            const getDisplayDataForNotebook = async (notebookId: string, defaultTemplateNoteId: string | null, defaultTemplateTodoId: string | null): Promise<NotebookDefaultTemplatesDisplayData | null> => {
                 const promiseGroup = new PromiseGroup();
                 promiseGroup.set("notebook", getFolderFromId(notebookId));
                 promiseGroup.set("noteTemplate", getTemplateFromId(defaultTemplateNoteId));
@@ -196,7 +196,7 @@ joplin.plugins.register({
             name: "setDefaultTemplateForNotebook",
             label: "Set default template for notebook",
             execute: async () => {
-                const folder: Folder | null = JSON.parse(await getUserFolderSelection());
+                const folder: Folder | null = JSON.parse(await getUserFolderSelection() || "null");
                 if (folder === null) return;
 
                 const templateId = await getUserTemplateSelection("id", `Default template for "${folder.title}":`);
@@ -214,7 +214,7 @@ joplin.plugins.register({
             name: "clearDefaultTemplatesForNotebook",
             label: "Clear default templates for notebook",
             execute: async () => {
-                const folder: Folder | null = JSON.parse(await getUserFolderSelection());
+                const folder: Folder | null = JSON.parse(await getUserFolderSelection() || "null");
                 if (folder === null) return;
 
                 await clearDefaultTemplates(folder.id);

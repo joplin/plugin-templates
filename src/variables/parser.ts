@@ -32,4 +32,8 @@ export const getVariableFromDefinition = (name: string, definition: unknown): Cu
             throw err;
         }
     }
+
+    // This ideally should never happen. "InvalidCustomVariable" accepts
+    // all definitions.
+    throw Error("No valid definition for variable: " + name);
 }

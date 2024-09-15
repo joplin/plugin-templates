@@ -40,14 +40,14 @@ export class DateAndTimeUtils {
         return `${this.dateFormat} ${this.timeFormat}`;
     }
 
-    public formatMsToLocal(ms: number, format: string = null): string {
+    public formatMsToLocal(ms: number, format: string | null = null): string {
         if (!format) {
             format = this.getDateTimeFormat();
         }
         return moment(ms).format(format);
     }
 
-    public formatLocalToJoplinCompatibleUnixTime(input: string, format: string = null): number {
+    public formatLocalToJoplinCompatibleUnixTime(input: string, format: string | null = null): number {
         if (!format) {
             format = this.getDateTimeFormat();
         }
@@ -60,7 +60,7 @@ export class DateAndTimeUtils {
         return date.unix() * 1000;
     }
 
-    public getCurrentTime(format: string = null): string {
+    public getCurrentTime(format: string | null = null): string {
         return this.formatMsToLocal(new Date().getTime(), format);
     }
 
