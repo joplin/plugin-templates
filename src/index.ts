@@ -2,7 +2,8 @@ import joplin from "api";
 import { MenuItemLocation, SettingItemType } from "api/types";
 import { Parser } from "./parser";
 import { DateAndTimeUtils } from "./utils/dateAndTime";
-import { getTemplateFromId, getUserTemplateSelection, Note } from "./utils/templates";
+import { getUserFolderSelection, Folder } from "./utils/folders";
+import { getTemplateFromId, getUserDefaultTemplateTypeSelection, getUserTemplateSelection, setDefaultTemplate, Note } from "./utils/templates";
 import { setDefaultTemplatesView } from "./views/defaultTemplates";
 import { TemplateAction, performAction } from "./actions";
 import { loadLegacyTemplates } from "./legacyTemplates";
@@ -33,6 +34,12 @@ joplin.plugins.register({
                 type: SettingItemType.String,
                 value: null,
                 label: "Default to-do template ID"
+            },
+            "defaultTemplatesConfig": {
+                public: false,
+                type: SettingItemType.Object,
+                value: null,
+                label: "Default templates config"
             },
             "applyTagsWhileInserting": {
                 public: true,
@@ -138,26 +145,35 @@ joplin.plugins.register({
         }));
 
         joplinCommands.add(joplin.commands.register({
-            name: "setDefaultNoteTemplate",
-            label: "Set default note template",
+            name: "setDefaultTemplate",
+            label: "Set default template",
             execute: async () => {
                 const templateId = await getUserTemplateSelection("id");
-                if (templateId) {
-                    await joplin.settings.setValue("defaultNoteTemplateId", templateId);
-                    await joplin.views.dialogs.showMessageBox("Default note template set successfully!");
-                }
+                if (templateId === null) return;
+
+                const defaultType = await getUserDefaultTemplateTypeSelection();
+                if (defaultType === null) return;
+
+                await setDefaultTemplate(null, templateId, defaultType);
+                await joplin.views.dialogs.showMessageBox("Default template set successfully!");
             }
         }));
 
         joplinCommands.add(joplin.commands.register({
-            name: "setDefaultTodoTemplate",
-            label: "Set default to-do template",
+            name: "setDefaultTemplateForNotebook",
+            label: "Set default template for notebook",
             execute: async () => {
-                const templateId = await getUserTemplateSelection("id");
-                if (templateId) {
-                    await joplin.settings.setValue("defaultTodoTemplateId", templateId);
-                    await joplin.views.dialogs.showMessageBox("Default to-do template set successfully!");
-                }
+                const folder: Folder | null = JSON.parse(await getUserFolderSelection());
+                if (folder === null) return;
+
+                const templateId = await getUserTemplateSelection("id", `Default template for "${folder.title}:"`);
+                if (templateId === null) return;
+
+                const defaultType = await getUserDefaultTemplateTypeSelection();
+                if (defaultType === null) return;
+
+                await setDefaultTemplate(folder.id, templateId, defaultType);
+                await joplin.views.dialogs.showMessageBox(`Default template set for "${folder.title}" successfully!`);
             }
         }));
 
@@ -237,10 +253,10 @@ joplin.plugins.register({
                         commandName: "showDefaultTemplates"
                     },
                     {
-                        commandName: "setDefaultNoteTemplate"
+                        commandName: "setDefaultTemplate"
                     },
                     {
-                        commandName: "setDefaultTodoTemplate"
+                        commandName: "setDefaultTemplateForNotebook"
                     }
                 ]
             },
