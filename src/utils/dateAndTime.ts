@@ -12,6 +12,7 @@ interface ParsedDate {
 interface ParsedTime {
     hours: number;
     minutes: number;
+    seconds: number;
 }
 
 export class DateAndTimeUtils {
@@ -82,6 +83,7 @@ export class DateAndTimeUtils {
         return {
             hours: time.hours(),
             minutes: time.minutes(),
+            seconds: time.seconds(),
         };
     }
 }
