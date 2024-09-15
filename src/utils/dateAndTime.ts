@@ -47,6 +47,19 @@ export class DateAndTimeUtils {
         return moment(ms).format(format);
     }
 
+    public formatLocalToJoplinCompatibleUnixTime(input: string, format: string = null): number {
+        if (!format) {
+            format = this.getDateTimeFormat();
+        }
+
+        const date = moment(input, format, true);
+        if (!date.isValid()) {
+            throw new Error(`Was not able to parse ${input} according to format ${format}`);
+        }
+
+        return date.unix() * 1000;
+    }
+
     public getCurrentTime(format: string = null): string {
         return this.formatMsToLocal(new Date().getTime(), format);
     }

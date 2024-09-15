@@ -331,6 +331,7 @@ describe("Template parser", () => {
         expect(parsedTemplate.folder).toEqual("8e4d3851a1237028");
         expect(parsedTemplate.tags).toStrictEqual(["scrum", "Project 2"]);
         expect(parsedTemplate.title).toEqual("Scrum - Project 2 - Title 1");
+        expect(parsedTemplate.todo_due).toBeNull();
         expect(parsedTemplate.body).toEqual(dedent`
             title: Title 1
             project: Project 2
@@ -986,5 +987,67 @@ describe("Template parser", () => {
         }
 
         expect(errorMessagesShown).toEqual(invalidTemplates.length);
+    });
+
+    // template_todo_alarm special variable tests
+    test("should parse template_todo_alarm special variable correctly", async () => {
+        const template = {
+            id: "note-id",
+            title: "Some Template",
+            body: dedent`
+                ---
+                my_date: date
+                template_todo_alarm: {{ datetime set_date=my_date set_time='00:00' delta_days=-1 }}
+
+                ---
+
+                my_date: {{ my_date }}
+                template_todo_alarm: {{ template_todo_alarm }}
+            `
+        };
+
+        testVariableTypes({
+            my_date: DateCustomVariable,
+        });
+
+        handleVariableDialog("ok", {
+            my_date: "2023-03-15",
+        });
+
+        const parsedTemplate = await parser.parseTemplate(template);
+        expect(parsedTemplate.folder).toBeNull();
+        expect(parsedTemplate.tags.length).toEqual(0);
+        expect(parsedTemplate.title).toEqual("Some Template");
+        expect(parsedTemplate.todo_due).toEqual(1678752000000); // 14 March 2023
+        expect(parsedTemplate.body).toEqual(dedent`
+            my_date: 15/03/2023
+            template_todo_alarm: 14/03/2023 00:00
+        `);
+    });
+
+    test("should show error if template_todo_alarm special variable can't be parsed", async () => {
+        const template = {
+            id: "note-id",
+            title: "Some Template",
+            body: dedent`
+                ---
+                template_todo_alarm: abc
+
+                ---
+
+                Hi
+            `
+        };
+
+        let errorMessagesShown = 0;
+        jest.spyOn(joplin.views.dialogs, "showMessageBox").mockImplementation(async () => {
+            errorMessagesShown++;
+            return 0;
+        });
+
+        const parsedTemplate = await parser.parseTemplate(template);
+
+        expect(parsedTemplate).toBeNull();
+        expect(errorMessagesShown).toEqual(1);
     });
 });

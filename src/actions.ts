@@ -24,7 +24,13 @@ const performInsertTextAction = async (template: NewNote) => {
 
 const performNewNoteAction = async (template: NewNote, isTodo: 0 | 1) => {
     const folderId = template.folder ? template.folder : await getSelectedFolder();
-    const note = await joplin.data.post(["notes"], null, { body: template.body, parent_id: folderId, title: template.title, is_todo: isTodo });
+    const notePayload = { body: template.body, parent_id: folderId, title: template.title, is_todo: isTodo };
+
+    if (isTodo && template.todo_due) {
+        notePayload["todo_due"] = template.todo_due;
+    }
+
+    const note = await joplin.data.post(["notes"], null, notePayload);
     await joplin.commands.execute("openNote", note.id);
     for (const tag of template.tags) {
         const tagId = (await getAnyTagWithTitle(tag)).id;
