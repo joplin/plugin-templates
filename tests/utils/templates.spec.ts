@@ -35,7 +35,7 @@ describe("Get user template selection", () => {
         }
     });
 
-    const expectTemplatesSelector = (templates: DropdownOption[], selectedValue: DropdownOption) => {
+    const expectTemplatesSelector = (templates: DropdownOption[], selectedValue: DropdownOption | null) => {
         jest.spyOn(joplin.commands, "execute").mockImplementation(async (cmd: string, props: Record<string, unknown>) => {
             expect(cmd).toEqual("showPrompt");
             expect(props.autocomplete).toEqual(templates);
@@ -62,6 +62,7 @@ describe("Get user template selection", () => {
                     return tag.notes;
                 }
             }
+            return [];
         });
     }
 
