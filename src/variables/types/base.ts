@@ -40,7 +40,7 @@ export class CustomVariable {
     static createFromDefinition(name: string, definition: unknown): CustomVariable {
         if (typeof definition === "string" && definition.trim() === this.definitionName) {
             return new this(name, name);
-        } else if (typeof definition === "object") {
+        } else if (typeof definition === "object" && definition !== null) {
             if ("type" in definition) {
                 const variableType = definition["type"];
                 if (typeof variableType === "string" && variableType.trim() === this.definitionName) {

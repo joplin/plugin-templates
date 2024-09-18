@@ -1,4 +1,6 @@
 import joplin from "api";
+
+import * as assert from "assert"
 import * as dedent from "dedent";
 
 import { DateAndTimeUtils } from "@templates/utils/dateAndTime";
@@ -89,6 +91,7 @@ describe("Template parser", () => {
             `
         });
 
+        assert(parsedTemplate);
         expect(parsedTemplate.folder).toBeNull();
         expect(parsedTemplate.tags.length).toEqual(0);
         expect(parsedTemplate.title).toEqual("Template Title");
@@ -129,13 +132,15 @@ describe("Template parser", () => {
             bows: NumberCustomVariable,
             show_summary: BooleanCustomVariable
         });
-
         handleVariableDialog("ok", {
             some_var: "text",
             bows: "12",
             show_summary: "false"
         });
+
         let parsedTemplate = await parser.parseTemplate(template);
+
+        assert(parsedTemplate);
         expect(parsedTemplate.folder).toBeNull();
         expect(parsedTemplate.tags.length).toEqual(0);
         expect(parsedTemplate.title).toEqual("Some Title");
@@ -151,7 +156,10 @@ describe("Template parser", () => {
             bows: "15",
             show_summary: "true"
         });
+
         parsedTemplate = await parser.parseTemplate(template);
+
+        assert(parsedTemplate);
         expect(parsedTemplate.folder).toBeNull();
         expect(parsedTemplate.tags.length).toEqual(0);
         expect(parsedTemplate.title).toEqual("Some Title");
@@ -183,12 +191,14 @@ describe("Template parser", () => {
             date_var: DateCustomVariable,
             time_var: TimeCustomVariable
         });
-
         handleVariableDialog("ok", {
             date_var: "2021-12-03",
             time_var: "20:43"
         });
+
         const parsedTemplate = await parser.parseTemplate(template);
+
+        assert(parsedTemplate);
         expect(parsedTemplate.folder).toBeNull();
         expect(parsedTemplate.tags.length).toEqual(0);
         expect(parsedTemplate.title).toEqual("Template");
@@ -212,11 +222,13 @@ describe("Template parser", () => {
         testVariableTypes({
             dvar: EnumCustomVariable,
         });
-
         handleVariableDialog("ok", {
             dvar: "opt2",
         });
+
         const parsedTemplate = await parser.parseTemplate(template);
+
+        assert(parsedTemplate);
         expect(parsedTemplate.folder).toBeNull();
         expect(parsedTemplate.tags.length).toEqual(0);
         expect(parsedTemplate.title).toEqual("Template");
@@ -271,13 +283,15 @@ describe("Template parser", () => {
             expect(v.variable_two.toHTML()).toContain("Enter something below");
             expect(v.variable_three.toHTML()).toContain("Choose an option");
         });
-
         handleVariableDialog("ok", {
             variable_one: "val1",
             variable_two: "val2",
             variable_three: "opt1"
         });
+
         const parsedTemplate = await parser.parseTemplate(template);
+
+        assert(parsedTemplate);
         expect(parsedTemplate.folder).toBeNull();
         expect(parsedTemplate.tags.length).toEqual(0);
         expect(parsedTemplate.title).toEqual("Some Template");
@@ -327,7 +341,10 @@ describe("Template parser", () => {
         jest.spyOn(folderUtils, "doesFolderExist").mockImplementation(async (folderId: string) => {
             return folderId === "8e4d3851a1237028";
         });
+
         const parsedTemplate = await parser.parseTemplate(template);
+
+        assert(parsedTemplate);
         expect(parsedTemplate.folder).toEqual("8e4d3851a1237028");
         expect(parsedTemplate.tags).toStrictEqual(["scrum", "Project 2"]);
         expect(parsedTemplate.title).toEqual("Scrum - Project 2 - Title 1");
@@ -441,7 +458,10 @@ describe("Template parser", () => {
             genre: "",
             status: "finished"
         });
+
         const parsedTemplate = await parser.parseTemplate(template);
+
+        assert(parsedTemplate);
         expect(parsedTemplate.title).toEqual("Some Template");
         expect(parsedTemplate.tags).toStrictEqual(["books", "finished"]);
     });
@@ -475,7 +495,10 @@ describe("Template parser", () => {
             some_date: "2023-05-09",
             some_time: "17:25"
         });
+
         const parsedTemplate = await parser.parseTemplate(template);
+
+        assert(parsedTemplate);
         expect(parsedTemplate.folder).toBeNull();
         expect(parsedTemplate.tags.length).toEqual(0);
         expect(parsedTemplate.title).toEqual("Some Template");
@@ -515,7 +538,10 @@ describe("Template parser", () => {
             num1: "11",
             num2: "4"
         });
+
         const parsedTemplate = await parser.parseTemplate(template);
+
+        assert(parsedTemplate);
         expect(parsedTemplate.folder).toBeNull();
         expect(parsedTemplate.tags.length).toEqual(0);
         expect(parsedTemplate.title).toEqual("Some Template");
@@ -531,7 +557,7 @@ describe("Template parser", () => {
     });
 
     test("should show error with invalid usage of math helpers", async () => {
-        const invalidTemplates = [];
+        const invalidTemplates: string[] = [];
         invalidTemplates.push(dedent`
             ---
             num1: text
@@ -613,7 +639,10 @@ describe("Template parser", () => {
             num1: "3",
             var1: "v"
         });
+
         const parsedTemplate = await parser.parseTemplate(template);
+
+        assert(parsedTemplate);
         expect(parsedTemplate.folder).toBeNull();
         expect(parsedTemplate.tags.length).toEqual(0);
         expect(parsedTemplate.title).toEqual("Some Template");
@@ -637,7 +666,7 @@ describe("Template parser", () => {
     });
 
     test("should show error with invalid usage of repeat helper", async () => {
-        const invalidTemplates = [];
+        const invalidTemplates: string[] = [];
         invalidTemplates.push(dedent`
             ---
             var1: text
@@ -707,7 +736,10 @@ describe("Template parser", () => {
         handleVariableDialog("ok", {
             var1: "Variable"
         });
+
         const parsedTemplate = await parser.parseTemplate(template);
+
+        assert(parsedTemplate);
         expect(parsedTemplate.folder).toBeNull();
         expect(parsedTemplate.tags.length).toEqual(0);
         expect(parsedTemplate.title).toEqual("Some Template");
@@ -719,7 +751,7 @@ describe("Template parser", () => {
     });
 
     test("should show error with invalid usage of case helper", async () => {
-        const invalidTemplates = [];
+        const invalidTemplates: string[] = [];
         invalidTemplates.push(dedent`
             ---
             var1: text
@@ -793,7 +825,10 @@ describe("Template parser", () => {
             var3: "40",
             var4: "false"
         });
+
         const parsedTemplate = await parser.parseTemplate(template);
+
+        assert(parsedTemplate);
         expect(parsedTemplate.folder).toBeNull();
         expect(parsedTemplate.tags.length).toEqual(0);
         expect(parsedTemplate.title).toEqual("Some Template");
@@ -812,7 +847,7 @@ describe("Template parser", () => {
     });
 
     test("should show error with invalid usage of compare helper", async () => {
-        const invalidTemplates = [];
+        const invalidTemplates: string[] = [];
         invalidTemplates.push(dedent`
             ---
             var1: text
@@ -879,7 +914,10 @@ describe("Template parser", () => {
             var2: "40",
             var3: "true",
         });
+
         const parsedTemplate = await parser.parseTemplate(template);
+
+        assert(parsedTemplate);
         expect(parsedTemplate.folder).toBeNull();
         expect(parsedTemplate.tags.length).toEqual(0);
         expect(parsedTemplate.title).toEqual("Some Template");
@@ -894,7 +932,7 @@ describe("Template parser", () => {
     });
 
     test("should show error with invalid usage of condition helper", async () => {
-        const invalidTemplates = [];
+        const invalidTemplates: string[] = [];
         invalidTemplates.push(dedent`
             {{ condition false "~~" }}
         `);
@@ -944,7 +982,10 @@ describe("Template parser", () => {
         handleVariableDialog("ok", {
             var1: "20",
         });
+
         const parsedTemplate = await parser.parseTemplate(template);
+
+        assert(parsedTemplate);
         expect(parsedTemplate.folder).toBeNull();
         expect(parsedTemplate.tags.length).toEqual(0);
         expect(parsedTemplate.title).toEqual("Some Template");
@@ -961,7 +1002,7 @@ describe("Template parser", () => {
     });
 
     test("should show error with invalid usage of datetime helper", async () => {
-        const invalidTemplates = [];
+        const invalidTemplates: string[] = [];
         invalidTemplates.push(dedent`
             {{ datetime delta_hours="abc" }}
         `);
@@ -1015,6 +1056,8 @@ describe("Template parser", () => {
         });
 
         const parsedTemplate = await parser.parseTemplate(template);
+
+        assert(parsedTemplate);
         expect(parsedTemplate.folder).toBeNull();
         expect(parsedTemplate.tags.length).toEqual(0);
         expect(parsedTemplate.title).toEqual("Some Template");
