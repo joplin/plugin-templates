@@ -4,6 +4,7 @@ import { Logger } from "./logger";
 import { DateAndTimeUtils } from "./utils/dateAndTime";
 import { doesFolderExist } from "./utils/folders";
 import { Note } from "./utils/templates";
+import { notEmpty } from "./utils/typescript";
 import { getVariableFromDefinition } from "./variables/parser";
 import { CustomVariable } from "./variables/types/base";
 import { setTemplateVariablesView } from "./views/templateVariables";
@@ -19,6 +20,13 @@ export interface NewNote {
     title: string;
     tags: string[];
     body: string;
+    folder: string | null;
+    todo_due: number | null;
+}
+
+interface NoteMetadata {
+    title: string;
+    tags: string[];
     folder: string | null;
     todo_due: number | null;
 }
@@ -129,8 +137,8 @@ export class Parser {
         return res;
     }
 
-    private async getNoteMetadata(parsedSpecialVariables: Record<string, string>) {
-        const meta = {
+    private async getNoteMetadata(parsedSpecialVariables: Record<string, string>): Promise<NoteMetadata> {
+        const meta: NoteMetadata = {
             title: parsedSpecialVariables.fallback_note_title,
             tags: [],
             folder: null,
@@ -183,7 +191,7 @@ export class Parser {
                 } else {
                     return null;
                 }
-            }).filter(val => !!val);
+            }).filter(notEmpty);
 
             if (!allMatchesAfterFirstMatch.length) {
                 return null;
@@ -229,7 +237,7 @@ export class Parser {
         return `${variableDefinitionsBlock}${templateContentBlock}`;
     }
 
-    public async parseTemplate(template: Note | null): Promise<NewNote> {
+    public async parseTemplate(template: Note | null): Promise<NewNote | null> {
         if (!template) {
             return null;
         }

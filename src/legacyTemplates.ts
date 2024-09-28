@@ -25,8 +25,8 @@ const getTemplatesTag = async (): Promise<string> => {
 export const loadLegacyTemplates = async (dateAndTimeUtils: DateAndTimeUtils, profileDir: string): Promise<void> => {
     const fs = joplin.require("fs-extra");
 
-    let folderId = null;
-    let templatesTagId = null;
+    let folderId: string | null = null;
+    let templatesTagId: string | null = null;
 
     const templatesDir = `${profileDir}/templates`;
 
