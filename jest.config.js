@@ -5,7 +5,8 @@ module.exports = {
     moduleFileExtensions: ["ts", "js", "json", "node"],
     moduleNameMapper: {
         "^@templates/(.*)$": "<rootDir>/src/$1",
-        "^api$": "<rootDir>/tests/mock-joplin-api.ts"
+        "^api$": "<rootDir>/tests/mock-joplin-api.ts",
+        "^api/types$": "<rootDir>/api/types.ts"
     },
     globalSetup: "./tests/jest-setup.js",
     collectCoverageFrom: ["src/**/*.{js,ts}"]
