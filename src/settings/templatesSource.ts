@@ -1,12 +1,12 @@
 import { SettingItemType } from "api/types";
-import { createEnumSetting } from "./base";
+import { createMappedSetting } from "./base";
 
 export enum TemplatesSource {
     Tag,
     Notebook,
 }
 
-export const TemplatesSourceSetting = createEnumSetting<TemplatesSource>("templatesSource", {
+export const TemplatesSourceSetting = createMappedSetting<TemplatesSource>("templatesSource", {
     public: true,
     type: SettingItemType.String,
     isEnum: true,

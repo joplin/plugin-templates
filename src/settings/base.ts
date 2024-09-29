@@ -25,10 +25,10 @@ export const createSimpleSetting = <T>(id: string, manifest: SettingItem): Plugi
 }
 
 /**
- * This considers that the original setting is of type string. On `set` if no original value
- * can be calculated, the setting is set to an empty string.
+ * This considers that the original setting is of type `string`. On `set` if no original value
+ * can be traced back, the setting is set to an empty string.
  */
-export const createEnumSetting = <T>(id: string, manifest: SettingItem, valueMap: Record<string, T>, defaultValue: T): PluginSetting<T> => {
+export const createMappedSetting = <T>(id: string, manifest: SettingItem, valueMap: Record<string, T>, defaultValue: T): PluginSetting<T> => {
     return class {
         static id = id;
         static manifest = manifest;
