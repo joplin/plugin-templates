@@ -1,9 +1,9 @@
 import joplin from "api";
-import { MenuItemLocation, SettingItemType } from "api/types";
+import { MenuItemLocation } from "api/types";
 import { Parser } from "./parser";
 import { DateAndTimeUtils } from "./utils/dateAndTime";
 import { getFolderFromId, getSelectedFolder, getUserFolderSelection, Folder } from "./utils/folders";
-import { clearDefaultTemplates, getNotebookDefaultTemplatesConfig, getUserDefaultTemplateTypeSelection, setDefaultTemplate, DefaultTemplatesConfigSetting } from "./utils/defaultTemplates";
+import { getUserDefaultTemplateTypeSelection, setDefaultTemplate } from "./utils/defaultTemplates";
 import { getTemplateFromId, getUserTemplateSelection, Note } from "./utils/templates";
 import { setDefaultTemplatesView, DefaultTemplatesDisplayData, NotebookDefaultTemplatesDisplayData } from "./views/defaultTemplates";
 import { TemplateAction, performAction } from "./actions";
@@ -11,69 +11,26 @@ import { loadLegacyTemplates } from "./legacyTemplates";
 import * as open from "open";
 import { Logger } from "./logger";
 import { PromiseGroup } from "./utils/promises";
+import { PluginSettingsRegistry, DefaultNoteTemplateIdSetting, DefaultTodoTemplateIdSetting, DefaultTemplatesConfigSetting } from "./settings";
+import { LocaleGlobalSetting, DateFormatGlobalSetting, TimeFormatGlobalSetting, ProfileDirGlobalSetting } from "./settings/global";
+import { DefaultTemplatesConfig } from "./settings/defaultTemplatesConfig";
 
 const DOCUMENTATION_URL = "https://github.com/joplin/plugin-templates#readme";
 
 joplin.plugins.register({
     onStart: async function() {
         // Register setting section
-        await joplin.settings.registerSection("templatesPlugin", {
-            label: "Templates",
-        });
-
-
-        // Register all settings
-        await joplin.settings.registerSettings({
-            "defaultNoteTemplateId": {
-                public: false,
-                type: SettingItemType.String,
-                value: null,
-                label: "Default note template ID"
-            },
-            "defaultTodoTemplateId": {
-                public: false,
-                type: SettingItemType.String,
-                value: null,
-                label: "Default to-do template ID"
-            },
-            "defaultTemplatesConfig": {
-                public: false,
-                type: SettingItemType.Object,
-                value: null,
-                label: "Default templates config"
-            },
-            "applyTagsWhileInserting": {
-                public: true,
-                type: SettingItemType.Bool,
-                value: true,
-                label: "Apply tags while inserting template",
-                description: "Apply tags using 'template_tags' variable while inserting template to notes/to-dos.",
-                section: "templatesPlugin"
-            },
-            "templatesSource": {
-                public: true,
-                type: SettingItemType.String,
-                isEnum: true,
-                value: "tag",
-                options: {
-                    "tag": "Tag",
-                    "notebook": "Notebook"
-                },
-                label: "Are templates set with tags or stored in a notebook?",
-                description: "If set to 'Tag', any note/to-do with a 'template' tag is considered a template. If set to 'Notebook', any note/todo stored in a notebook titled 'Templates' is considered a template.",
-                section: "templatesPlugin"
-            },
-        });
+        await PluginSettingsRegistry.registerSettings();
 
 
         // Global variables
         const joplinGlobalApis = new PromiseGroup();
 
         joplinGlobalApis.set("dialogViewHandle", joplin.views.dialogs.create("dialog"));
-        joplinGlobalApis.set("userLocale", joplin.settings.globalValue("locale"));
-        joplinGlobalApis.set("userDateFormat", joplin.settings.globalValue("dateFormat"));
-        joplinGlobalApis.set("userTimeFormat", joplin.settings.globalValue("timeFormat"));
-        joplinGlobalApis.set("profileDir", joplin.settings.globalValue("profileDir"));
+        joplinGlobalApis.set("userLocale", LocaleGlobalSetting.get());
+        joplinGlobalApis.set("userDateFormat", DateFormatGlobalSetting.get());
+        joplinGlobalApis.set("userTimeFormat", TimeFormatGlobalSetting.get());
+        joplinGlobalApis.set("profileDir", ProfileDirGlobalSetting.get());
 
         const {
             dialogViewHandle, userLocale, userDateFormat,
@@ -102,7 +59,7 @@ joplin.plugins.register({
             await performActionWithParsedTemplate(action, template);
         }
 
-        const getNotebookDefaultTemplatesDisplayData = async (settings: DefaultTemplatesConfigSetting): Promise<NotebookDefaultTemplatesDisplayData[]> => {
+        const getNotebookDefaultTemplatesDisplayData = async (settings: DefaultTemplatesConfig): Promise<NotebookDefaultTemplatesDisplayData[]> => {
             const getDisplayDataForNotebook = async (notebookId: string, defaultTemplateNoteId: string | null, defaultTemplateTodoId: string | null): Promise<NotebookDefaultTemplatesDisplayData | null> => {
                 const promiseGroup = new PromiseGroup();
                 promiseGroup.set("notebook", getFolderFromId(notebookId));
@@ -112,7 +69,7 @@ joplin.plugins.register({
 
                 if (notebook === null || (noteTemplate === null && todoTemplate === null)) {
                     // Async remove of the obsolete config
-                    clearDefaultTemplates(notebookId);
+                    DefaultTemplatesConfigSetting.clearDefaultTemplates(notebookId);
                     return null;
                 }
                 return {
@@ -162,9 +119,9 @@ joplin.plugins.register({
             name: "showDefaultTemplates",
             label: "Show default templates",
             execute: async () => {
-                const noteTemplate = await getTemplateFromId(await joplin.settings.value("defaultNoteTemplateId"));
-                const todoTemplate = await getTemplateFromId(await joplin.settings.value("defaultTodoTemplateId"));
-                const defaultTemplatesConfig = await getNotebookDefaultTemplatesConfig();
+                const noteTemplate = await getTemplateFromId(await DefaultNoteTemplateIdSetting.get());
+                const todoTemplate = await getTemplateFromId(await DefaultTodoTemplateIdSetting.get());
+                const defaultTemplatesConfig = await DefaultTemplatesConfigSetting.get();
 
                 const globalDefaultTemplates: DefaultTemplatesDisplayData = {
                     defaultNoteTemplateTitle: noteTemplate ? noteTemplate.title : null,
@@ -217,7 +174,7 @@ joplin.plugins.register({
                 const folder: Folder | null = JSON.parse(await getUserFolderSelection() || "null");
                 if (folder === null) return;
 
-                await clearDefaultTemplates(folder.id);
+                await DefaultTemplatesConfigSetting.clearDefaultTemplates(folder.id);
                 await joplin.views.dialogs.showMessageBox(`Default templates for "${folder.title}" cleared successfully!`);
             }
         }));
@@ -228,7 +185,7 @@ joplin.plugins.register({
             execute: async () => {
                 let defaultTemplate: Note | null = null;
 
-                const defaultTemplatesConfig = await getNotebookDefaultTemplatesConfig();
+                const defaultTemplatesConfig = await DefaultTemplatesConfigSetting.get();
                 const currentFolderId = await getSelectedFolder();
 
                 if (currentFolderId in defaultTemplatesConfig) {
@@ -236,7 +193,7 @@ joplin.plugins.register({
                 }
 
                 if (defaultTemplate === null) {
-                    defaultTemplate = await getTemplateFromId(await joplin.settings.value("defaultNoteTemplateId"));
+                    defaultTemplate = await getTemplateFromId(await DefaultNoteTemplateIdSetting.get());
                 }
 
                 if (defaultTemplate) {
@@ -252,7 +209,7 @@ joplin.plugins.register({
             execute: async () => {
                 let defaultTemplate: Note | null = null;
 
-                const defaultTemplatesConfig = await getNotebookDefaultTemplatesConfig();
+                const defaultTemplatesConfig = await DefaultTemplatesConfigSetting.get();
                 const currentFolderId = await getSelectedFolder();
 
                 if (currentFolderId in defaultTemplatesConfig) {
@@ -260,7 +217,7 @@ joplin.plugins.register({
                 }
 
                 if (defaultTemplate === null) {
-                    defaultTemplate = await getTemplateFromId(await joplin.settings.value("defaultTodoTemplateId"));
+                    defaultTemplate = await getTemplateFromId(await DefaultTodoTemplateIdSetting.get());
                 }
 
                 if (defaultTemplate) {
