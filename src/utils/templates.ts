@@ -1,6 +1,8 @@
 import joplin from "api";
 import { getAllNotesInFolder } from "./folders";
 import { getAllNotesWithTag, getAllTagsWithTitle } from "./tags";
+import { TemplatesSourceSetting, TemplatesSource } from "../settings/templatesSource";
+import { LocaleGlobalSetting } from "../settings/global";
 
 export interface Note {
     id: string;
@@ -27,9 +29,9 @@ const removeDuplicateTemplates = (templates: Note[]) => {
 const getAllTemplates = async () => {
     let templates: Note[] = [];
 
-    const templatesSource = await joplin.settings.value("templatesSource");
+    const templatesSource = await TemplatesSourceSetting.get();
 
-    if (templatesSource == "tag"){
+    if (templatesSource == TemplatesSource.Tag) {
         const templateTags = await getAllTagsWithTitle("template");
 
         for (const tag of templateTags) {
@@ -41,7 +43,7 @@ const getAllTemplates = async () => {
 
     templates = removeDuplicateTemplates(templates);
 
-    let userLocale: string = await joplin.settings.globalValue("locale");
+    let userLocale: string = await LocaleGlobalSetting.get();
     userLocale = userLocale.split("_").join("-");
 
     templates.sort((a, b) => {

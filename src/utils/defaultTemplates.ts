@@ -1,11 +1,5 @@
 import joplin from "api";
-
-export interface DefaultTemplatesConfigSetting {
-    [notebookId: string]: {
-        defaultNoteTemplateId: string | null;
-        defaultTodoTemplateId: string | null;
-    }
-}
+import { DefaultTemplatesConfigSetting, DefaultNoteTemplateIdSetting, DefaultTodoTemplateIdSetting } from "../settings";
 
 export enum DefaultTemplateType {
     Both,
@@ -45,57 +39,30 @@ export const setDefaultTemplate = async (notebookId: string | null, templateId: 
         // Global default
         switch (defaultType) {
             case DefaultTemplateType.Note:
-                await joplin.settings.setValue("defaultNoteTemplateId", templateId);
+                await DefaultNoteTemplateIdSetting.set(templateId);
                 break;
             case DefaultTemplateType.Todo:
-                await joplin.settings.setValue("defaultTodoTemplateId", templateId);
+                await DefaultTodoTemplateIdSetting.set(templateId);
                 break;
             case DefaultTemplateType.Both:
-                await joplin.settings.setValue("defaultNoteTemplateId", templateId);
-                await joplin.settings.setValue("defaultTodoTemplateId", templateId);
+                await DefaultNoteTemplateIdSetting.set(templateId);
+                await DefaultTodoTemplateIdSetting.set(templateId);
                 break;
             default:
                 break;
         }
     } else {
         // Notebook specific default
-        let defaultTemplatesConfig: DefaultTemplatesConfigSetting | null = await joplin.settings.value("defaultTemplatesConfig");
-        if (defaultTemplatesConfig === null) defaultTemplatesConfig = {};
-
-        if (!(notebookId in defaultTemplatesConfig)) {
-            defaultTemplatesConfig[notebookId] = {
-                defaultNoteTemplateId: null,
-                defaultTodoTemplateId: null
-            };
-        }
-
         switch (defaultType) {
             case DefaultTemplateType.Note:
-                defaultTemplatesConfig[notebookId].defaultNoteTemplateId = templateId;
+                await DefaultTemplatesConfigSetting.setDefaultTempalte(notebookId, templateId, DefaultTemplatesConfigSetting.DefaultType.Note);
                 break;
             case DefaultTemplateType.Todo:
-                defaultTemplatesConfig[notebookId].defaultTodoTemplateId = templateId;
+                await DefaultTemplatesConfigSetting.setDefaultTempalte(notebookId, templateId, DefaultTemplatesConfigSetting.DefaultType.Todo);
                 break;
             case DefaultTemplateType.Both:
-                defaultTemplatesConfig[notebookId].defaultNoteTemplateId = templateId;
-                defaultTemplatesConfig[notebookId].defaultTodoTemplateId = templateId;
-                break;
-            default:
+                await DefaultTemplatesConfigSetting.setDefaultTempalte(notebookId, templateId, DefaultTemplatesConfigSetting.DefaultType.Both);
                 break;
         }
-
-        await joplin.settings.setValue("defaultTemplatesConfig", defaultTemplatesConfig);
     }
-}
-
-export const getNotebookDefaultTemplatesConfig = async (): Promise<DefaultTemplatesConfigSetting> => {
-    let defaultTemplatesConfig: DefaultTemplatesConfigSetting | null = await joplin.settings.value("defaultTemplatesConfig");
-    if (defaultTemplatesConfig === null) defaultTemplatesConfig = {};
-    return defaultTemplatesConfig;
-}
-
-export const clearDefaultTemplates = async (notebookId: string): Promise<void> => {
-    const defaultTemplatesConfig = await getNotebookDefaultTemplatesConfig();
-    delete defaultTemplatesConfig[notebookId];
-    await joplin.settings.setValue("defaultTemplatesConfig", defaultTemplatesConfig);
 }

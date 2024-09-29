@@ -2,6 +2,7 @@ import joplin from "api";
 import { NewNote } from "./parser";
 import { getSelectedFolder } from "./utils/folders";
 import { applyTagToNote, getAnyTagWithTitle } from "./utils/tags";
+import { ApplyTagsWhileInsertingSetting } from "./settings";
 
 export enum TemplateAction {
     NewNote = "newNote",
@@ -12,7 +13,7 @@ export enum TemplateAction {
 const performInsertTextAction = async (template: NewNote) => {
     await joplin.commands.execute("insertText", template.body);
 
-    const applyTags = await joplin.settings.value("applyTagsWhileInserting")
+    const applyTags = await ApplyTagsWhileInsertingSetting.get()
     if (applyTags) {
         const noteId = (await joplin.workspace.selectedNote()).id;
         for (const tag of template.tags) {
