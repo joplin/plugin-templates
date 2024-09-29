@@ -40,7 +40,7 @@ export const createMappedSetting = <T>(id: string, manifest: SettingItem, valueM
 
         static async set(newValue: T): Promise<void> {
             const potentialValues = Object.entries(valueMap).filter((entry) => entry[1] === newValue);
-            await joplin.settings.setValue(id, potentialValues.length ? potentialValues[1][0] : "" );
+            await joplin.settings.setValue(id, potentialValues.length ? potentialValues[0][0] : "" );
         }
     }
 }
