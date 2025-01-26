@@ -28,6 +28,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           tag: dev
+          deleteOnlyFromDrafts: false
       - name: Calculate short SHA
         shell: bash
         run: echo "GITHUB_SHORT_SHA=$(git rev-parse --short "$GITHUB_SHA")" >> "$GITHUB_ENV"
