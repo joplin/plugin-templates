@@ -1,0 +1,40 @@
+name: CD
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - src/**
+      - package.json
+      - tsconfig.json
+      - webpack.config.js
+      - .github/workflows/cd.yml
+  workflow_dispatch:
+jobs:
+  dev-release:
+    runs-on:  ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+      - name: Install dependencies
+        run: npm install
+      - name: Build plugin
+        run: npm run dist
+      - name: Remove existing artifacts
+        uses: andreaswilli/delete-release-assets-action@4.0.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          tag: dev
+      - name: Calculate short SHA
+        shell: bash
+        run: echo "GITHUB_SHORT_SHA=$(git rev-parse --short "$GITHUB_SHA")" >> "$GITHUB_ENV"
+      - name: Upload binary to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: publish/joplin.plugin.templates.jpl
+          asset_name: joplin.plugin.templates.dev-${{ env.GITHUB_SHORT_SHA }}.jpl
+          tag: dev
