@@ -24,7 +24,7 @@ jobs:
       - name: Build plugin
         run: npm run dist
       - name: Remove existing artifacts
-        uses: andreaswilli/delete-release-assets-action@4.0.0
+        uses: andreaswilli/delete-release-assets-action@v4.0.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           tag: dev
