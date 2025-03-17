@@ -8,7 +8,6 @@ import { getTemplateFromId, getUserTemplateSelection, Note } from "./utils/templ
 import { setDefaultTemplatesView, DefaultTemplatesDisplayData, NotebookDefaultTemplatesDisplayData } from "./views/defaultTemplates";
 import { TemplateAction, performAction } from "./actions";
 import { loadLegacyTemplates } from "./legacyTemplates";
-import * as open from "open";
 import { Logger } from "./logger";
 import { PromiseGroup } from "./utils/promises";
 import { PluginSettingsRegistry, DefaultNoteTemplateIdSetting, DefaultTodoTemplateIdSetting, DefaultTemplatesConfigSetting } from "./settings";
@@ -16,6 +15,14 @@ import { LocaleGlobalSetting, DateFormatGlobalSetting, TimeFormatGlobalSetting, 
 import { DefaultTemplatesConfig } from "./settings/defaultTemplatesConfig";
 
 const DOCUMENTATION_URL = "https://github.com/joplin/plugin-templates#readme";
+
+async function safeOpenUrl(url: string) {
+    try {
+        await joplin.commands.execute('openUrl', url);
+    } catch (error) {
+        await joplin.views.dialogs.showMessageBox(`Please visit: ${url}`);
+    }
+}
 
 joplin.plugins.register({
     onStart: async function() {
@@ -244,7 +251,7 @@ joplin.plugins.register({
             name: "showPluginDocumentation",
             label: "Help",
             execute: async () => {
-                open(DOCUMENTATION_URL);
+                await safeOpenUrl(DOCUMENTATION_URL);
             }
         }));
 
