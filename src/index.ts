@@ -1,5 +1,5 @@
 import joplin from "api";
-import { MenuItemLocation } from "api/types";
+import { MenuItemLocation, ToolbarButtonLocation } from "api/types";
 import { Parser } from "./parser";
 import { DateAndTimeUtils } from "./utils/dateAndTime";
 import { getFolderFromId, getSelectedFolder, getUserFolderSelection, Folder } from "./utils/folders";
@@ -94,10 +94,23 @@ joplin.plugins.register({
         joplinCommands.add(joplin.commands.register({
             name: "createNoteFromTemplate",
             label: "Create note from template",
+            iconName: "fa-solid fa-file-lines",
             execute: async () => {
                 await getTemplateAndPerformAction(TemplateAction.NewNote);
             }
         }));
+
+        joplin.views.toolbarButtons.create(
+            "createNoteFromTemplateEditorToolbar",
+            "createNoteFromTemplate",
+            ToolbarButtonLocation.EditorToolbar
+        );
+
+        joplin.views.toolbarButtons.create(
+            "createNoteFromTemplateNoteToolbar",
+            "createNoteFromTemplate",
+            ToolbarButtonLocation.NoteToolbar
+        );
 
         joplinCommands.add(joplin.commands.register({
             name: "createTodoFromTemplate",
