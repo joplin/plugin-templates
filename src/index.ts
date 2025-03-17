@@ -50,7 +50,12 @@ joplin.plugins.register({
 
 
         // Asynchronously load legacy templates
-        loadLegacyTemplates(dateAndTimeUtils, profileDir);
+        const version = await joplin.versionInfo();
+        if (version.platform === 'desktop') {
+            loadLegacyTemplates(dateAndTimeUtils, profileDir);
+        } else {
+            logger.log('Legacy templates loading skipped on mobile');
+        }
 
 
         // Utility Functions
