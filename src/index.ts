@@ -29,18 +29,18 @@ joplin.plugins.register({
         // Register setting section
         await PluginSettingsRegistry.registerSettings();
 
-
         // Global variables
         const joplinGlobalApis = new PromiseGroup();
 
         joplinGlobalApis.set("dialogViewHandle", joplin.views.dialogs.create("dialog"));
+        joplinGlobalApis.set("templateSelectorHandle", joplin.views.dialogs.create("templateSelector"));
         joplinGlobalApis.set("userLocale", LocaleGlobalSetting.get());
         joplinGlobalApis.set("userDateFormat", DateFormatGlobalSetting.get());
         joplinGlobalApis.set("userTimeFormat", TimeFormatGlobalSetting.get());
         joplinGlobalApis.set("profileDir", ProfileDirGlobalSetting.get());
 
         const {
-            dialogViewHandle, userLocale, userDateFormat,
+            dialogViewHandle, templateSelectorHandle, userLocale, userDateFormat,
             userTimeFormat, profileDir
         } = await joplinGlobalApis.groupAll();
 
@@ -67,7 +67,7 @@ joplin.plugins.register({
         }
 
         const getTemplateAndPerformAction = async (action: TemplateAction) => {
-            const template: Note = JSON.parse(await getUserTemplateSelection() || "null");
+            const template: Note = JSON.parse(await getUserTemplateSelection(templateSelectorHandle) || "null");
             await performActionWithParsedTemplate(action, template);
         }
 
@@ -163,7 +163,7 @@ joplin.plugins.register({
             name: "setDefaultTemplate",
             label: "Set default template",
             execute: async () => {
-                const templateId = await getUserTemplateSelection("id");
+                const templateId = await getUserTemplateSelection(templateSelectorHandle, "id");
                 if (templateId === null) return;
 
                 const defaultType = await getUserDefaultTemplateTypeSelection();
@@ -181,7 +181,7 @@ joplin.plugins.register({
                 const folder: Folder | null = JSON.parse(await getUserFolderSelection() || "null");
                 if (folder === null) return;
 
-                const templateId = await getUserTemplateSelection("id", `Default template for "${folder.title}":`);
+                const templateId = await getUserTemplateSelection(templateSelectorHandle, "id", `Default template for "${folder.title}":`);
                 if (templateId === null) return;
 
                 const defaultType = await getUserDefaultTemplateTypeSelection();

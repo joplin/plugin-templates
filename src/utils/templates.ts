@@ -53,40 +53,39 @@ const getAllTemplates = async () => {
     return templates;
 }
 
-export const getUserTemplateSelection = async (property?: NoteProperty, promptLabel = "Template:"): Promise<string | null> => {
-    const templates = await getAllTemplates();
-    const templateOptions = templates.map(note => {
-        let optionValue;
-
-        if (!property) {
-            optionValue = JSON.stringify(note);
-        } else {
-            optionValue = note[property];
+export async function getUserTemplateSelection(dialogHandle: string, returnField: "id" | "note" | "body" = "note", prompt?: string): Promise<string | null> {
+    try {
+        const version = await joplin.versionInfo();
+        const templates = await getAllTemplates();
+        
+        if (templates.length === 0) {
+            await joplin.views.dialogs.showMessageBox('No templates found. Please create some templates first.');
+            return null;
         }
 
-        return {
-            label: note.title,
-            value: optionValue
-        };
-    });
+        const templateOptions = templates.map(template => `
+            <option value="${returnField === "id" ? template.id : JSON.stringify(template)}">
+                ${template.title}
+            </option>
+        `).join('');
 
-    if (!templateOptions.length) {
-        await joplin.views.dialogs.showMessageBox("No templates found! Please create a template and try again.");
+        await joplin.views.dialogs.setHtml(dialogHandle, `
+            <form name="select-template">
+                <div style="padding: 10px;">
+                    <label for="template">${prompt || "Select template:"}</label><br/>
+                    <select name="template" id="template" style="width: 100%; margin-top: 10px;">
+                        ${templateOptions}
+                    </select>
+                </div>
+            </form>
+        `);
+
+        const result = await joplin.views.dialogs.open(dialogHandle);
+        return result.formData?.template || null;
+    } catch (error) {
+        console.error("Error getting user template selection", error);
         return null;
     }
-
-    const { answer } = await joplin.commands.execute("showPrompt", {
-        label: promptLabel,
-        inputType: "dropdown",
-        value: templateOptions[0],
-        autocomplete: templateOptions
-    });
-
-    if (answer) {
-        return answer.value;
-    }
-
-    return null;
 }
 
 export const getTemplateFromId = async (templateId: string | null): Promise<Note | null> => {

@@ -17,6 +17,12 @@ interface TagData {
     }[];
 }
 
+let dialogHandle: string;
+
+beforeEach(async () => {
+    dialogHandle = await joplin.views.dialogs.create("templateSelector");
+});
+
 describe("Get user template selection", () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     jest.spyOn(joplin.views.dialogs, "showMessageBox").mockImplementation(async (message: string) => {
@@ -77,7 +83,7 @@ describe("Get user template selection", () => {
 
     test("should show a dialog when there are no templates", async () => {
         setTemplateTagsAndNotes([]);
-        const selectedTemplate = await getUserTemplateSelection();
+        const selectedTemplate = await getUserTemplateSelection(dialogHandle);
         testExpectedCalls(joplin.views.dialogs.showMessageBox, 1);
         expect(selectedTemplate).toBeNull();
     });
@@ -90,7 +96,7 @@ describe("Get user template selection", () => {
                 notes: []
             }
         ]);
-        const selectedTemplate = await getUserTemplateSelection();
+        const selectedTemplate = await getUserTemplateSelection(dialogHandle);
         testExpectedCalls(joplin.views.dialogs.showMessageBox, 1);
         expect(selectedTemplate).toBeNull();
     });
@@ -136,7 +142,7 @@ describe("Get user template selection", () => {
         const selectedTemplate = templateOptions[0];
 
         expectTemplatesSelector(templateOptions, selectedTemplate);
-        const res = await getUserTemplateSelection();
+        const res = await getUserTemplateSelection(dialogHandle);
         testExpectedCalls(joplin.commands.execute, 1);
         expect(res).toEqual(selectedTemplate.value);
     });
@@ -206,7 +212,7 @@ describe("Get user template selection", () => {
         const selectedTemplate = templateOptions[1];
 
         expectTemplatesSelector(templateOptions, selectedTemplate);
-        const res = await getUserTemplateSelection();
+        const res = await getUserTemplateSelection(dialogHandle);
         testExpectedCalls(joplin.commands.execute, 1);
         expect(res).toEqual(selectedTemplate.value);
     });
@@ -252,7 +258,7 @@ describe("Get user template selection", () => {
         const selectedTemplate = null;
 
         expectTemplatesSelector(templateOptions, selectedTemplate);
-        const res = await getUserTemplateSelection();
+        const res = await getUserTemplateSelection(dialogHandle);
         testExpectedCalls(joplin.commands.execute, 1);
         expect(res).toBeNull();
     });
@@ -290,7 +296,7 @@ describe("Get user template selection", () => {
         const selectedTemplate = templateOptions[1];
 
         expectTemplatesSelector(templateOptions, selectedTemplate);
-        const res = await getUserTemplateSelection("body");
+        const res = await getUserTemplateSelection(dialogHandle, "body");
         testExpectedCalls(joplin.commands.execute, 1);
         expect(res).toEqual(selectedTemplate.value);
     });
@@ -337,7 +343,7 @@ describe("Get user template selection", () => {
         const selectedTemplate = null;
 
         expectTemplatesSelector(templateOptions, selectedTemplate);
-        const res = await getUserTemplateSelection("body");
+        const res = await getUserTemplateSelection(dialogHandle, "body");
         testExpectedCalls(joplin.commands.execute, 1);
         expect(res).toEqual(null);
     });
