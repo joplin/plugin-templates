@@ -109,7 +109,7 @@ joplin.plugins.register({
         joplinCommands.add(joplin.commands.register({
             name: "createNoteFromTemplate",
             label: "Create note from template",
-            iconName: "fa-solid fa-file-lines",
+            iconName: "far fa-file-alt",
             execute: async () => {
                 await getTemplateAndPerformAction(TemplateAction.NewNote);
             }
