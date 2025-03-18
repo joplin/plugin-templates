@@ -63,28 +63,47 @@ export async function getUserTemplateSelection(dialogHandle: string, property?: 
         }
 
         await joplin.views.dialogs.setHtml(dialogHandle, `
-            <div style="padding: 10px;">
-                <p>${promptLabel}</p>
-                <select id="template" name="template">
-                    ${templates.map(note => {
-                        let optionValue;
-                        if (!property) {
-                            optionValue = JSON.stringify(note);
-                        } else {
-                            optionValue = note[property];
-                        }
-                        return `
-                            <option value="${optionValue}">
-                                ${note.title}
-                            </option>
-                        `;
-                    }).join('')}
-                </select>
-            </div>
+            <form name="templates-form">
+                <div style="padding: 10px;">
+                    <p>${promptLabel}</p>
+                    <select id="template" name="template">
+                        ${templates.map(note => {
+                            let optionValue;
+                            if (!property) {
+                                optionValue = JSON.stringify(note).replace(/"/g, '&quot;');
+                            } else {
+                                optionValue = note[property];
+                            }
+                            return `
+                                <option value="${optionValue}">
+                                    ${note.title}
+                                </option>
+                            `;
+                        }).join('')}
+                    </select>
+                </div>
+            </form>
         `);
 
+        // Add buttons to the dialog
+        await joplin.views.dialogs.setButtons(dialogHandle, [
+            { id: "ok", title: "Select" },
+            { id: "cancel", title: "Cancel" }
+        ]);
+
+        // Make dialog size adapt to content
+        await joplin.views.dialogs.setFitToContent(dialogHandle, true);
+
         const result = await joplin.views.dialogs.open(dialogHandle);
-        return result.formData?.template || null;
+        
+        if (result.id === 'cancel') {
+            return null;
+        }
+
+        // Get the template value from the nested form data structure
+        const templateValue = result.formData?.['templates-form']?.template;
+        
+        return templateValue || null;
     } catch (error) {
         console.error('Error in getUserTemplateSelection:', error);
         return null;
