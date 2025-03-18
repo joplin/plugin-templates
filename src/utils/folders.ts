@@ -54,38 +54,32 @@ const getAllFolders = async (): Promise<Folder[]> => {
     });
 }
 
-export const getUserFolderSelection = async (property?: FolderProperty): Promise<string | null> => {
-    const folders = await getAllFolders();
-    if (!folders.length) {
-        await joplin.views.dialogs.showMessageBox("No notebooks found! Please create a notebook and try again.");
-        return null;
-    }
-
-    const notebookOptions = folders.map(folder => {
-        let optionValue;
-
-        if (!property) {
-            optionValue = JSON.stringify(folder);
-        } else {
-            optionValue = folder[property];
+export async function getUserFolderSelection(dialogHandle: string, returnField: "id" | "folder" = "folder", prompt?: string): Promise<string | null> {
+    try {
+        const folders = await getAllFolders();
+        
+        if (folders.length === 0) {
+            await joplin.views.dialogs.showMessageBox('No notebooks found.');
+            return null;
         }
 
-        return {
-            label: folder.title,
-            value: optionValue
-        };
-    });
+        await joplin.views.dialogs.setHtml(dialogHandle, `
+            <div style="padding: 10px;">
+                <p>${prompt || "Select notebook:"}</p>
+                <select id="folder" name="folder">
+                    ${folders.map(folder => `
+                        <option value='${returnField === "id" ? folder.id : JSON.stringify(folder)}'>
+                            ${folder.title}
+                        </option>
+                    `).join('')}
+                </select>
+            </div>
+        `);
 
-    const { answer } = await joplin.commands.execute("showPrompt", {
-        label: "Notebook:",
-        inputType: "dropdown",
-        value: notebookOptions[0],
-        autocomplete: notebookOptions
-    });
-
-    if (answer) {
-        return answer.value;
+        const result = await joplin.views.dialogs.open(dialogHandle);
+        return result.formData?.folder || null;
+    } catch (error) {
+        console.error('Error in getUserFolderSelection:', error);
+        return null;
     }
-
-    return null;
 }

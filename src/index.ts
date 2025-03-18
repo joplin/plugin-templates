@@ -34,13 +34,16 @@ joplin.plugins.register({
 
         joplinGlobalApis.set("dialogViewHandle", joplin.views.dialogs.create("dialog"));
         joplinGlobalApis.set("templateSelectorHandle", joplin.views.dialogs.create("templateSelector"));
+        joplinGlobalApis.set("folderSelectorHandle", joplin.views.dialogs.create("folderSelector"));
+        joplinGlobalApis.set("templateTypeSelectorHandle", joplin.views.dialogs.create("templateTypeSelector"));
         joplinGlobalApis.set("userLocale", LocaleGlobalSetting.get());
         joplinGlobalApis.set("userDateFormat", DateFormatGlobalSetting.get());
         joplinGlobalApis.set("userTimeFormat", TimeFormatGlobalSetting.get());
         joplinGlobalApis.set("profileDir", ProfileDirGlobalSetting.get());
 
         const {
-            dialogViewHandle, templateSelectorHandle, userLocale, userDateFormat,
+            dialogViewHandle, templateSelectorHandle, folderSelectorHandle,
+            templateTypeSelectorHandle, userLocale, userDateFormat,
             userTimeFormat, profileDir
         } = await joplinGlobalApis.groupAll();
 
@@ -166,7 +169,7 @@ joplin.plugins.register({
                 const templateId = await getUserTemplateSelection(templateSelectorHandle, "id");
                 if (templateId === null) return;
 
-                const defaultType = await getUserDefaultTemplateTypeSelection();
+                const defaultType = await getUserDefaultTemplateTypeSelection(templateSelectorHandle);
                 if (defaultType === null) return;
 
                 await setDefaultTemplate(null, templateId, defaultType);
@@ -178,13 +181,13 @@ joplin.plugins.register({
             name: "setDefaultTemplateForNotebook",
             label: "Set default template for notebook",
             execute: async () => {
-                const folder: Folder | null = JSON.parse(await getUserFolderSelection() || "null");
+                const folder: Folder | null = JSON.parse(await getUserFolderSelection(folderSelectorHandle) || "null");
                 if (folder === null) return;
 
                 const templateId = await getUserTemplateSelection(templateSelectorHandle, "id", `Default template for "${folder.title}":`);
                 if (templateId === null) return;
 
-                const defaultType = await getUserDefaultTemplateTypeSelection();
+                const defaultType = await getUserDefaultTemplateTypeSelection(templateTypeSelectorHandle);
                 if (defaultType === null) return;
 
                 await setDefaultTemplate(folder.id, templateId, defaultType);
@@ -196,7 +199,7 @@ joplin.plugins.register({
             name: "clearDefaultTemplatesForNotebook",
             label: "Clear default templates for notebook",
             execute: async () => {
-                const folder: Folder | null = JSON.parse(await getUserFolderSelection() || "null");
+                const folder: Folder | null = JSON.parse(await getUserFolderSelection(folderSelectorHandle) || "null");
                 if (folder === null) return;
 
                 await DefaultTemplatesConfigSetting.clearDefaultTemplates(folder.id);

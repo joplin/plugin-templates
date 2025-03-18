@@ -53,37 +53,40 @@ const getAllTemplates = async () => {
     return templates;
 }
 
-export async function getUserTemplateSelection(dialogHandle: string, returnField: "id" | "note" | "body" = "note", prompt?: string): Promise<string | null> {
+export async function getUserTemplateSelection(dialogHandle: string, property?: NoteProperty, promptLabel: string = "Template:"): Promise<string | null> {
     try {
-        const version = await joplin.versionInfo();
         const templates = await getAllTemplates();
         
         if (templates.length === 0) {
-            await joplin.views.dialogs.showMessageBox('No templates found. Please create some templates first.');
+            await joplin.views.dialogs.showMessageBox("No templates found! Please create a template and try again.");
             return null;
         }
 
-        const templateOptions = templates.map(template => `
-            <option value="${returnField === "id" ? template.id : JSON.stringify(template)}">
-                ${template.title}
-            </option>
-        `).join('');
-
         await joplin.views.dialogs.setHtml(dialogHandle, `
-            <form name="select-template">
-                <div style="padding: 10px;">
-                    <label for="template">${prompt || "Select template:"}</label><br/>
-                    <select name="template" id="template" style="width: 100%; margin-top: 10px;">
-                        ${templateOptions}
-                    </select>
-                </div>
-            </form>
+            <div style="padding: 10px;">
+                <p>${promptLabel}</p>
+                <select id="template" name="template">
+                    ${templates.map(note => {
+                        let optionValue;
+                        if (!property) {
+                            optionValue = JSON.stringify(note);
+                        } else {
+                            optionValue = note[property];
+                        }
+                        return `
+                            <option value="${optionValue}">
+                                ${note.title}
+                            </option>
+                        `;
+                    }).join('')}
+                </select>
+            </div>
         `);
 
         const result = await joplin.views.dialogs.open(dialogHandle);
         return result.formData?.template || null;
     } catch (error) {
-        console.error("Error getting user template selection", error);
+        console.error('Error in getUserTemplateSelection:', error);
         return null;
     }
 }

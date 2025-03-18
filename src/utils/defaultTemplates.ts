@@ -7,31 +7,26 @@ export enum DefaultTemplateType {
     Todo,
 }
 
-export const getUserDefaultTemplateTypeSelection = async (promptLabel = "Applicable for:"): Promise<DefaultTemplateType | null> => {
-    const defaultTypeOptions = [
-        {
-            label: "Both notes & todos",
-            value: DefaultTemplateType.Both
-        },
-        {
-            label: "Notes",
-            value: DefaultTemplateType.Note
-        },
-        {
-            label: "Todos",
-            value: DefaultTemplateType.Todo
-        },
-    ];
+export async function getUserDefaultTemplateTypeSelection(dialogHandle: string, prompt?: string): Promise<DefaultTemplateType | null> {
+    try {
+        await joplin.views.dialogs.setHtml(dialogHandle, `
+            <div style="padding: 10px;">
+                <p>${prompt || "Select template type:"}</p>
+                <select id="templateType" name="templateType">
+                    <option value="${DefaultTemplateType.Note}">Note</option>
+                    <option value="${DefaultTemplateType.Todo}">To-do</option>
+                    <option value="${DefaultTemplateType.Both}">Both</option>
+                </select>
+            </div>
+        `);
 
-    const { answer } = await joplin.commands.execute("showPrompt", {
-        label: promptLabel,
-        inputType: "dropdown",
-        value: defaultTypeOptions[0],
-        autocomplete: defaultTypeOptions
-    });
-
-    if (!answer) return null;
-    return answer.value;
+        const result = await joplin.views.dialogs.open(dialogHandle);
+        const value = result.formData?.templateType;
+        return value ? parseInt(value) as DefaultTemplateType : null;
+    } catch (error) {
+        console.error('Error in getUserDefaultTemplateTypeSelection:', error);
+        return null;
+    }
 }
 
 export const setDefaultTemplate = async (notebookId: string | null, templateId: string, defaultType: DefaultTemplateType): Promise<void> => {
