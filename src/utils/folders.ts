@@ -64,20 +64,39 @@ export async function getUserFolderSelection(dialogHandle: string, returnField: 
         }
 
         await joplin.views.dialogs.setHtml(dialogHandle, `
-            <div style="padding: 10px;">
-                <p>${prompt || "Select notebook:"}</p>
-                <select id="folder" name="folder">
-                    ${folders.map(folder => `
-                        <option value='${returnField === "id" ? folder.id : JSON.stringify(folder)}'>
-                            ${folder.title}
-                        </option>
-                    `).join('')}
-                </select>
-            </div>
+            <form name="folders-form">
+                <div style="padding: 10px;">
+                    <p>${prompt || "Select notebook:"}</p>
+                    <select id="folder" name="folder">
+                        ${folders.map(folder => `
+                            <option value='${returnField === "id" ? folder.id : JSON.stringify(folder)}'>
+                                ${folder.title}
+                            </option>
+                        `).join('')}
+                    </select>
+                </div>
+            </form>
         `);
 
+        // Add buttons to the dialog
+        await joplin.views.dialogs.setButtons(dialogHandle, [
+            { id: "ok", title: "Select" },
+            { id: "cancel", title: "Cancel" }
+        ]);
+
+        // Make dialog size adapt to content
+        await joplin.views.dialogs.setFitToContent(dialogHandle, true);
+
         const result = await joplin.views.dialogs.open(dialogHandle);
-        return result.formData?.folder || null;
+        
+        if (result.id === 'cancel') {
+            return null;
+        }
+
+        // Get the folder value from the nested form data structure
+        const folderValue = result.formData?.['folders-form']?.folder;
+        
+        return folderValue || null;
     } catch (error) {
         console.error('Error in getUserFolderSelection:', error);
         return null;
