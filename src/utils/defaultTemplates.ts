@@ -10,18 +10,36 @@ export enum DefaultTemplateType {
 export async function getUserDefaultTemplateTypeSelection(dialogHandle: string, prompt?: string): Promise<DefaultTemplateType | null> {
     try {
         await joplin.views.dialogs.setHtml(dialogHandle, `
-            <div style="padding: 10px;">
-                <p>${prompt || "Select template type:"}</p>
-                <select id="templateType" name="templateType">
-                    <option value="${DefaultTemplateType.Note}">Note</option>
-                    <option value="${DefaultTemplateType.Todo}">To-do</option>
-                    <option value="${DefaultTemplateType.Both}">Both</option>
-                </select>
-            </div>
+            <form name="template-type-form">
+                <div style="padding: 10px;">
+                    <p>${prompt || "Select template type:"}</p>
+                    <select id="templateType" name="templateType">
+                        <option value="${DefaultTemplateType.Note}">Note</option>
+                        <option value="${DefaultTemplateType.Todo}">To-do</option>
+                        <option value="${DefaultTemplateType.Both}">Both</option>
+                    </select>
+                </div>
+            </form>
         `);
 
+        // Add buttons to the dialog
+        await joplin.views.dialogs.setButtons(dialogHandle, [
+            { id: "ok", title: "Select" },
+            { id: "cancel", title: "Cancel" }
+        ]);
+
+        // Make dialog size adapt to content
+        await joplin.views.dialogs.setFitToContent(dialogHandle, true);
+
         const result = await joplin.views.dialogs.open(dialogHandle);
-        const value = result.formData?.templateType;
+        
+        if (result.id === 'cancel') {
+            return null;
+        }
+
+        // Get the template type value from the nested form data structure
+        const value = result.formData?.['template-type-form']?.templateType;
+        
         return value ? parseInt(value) as DefaultTemplateType : null;
     } catch (error) {
         console.error('Error in getUserDefaultTemplateTypeSelection:', error);
