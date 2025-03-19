@@ -1,5 +1,6 @@
 import joplin from "api";
 import { DefaultTemplatesConfigSetting, DefaultNoteTemplateIdSetting, DefaultTodoTemplateIdSetting } from "../settings";
+import { encode } from "html-entities";
 
 export enum DefaultTemplateType {
     Both,
@@ -9,16 +10,19 @@ export enum DefaultTemplateType {
 
 export async function getUserDefaultTemplateTypeSelection(dialogHandle: string, prompt?: string): Promise<DefaultTemplateType | null> {
     try {
+        await joplin.views.dialogs.addScript(dialogHandle, "./views/webview.css");
+
+        const optionsHtml = [
+            { value: DefaultTemplateType.Note, label: "Note" },
+            { value: DefaultTemplateType.Todo, label: "To-do" },
+            { value: DefaultTemplateType.Both, label: "Both" }
+        ].map(option => `<option value="${encode(option.value.toString())}">${encode(option.label)}</option>`).join("");
+
         await joplin.views.dialogs.setHtml(dialogHandle, `
-            <form name="template-type-form">
-                <div style="padding: 10px;">
-                    <p>${prompt || "Select template type:"}</p>
-                    <select id="templateType" name="templateType">
-                        <option value="${DefaultTemplateType.Note}">Note</option>
-                        <option value="${DefaultTemplateType.Todo}">To-do</option>
-                        <option value="${DefaultTemplateType.Both}">Both</option>
-                    </select>
-                </div>
+            <h2>${encode(prompt || "Select template type")}</h2>
+            <form class="variablesForm" name="template-type-form">
+                <div class="variableName">Choose template type:</div>
+                <select name="templateType">${optionsHtml}</select>
             </form>
         `);
 
