@@ -1,6 +1,7 @@
 import joplin from "api";
 import { fetchAllItems } from "./dataApi";
 import { Note } from "./templates";
+import { encode } from "html-entities";
 
 export interface Folder {
     id: string;
@@ -63,18 +64,18 @@ export async function getUserFolderSelection(dialogHandle: string, returnField: 
             return null;
         }
 
+        await joplin.views.dialogs.addScript(dialogHandle, "./views/webview.css");
+
+        const optionsHtml = folders.map(folder => {
+            const value = returnField === "id" ? folder.id : JSON.stringify(folder);
+            return `<option value="${encode(value)}">${encode(folder.title)}</option>`;
+        }).join("");
+
         await joplin.views.dialogs.setHtml(dialogHandle, `
-            <form name="folders-form">
-                <div style="padding: 10px;">
-                    <p>${prompt || "Select notebook:"}</p>
-                    <select id="folder" name="folder">
-                        ${folders.map(folder => `
-                            <option value='${returnField === "id" ? folder.id : JSON.stringify(folder)}'>
-                                ${folder.title}
-                            </option>
-                        `).join('')}
-                    </select>
-                </div>
+            <h2>${encode(prompt || "Select notebook")}</h2>
+            <form class="variablesForm" name="folders-form">
+                <div class="variableName">Choose notebook:</div>
+                <select name="folder">${optionsHtml}</select>
             </form>
         `);
 
