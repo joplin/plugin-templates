@@ -3,6 +3,7 @@ import { getAllNotesInFolder } from "./folders";
 import { getAllNotesWithTag, getAllTagsWithTitle } from "./tags";
 import { TemplatesSourceSetting, TemplatesSource } from "../settings/templatesSource";
 import { LocaleGlobalSetting } from "../settings/global";
+import { encode } from "html-entities";
 
 export interface Note {
     id: string;
@@ -62,26 +63,23 @@ export async function getUserTemplateSelection(dialogHandle: string, property?: 
             return null;
         }
 
+        await joplin.views.dialogs.addScript(dialogHandle, "./views/webview.css");
+
+        const optionsHtml = templates.map(note => {
+            let optionValue;
+            if (!property) {
+                optionValue = JSON.stringify(note).replace(/"/g, '&quot;');
+            } else {
+                optionValue = note[property];
+            }
+            return `<option value="${encode(optionValue)}">${encode(note.title)}</option>`;
+        }).join("");
+
         await joplin.views.dialogs.setHtml(dialogHandle, `
-            <form name="templates-form">
-                <div style="padding: 10px;">
-                    <p>${promptLabel}</p>
-                    <select id="template" name="template">
-                        ${templates.map(note => {
-                            let optionValue;
-                            if (!property) {
-                                optionValue = JSON.stringify(note).replace(/"/g, '&quot;');
-                            } else {
-                                optionValue = note[property];
-                            }
-                            return `
-                                <option value="${optionValue}">
-                                    ${note.title}
-                                </option>
-                            `;
-                        }).join('')}
-                    </select>
-                </div>
+            <h2>${encode(promptLabel)}</h2>
+            <form class="variablesForm" name="templates-form">
+                <div class="variableName">Select a template:</div>
+                <select name="template">${optionsHtml}</select>
             </form>
         `);
 
