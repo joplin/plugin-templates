@@ -3,7 +3,7 @@ import { getAllNotesInFolder } from "./folders";
 import { getAllNotesWithTag, getAllTagsWithTitle } from "./tags";
 import { TemplatesSourceSetting, TemplatesSource } from "../settings/templatesSource";
 import { LocaleGlobalSetting } from "../settings/global";
-import { encode } from "html-entities";
+import { encode, decode } from "html-entities";
 
 export interface Note {
     id: string;
@@ -97,11 +97,12 @@ export async function getUserTemplateSelection(dialogHandle: string, property?: 
         if (result.id === 'cancel') {
             return null;
         }
-
-        // Get the template value from the nested form data structure
-        const templateValue = result.formData?.['templates-form']?.template;
         
-        return templateValue || null;
+        // Get the template value and decode HTML entities
+        const templateValue = result.formData?.['templates-form']?.template;
+        const decodedValue = templateValue ? decode(templateValue) : null;
+        
+        return decodedValue;
     } catch (error) {
         console.error('Error in getUserTemplateSelection:', error);
         return null;
