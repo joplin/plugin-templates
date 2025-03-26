@@ -13,6 +13,7 @@ import { PromiseGroup } from "./utils/promises";
 import { PluginSettingsRegistry, DefaultNoteTemplateIdSetting, DefaultTodoTemplateIdSetting, DefaultTemplatesConfigSetting } from "./settings";
 import { LocaleGlobalSetting, DateFormatGlobalSetting, TimeFormatGlobalSetting, ProfileDirGlobalSetting } from "./settings/global";
 import { DefaultTemplatesConfig } from "./settings/defaultTemplatesConfig";
+import { CommandsPanel } from "./views/commandsPanel";
 
 const DOCUMENTATION_URL = "https://github.com/joplin/plugin-templates#readme";
 
@@ -324,8 +325,58 @@ joplin.plugins.register({
 
         await joplinCommands.groupAll();
 
-
         // Folder context menu
         await joplin.views.menuItems.create("templates_folderid", "copyFolderID", MenuItemLocation.FolderContextMenu);
+
+        if (version.platform === 'mobile') {
+            const commandsPanel = new CommandsPanel([
+                {
+                    id: "createNoteFromTemplate",
+                    label: "Create note from template",
+                    command: "createNoteFromTemplate"
+                },
+                {
+                    id: "createNoteFromDefaultTemplate",
+                    label: "Create note from default template",
+                    command: "createNoteFromDefaultTemplate"
+                },
+                {
+                    id: "createTodoFromTemplate",
+                    label: "Create to-do from template",
+                    command: "createTodoFromTemplate"
+                },
+                {
+                    id: "createTodoFromDefaultTemplate",
+                    label: "Create to-do from default template",
+                    command: "createTodoFromDefaultTemplate"
+                },
+                {
+                    id: "insertTemplate",
+                    label: "Insert template",
+                    command: "insertTemplate"
+                },
+                {
+                    id: "showDefaultTemplates",
+                    label: "Show default templates",
+                    command: "showDefaultTemplates"
+                },
+                {
+                    id: "setDefaultTemplate",
+                    label: "Set default template",
+                    command: "setDefaultTemplate"
+                },
+                {
+                    id: "setDefaultTemplateForNotebook",
+                    label: "Set default template for notebook",
+                    command: "setDefaultTemplateForNotebook"
+                },
+                {
+                    id: "clearDefaultTemplatesForNotebook",
+                    label: "Clear default templates for notebook",
+                    command: "clearDefaultTemplatesForNotebook"
+                }
+            ]);
+            await commandsPanel.create();
+        }
     },
 });
