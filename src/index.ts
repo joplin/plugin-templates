@@ -122,12 +122,6 @@ joplin.plugins.register({
             ToolbarButtonLocation.EditorToolbar
         );
 
-        joplin.views.toolbarButtons.create(
-            "createNoteFromTemplateNoteToolbar",
-            "createNoteFromTemplate",
-            ToolbarButtonLocation.NoteToolbar
-        );
-
         joplinCommands.add(joplin.commands.register({
             name: "createTodoFromTemplate",
             label: "Create to-do from template",
