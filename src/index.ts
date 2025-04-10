@@ -17,14 +17,6 @@ import { CommandsPanel } from "./views/commandsPanel";
 
 const DOCUMENTATION_URL = "https://github.com/joplin/plugin-templates#readme";
 
-async function safeOpenUrl(url: string) {
-    try {
-        await joplin.commands.execute('openUrl', url);
-    } catch (error) {
-        await joplin.views.dialogs.showMessageBox(`Please visit: ${url}`);
-    }
-}
-
 joplin.plugins.register({
     onStart: async function() {
         // Register setting section
@@ -254,7 +246,7 @@ joplin.plugins.register({
             name: "showPluginDocumentation",
             label: "Help",
             execute: async () => {
-                await safeOpenUrl(DOCUMENTATION_URL);
+                await joplin.commands.execute('openItem', DOCUMENTATION_URL);
             }
         }));
 
