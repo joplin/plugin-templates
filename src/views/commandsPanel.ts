@@ -26,12 +26,12 @@ export class CommandsPanel {
                 console.log('Received message from webview:', message);
                 if (message.type === "executeCommand") {
                     console.log('Executing command:', message.command);
-                    await joplin.commands.execute(message.command);
                     try {
                         await joplin.commands.execute('dismissPluginPanels');
                     } catch (error) {
                         // Ignore error
                     }
+                    await joplin.commands.execute(message.command);
                 }
             });
 
