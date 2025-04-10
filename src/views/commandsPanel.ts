@@ -1,4 +1,5 @@
 import joplin from "api";
+import { PassThrough } from "stream";
 
 export interface CommandButton {
     id: string;
@@ -26,6 +27,11 @@ export class CommandsPanel {
                 if (message.type === "executeCommand") {
                     console.log('Executing command:', message.command);
                     await joplin.commands.execute(message.command);
+                    try {
+                        await joplin.commands.execute('dismissPluginPanels');
+                    } catch (error) {
+                        // Ignore error
+                    }
                 }
             });
 
