@@ -317,47 +317,38 @@ joplin.plugins.register({
         if (version.platform === 'mobile') {
             const commandsPanel = new CommandsPanel([
                 {
-                    id: "createNoteFromTemplate",
                     label: "Create note from template",
                     command: "createNoteFromTemplate"
                 },
                 {
-                    id: "createNoteFromDefaultTemplate",
                     label: "Create note from default template",
                     command: "createNoteFromDefaultTemplate"
                 },
                 {
-                    id: "createTodoFromTemplate",
                     label: "Create to-do from template",
                     command: "createTodoFromTemplate"
                 },
                 {
-                    id: "createTodoFromDefaultTemplate",
                     label: "Create to-do from default template",
                     command: "createTodoFromDefaultTemplate"
                 },
                 {
-                    id: "insertTemplate",
                     label: "Insert template",
                     command: "insertTemplate"
                 },
                 {
-                    id: "showDefaultTemplates",
                     label: "Show default templates",
                     command: "showDefaultTemplates"
                 },
                 {
-                    id: "setDefaultTemplate",
                     label: "Set default template",
                     command: "setDefaultTemplate"
                 },
                 {
-                    id: "setDefaultTemplateForNotebook",
                     label: "Set default template for notebook",
                     command: "setDefaultTemplateForNotebook"
                 },
                 {
-                    id: "clearDefaultTemplatesForNotebook",
                     label: "Clear default templates for notebook",
                     command: "clearDefaultTemplatesForNotebook"
                 }

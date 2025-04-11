@@ -2,7 +2,6 @@ import joplin from "api";
 import { PassThrough } from "stream";
 
 export interface CommandButton {
-    id: string;
     label: string;
     command: string;
 }
