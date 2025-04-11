@@ -351,6 +351,10 @@ joplin.plugins.register({
                 {
                     label: "Clear default templates for notebook",
                     command: "clearDefaultTemplatesForNotebook"
+                },
+                {
+                    label: "Help",
+                    command: "showPluginDocumentation"
                 }
             ]);
             await commandsPanel.create();
