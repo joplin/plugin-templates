@@ -68,7 +68,7 @@ export async function getUserTemplateSelection(dialogHandle: string, property?: 
         const optionsHtml = templates.map(note => {
             let optionValue;
             if (!property) {
-                optionValue = JSON.stringify(note).replace(/"/g, '&quot;');
+                optionValue = JSON.stringify(note);
             } else {
                 optionValue = note[property];
             }
