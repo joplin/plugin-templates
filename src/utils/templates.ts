@@ -3,6 +3,7 @@ import { getAllNotesInFolder } from "./folders";
 import { getAllNotesWithTag, getAllTagsWithTitle } from "./tags";
 import { TemplatesSourceSetting, TemplatesSource } from "../settings/templatesSource";
 import { LocaleGlobalSetting } from "../settings/global";
+import { encode, decode } from "html-entities";
 
 export interface Note {
     id: string;
@@ -53,40 +54,59 @@ const getAllTemplates = async () => {
     return templates;
 }
 
-export const getUserTemplateSelection = async (property?: NoteProperty, promptLabel = "Template:"): Promise<string | null> => {
-    const templates = await getAllTemplates();
-    const templateOptions = templates.map(note => {
-        let optionValue;
-
-        if (!property) {
-            optionValue = JSON.stringify(note);
-        } else {
-            optionValue = note[property];
+export async function getUserTemplateSelection(dialogHandle: string, property?: NoteProperty, promptLabel: string = "Template:"): Promise<string | null> {
+    try {
+        const templates = await getAllTemplates();
+        
+        if (templates.length === 0) {
+            await joplin.views.dialogs.showMessageBox("No templates found! Please create a template and try again.");
+            return null;
         }
 
-        return {
-            label: note.title,
-            value: optionValue
-        };
-    });
+        await joplin.views.dialogs.addScript(dialogHandle, "./views/webview.css");
 
-    if (!templateOptions.length) {
-        await joplin.views.dialogs.showMessageBox("No templates found! Please create a template and try again.");
+        const optionsHtml = templates.map(note => {
+            let optionValue;
+            if (!property) {
+                optionValue = JSON.stringify(note);
+            } else {
+                optionValue = note[property];
+            }
+            return `<option value="${encode(optionValue)}">${encode(note.title)}</option>`;
+        }).join("");
+
+        await joplin.views.dialogs.setHtml(dialogHandle, `
+            <h2>${encode(promptLabel)}</h2>
+            <form class="variablesForm" name="templates-form">
+                <div class="variableName">Select a template:</div>
+                <select name="template">${optionsHtml}</select>
+            </form>
+        `);
+
+        // Add buttons to the dialog
+        await joplin.views.dialogs.setButtons(dialogHandle, [
+            { id: "ok", title: "Select" },
+            { id: "cancel", title: "Cancel" }
+        ]);
+
+        // Make dialog size adapt to content
+        await joplin.views.dialogs.setFitToContent(dialogHandle, true);
+
+        const result = await joplin.views.dialogs.open(dialogHandle);
+        
+        if (result.id === 'cancel') {
+            return null;
+        }
+        
+        // Get the template value and decode HTML entities
+        const templateValue = result.formData?.['templates-form']?.template;
+        const decodedValue = templateValue ? decode(templateValue) : null;
+        
+        return decodedValue;
+    } catch (error) {
+        console.error('Error in getUserTemplateSelection:', error);
         return null;
     }
-
-    const { answer } = await joplin.commands.execute("showPrompt", {
-        label: promptLabel,
-        inputType: "dropdown",
-        value: templateOptions[0],
-        autocomplete: templateOptions
-    });
-
-    if (answer) {
-        return answer.value;
-    }
-
-    return null;
 }
 
 export const getTemplateFromId = async (templateId: string | null): Promise<Note | null> => {

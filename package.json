@@ -54,7 +54,6 @@
     "front-matter": "^4.0.2",
     "handlebars": "^4.7.7",
     "html-entities": "^2.3.2",
-    "moment": "^2.29.1",
-    "open": "^8.2.1"
+    "moment": "^2.29.1"
   }
 }

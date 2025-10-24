@@ -1,5 +1,5 @@
 import joplin from "api";
-import { MenuItemLocation } from "api/types";
+import { MenuItemLocation, ToolbarButtonLocation } from "api/types";
 import { Parser } from "./parser";
 import { DateAndTimeUtils } from "./utils/dateAndTime";
 import { getFolderFromId, getSelectedFolder, getUserFolderSelection, Folder } from "./utils/folders";
@@ -8,12 +8,12 @@ import { getTemplateFromId, getUserTemplateSelection, Note } from "./utils/templ
 import { setDefaultTemplatesView, DefaultTemplatesDisplayData, NotebookDefaultTemplatesDisplayData } from "./views/defaultTemplates";
 import { TemplateAction, performAction } from "./actions";
 import { loadLegacyTemplates } from "./legacyTemplates";
-import * as open from "open";
 import { Logger } from "./logger";
 import { PromiseGroup } from "./utils/promises";
 import { PluginSettingsRegistry, DefaultNoteTemplateIdSetting, DefaultTodoTemplateIdSetting, DefaultTemplatesConfigSetting } from "./settings";
 import { LocaleGlobalSetting, DateFormatGlobalSetting, TimeFormatGlobalSetting, ProfileDirGlobalSetting } from "./settings/global";
 import { DefaultTemplatesConfig } from "./settings/defaultTemplatesConfig";
+import { CommandsPanel } from "./views/commandsPanel";
 
 const DOCUMENTATION_URL = "https://github.com/joplin/plugin-templates#readme";
 
@@ -22,18 +22,21 @@ joplin.plugins.register({
         // Register setting section
         await PluginSettingsRegistry.registerSettings();
 
-
         // Global variables
         const joplinGlobalApis = new PromiseGroup();
 
         joplinGlobalApis.set("dialogViewHandle", joplin.views.dialogs.create("dialog"));
+        joplinGlobalApis.set("templateSelectorHandle", joplin.views.dialogs.create("templateSelector"));
+        joplinGlobalApis.set("folderSelectorHandle", joplin.views.dialogs.create("folderSelector"));
+        joplinGlobalApis.set("templateTypeSelectorHandle", joplin.views.dialogs.create("templateTypeSelector"));
         joplinGlobalApis.set("userLocale", LocaleGlobalSetting.get());
         joplinGlobalApis.set("userDateFormat", DateFormatGlobalSetting.get());
         joplinGlobalApis.set("userTimeFormat", TimeFormatGlobalSetting.get());
         joplinGlobalApis.set("profileDir", ProfileDirGlobalSetting.get());
 
         const {
-            dialogViewHandle, userLocale, userDateFormat,
+            dialogViewHandle, templateSelectorHandle, folderSelectorHandle,
+            templateTypeSelectorHandle, userLocale, userDateFormat,
             userTimeFormat, profileDir
         } = await joplinGlobalApis.groupAll();
 
@@ -43,7 +46,12 @@ joplin.plugins.register({
 
 
         // Asynchronously load legacy templates
-        loadLegacyTemplates(dateAndTimeUtils, profileDir);
+        const version = await joplin.versionInfo();
+        if (version.platform === 'desktop') {
+            loadLegacyTemplates(dateAndTimeUtils, profileDir);
+        } else {
+            logger.log('Legacy templates loading skipped on mobile');
+        }
 
 
         // Utility Functions
@@ -55,7 +63,7 @@ joplin.plugins.register({
         }
 
         const getTemplateAndPerformAction = async (action: TemplateAction) => {
-            const template: Note = JSON.parse(await getUserTemplateSelection() || "null");
+            const template: Note = JSON.parse(await getUserTemplateSelection(templateSelectorHandle) || "null");
             await performActionWithParsedTemplate(action, template);
         }
 
@@ -94,10 +102,17 @@ joplin.plugins.register({
         joplinCommands.add(joplin.commands.register({
             name: "createNoteFromTemplate",
             label: "Create note from template",
+            iconName: "far fa-file-alt",
             execute: async () => {
                 await getTemplateAndPerformAction(TemplateAction.NewNote);
             }
         }));
+
+        joplin.views.toolbarButtons.create(
+            "createNoteFromTemplateEditorToolbar",
+            "createNoteFromTemplate",
+            ToolbarButtonLocation.EditorToolbar
+        );
 
         joplinCommands.add(joplin.commands.register({
             name: "createTodoFromTemplate",
@@ -138,10 +153,10 @@ joplin.plugins.register({
             name: "setDefaultTemplate",
             label: "Set default template",
             execute: async () => {
-                const templateId = await getUserTemplateSelection("id");
+                const templateId = await getUserTemplateSelection(templateSelectorHandle, "id");
                 if (templateId === null) return;
 
-                const defaultType = await getUserDefaultTemplateTypeSelection();
+                const defaultType = await getUserDefaultTemplateTypeSelection(templateSelectorHandle);
                 if (defaultType === null) return;
 
                 await setDefaultTemplate(null, templateId, defaultType);
@@ -153,13 +168,13 @@ joplin.plugins.register({
             name: "setDefaultTemplateForNotebook",
             label: "Set default template for notebook",
             execute: async () => {
-                const folder: Folder | null = JSON.parse(await getUserFolderSelection() || "null");
+                const folder: Folder | null = JSON.parse(await getUserFolderSelection(folderSelectorHandle) || "null");
                 if (folder === null) return;
 
-                const templateId = await getUserTemplateSelection("id", `Default template for "${folder.title}":`);
+                const templateId = await getUserTemplateSelection(templateSelectorHandle, "id", `Default template for "${folder.title}":`);
                 if (templateId === null) return;
 
-                const defaultType = await getUserDefaultTemplateTypeSelection();
+                const defaultType = await getUserDefaultTemplateTypeSelection(templateTypeSelectorHandle);
                 if (defaultType === null) return;
 
                 await setDefaultTemplate(folder.id, templateId, defaultType);
@@ -171,7 +186,7 @@ joplin.plugins.register({
             name: "clearDefaultTemplatesForNotebook",
             label: "Clear default templates for notebook",
             execute: async () => {
-                const folder: Folder | null = JSON.parse(await getUserFolderSelection() || "null");
+                const folder: Folder | null = JSON.parse(await getUserFolderSelection(folderSelectorHandle) || "null");
                 if (folder === null) return;
 
                 await DefaultTemplatesConfigSetting.clearDefaultTemplates(folder.id);
@@ -231,7 +246,7 @@ joplin.plugins.register({
             name: "showPluginDocumentation",
             label: "Help",
             execute: async () => {
-                open(DOCUMENTATION_URL);
+                await joplin.commands.execute('openItem', DOCUMENTATION_URL);
             }
         }));
 
@@ -296,8 +311,53 @@ joplin.plugins.register({
 
         await joplinCommands.groupAll();
 
-
         // Folder context menu
         await joplin.views.menuItems.create("templates_folderid", "copyFolderID", MenuItemLocation.FolderContextMenu);
+
+        if (version.platform === 'mobile') {
+            const commandsPanel = new CommandsPanel([
+                {
+                    label: "Create note from template",
+                    command: "createNoteFromTemplate"
+                },
+                {
+                    label: "Create note from default template",
+                    command: "createNoteFromDefaultTemplate"
+                },
+                {
+                    label: "Create to-do from template",
+                    command: "createTodoFromTemplate"
+                },
+                {
+                    label: "Create to-do from default template",
+                    command: "createTodoFromDefaultTemplate"
+                },
+                {
+                    label: "Insert template",
+                    command: "insertTemplate"
+                },
+                {
+                    label: "Show default templates",
+                    command: "showDefaultTemplates"
+                },
+                {
+                    label: "Set default template",
+                    command: "setDefaultTemplate"
+                },
+                {
+                    label: "Set default template for notebook",
+                    command: "setDefaultTemplateForNotebook"
+                },
+                {
+                    label: "Clear default templates for notebook",
+                    command: "clearDefaultTemplatesForNotebook"
+                },
+                {
+                    label: "Help",
+                    command: "showPluginDocumentation"
+                }
+            ]);
+            await commandsPanel.create();
+        }
     },
 });
