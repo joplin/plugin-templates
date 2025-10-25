@@ -71,13 +71,17 @@ const createJoplinReleasePost = async (release) => {
 }
 
 const announceRelease = async () => {
-    const release = await getLatestRelease();
+    try {
+        const release = await getLatestRelease();
 
-    const githubReleaseUrl = await createGithubRelease(release);
-    console.log("GitHub release created at", githubReleaseUrl);
+        const githubReleaseUrl = await createGithubRelease(release);
+        console.log("GitHub release created at", githubReleaseUrl);
 
-    const discoursePostUrl = await createJoplinReleasePost(release);
-    console.log("Discourse post created at", discoursePostUrl);
+        const discoursePostUrl = await createJoplinReleasePost(release);
+        console.log("Discourse post created at", discoursePostUrl);
+    } catch (error) {
+        console.error('Could not announce release on forum: ' + error.message);
+    }
 }
 
 announceRelease();
