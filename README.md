@@ -10,6 +10,8 @@
 
 This plugin allows you to create templates in Joplin and use them to create new notes and to-dos.
 
+> **📚 New to the plugin?** Check out the [Complete Feature Demonstration Template](DEMO_TEMPLATE.md) to see all features in action with examples and expected outputs.
+
 ## Table of contents
 
 - [Installing Plugin](#installing-plugin)
@@ -158,7 +160,7 @@ Currently there are four special variables.
 | `template_title` | Title of the note/to-do created using this template. | template_title: Standup - {{ date }} |
 | `template_tags` | Comma separated tags to be applied to the note/to-do created  using this template. | template_tags: spec, {{ project }} |
 | `template_notebook` | The ID of the target notebook for this template. Whenever a new note/to-do will be created by this template, it will be created in this target notebook. | template_notebook: 82d2384b025f44588e4d3851a1237028 |
-| `template_todo_alarm` | The date and time for a to-do alarm/reminder. Only applies when creating to-dos from templates. | template_todo_alarm: {{ datetime delta_days=1 format="YYYY-MM-DD HH:mm:ss" }} |
+| `template_todo_alarm` | The date and time for a to-do alarm/reminder. Only applies when creating to-dos from templates. | template_todo_alarm: {{ datetime delta_days=1 format="YYYY-MM-DD HH:mm" }} |
 
 **Points to note**
 - If `template_title` is not provided, the title of the template will be used as a fallback value.
@@ -166,7 +168,7 @@ Currently there are four special variables.
 - You can't use these variable names i.e. `template_title`, `template_tags`, `template_notebook`, and `template_todo_alarm` for custom variables. In general, please avoid defining custom variables with `template_` prefix.
 - To get the ID of a notebook, you can right click on that notebook and click on `Copy notebook ID`.
 - While you are inserting the template in an existing note/to-do, `template_tags` variable is used to apply those tags to the note the template is inserted in. However, you can disable using `template_tags` while inserting templates from the plugin settings.
-- The `template_todo_alarm` variable expects a date-time string in the format "YYYY-MM-DD HH:mm:ss". You can use the `datetime` helper to generate properly formatted timestamps.
+- The `template_todo_alarm` variable expects a date-time string in the format "YYYY-MM-DD HH:mm" (without seconds). You can use the `datetime` helper to generate properly formatted timestamps.
 
 **Example of a template using special variables**
 
@@ -186,6 +188,8 @@ This note contains the meeting minutes of the weekly meet held on {{ datetime }}
 ## Advanced Template Features (Helpers)
 
 The plugin uses [Handlebars.js](https://handlebarsjs.com/) as its templating engine, which provides powerful helpers for advanced template logic. These helpers allow you to perform comparisons, mathematical operations, text transformations, loops, and complex date/time manipulations.
+
+> **💡 Tip:** See the [Complete Feature Demonstration Template](DEMO_TEMPLATE.md) for a comprehensive example using all helpers together in a real-world scenario.
 
 ### Compare Helper
 
@@ -239,7 +243,6 @@ The `condition` helper provides logical operators for combining multiple conditi
 | --- | --- | --- |
 | `&&` | `and` | Logical AND |
 | `\|\|` | `or` | Logical OR |
-| `!` | `not` | Logical NOT |
 
 **Example**:
 ```markdown
@@ -259,10 +262,13 @@ Data is available and summary display is enabled.
 Perfect day for outdoor activities!
 {{/if}}
 
-{{#if (condition "not" show_summary)}}
+{{! For negation, use Handlebars' built-in unless helper }}
+{{#unless show_summary}}
 Summary is hidden.
-{{/if}}
+{{/unless}}
 ```
+
+**Note**: For simple boolean negation, use Handlebars' built-in `{{#unless variable}}` helper instead of the condition helper.
 
 ### Math Helper
 
@@ -399,7 +405,7 @@ Readable: {{datetime format="MMMM Do, YYYY [at] h:mm A"}}
 Short: {{datetime format="MM/DD/YY"}}
 
 # Combined Operations
-Meeting in 2 days at 2 PM: {{datetime delta_days=2 set_time="14:00:00" format="YYYY-MM-DD HH:mm:ss"}}
+Meeting in 2 days at 2 PM: {{datetime delta_days=2 set_time="14:00" format="YYYY-MM-DD HH:mm"}}
 ```
 
 **Using with template_todo_alarm**:
@@ -407,7 +413,7 @@ Meeting in 2 days at 2 PM: {{datetime delta_days=2 set_time="14:00:00" format="Y
 ---
 days_until_due: number
 template_title: Task due in {{days_until_due}} days
-template_todo_alarm: {{datetime delta_days=days_until_due set_time="09:00:00" format="YYYY-MM-DD HH:mm:ss"}}
+template_todo_alarm: {{datetime delta_days=days_until_due set_time="09:00" format="YYYY-MM-DD HH:mm"}}
 
 ---
 
@@ -416,7 +422,8 @@ This task is due on {{datetime delta_days=days_until_due format="MMMM Do, YYYY"}
 
 **Points to note**:
 - All date/time operations start from the current date and time
-- When using `set_date` and `set_time`, the format should match your Joplin date/time settings
+- When using `set_date`, the format should match your Joplin date format settings (found in Preferences > General)
+- When using `set_time`, the format should match your Joplin time format settings (typically "HH:mm" for 24-hour or "h:mm A" for 12-hour format, without seconds)
 - Delta operations are applied after any set operations
 - The default output format matches your Joplin date/time format settings
 - For more format options, see [moment.js format documentation](https://momentjs.com/docs/#/displaying/format/)
