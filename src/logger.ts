@@ -15,7 +15,7 @@ export class Logger {
     }
 
     public async log(message: string): Promise<void> {
-        if (this.platform === 'desktop') {
+        if (this.platform === "desktop") {
             const fs = joplin.require("fs-extra");
             await fs.appendFile(this.logsFile, `[${new Date().toISOString()}]\n${message}\n\n\n`);
         } else {

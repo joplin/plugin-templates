@@ -54,7 +54,7 @@ const getAllTemplates = async () => {
     return templates;
 }
 
-export async function getUserTemplateSelection(dialogHandle: string, property?: NoteProperty, promptLabel: string = "Template:"): Promise<string | null> {
+export async function getUserTemplateSelection(dialogHandle: string, property?: NoteProperty, promptLabel = "Template:"): Promise<string | null> {
     try {
         const templates = await getAllTemplates();
         
@@ -94,17 +94,17 @@ export async function getUserTemplateSelection(dialogHandle: string, property?: 
 
         const result = await joplin.views.dialogs.open(dialogHandle);
         
-        if (result.id === 'cancel') {
+        if (result.id === "cancel") {
             return null;
         }
         
         // Get the template value and decode HTML entities
-        const templateValue = result.formData?.['templates-form']?.template;
+        const templateValue = result.formData?.["templates-form"]?.template;
         const decodedValue = templateValue ? decode(templateValue) : null;
         
         return decodedValue;
     } catch (error) {
-        console.error('Error in getUserTemplateSelection:', error);
+        console.error("Error in getUserTemplateSelection:", error);
         return null;
     }
 }

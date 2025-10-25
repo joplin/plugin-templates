@@ -60,7 +60,7 @@ export async function getUserFolderSelection(dialogHandle: string, returnField: 
         const folders = await getAllFolders();
         
         if (folders.length === 0) {
-            await joplin.views.dialogs.showMessageBox('No notebooks found.');
+            await joplin.views.dialogs.showMessageBox("No notebooks found.");
             return null;
         }
 
@@ -90,16 +90,16 @@ export async function getUserFolderSelection(dialogHandle: string, returnField: 
 
         const result = await joplin.views.dialogs.open(dialogHandle);
         
-        if (result.id === 'cancel') {
+        if (result.id === "cancel") {
             return null;
         }
 
         // Get the folder value from the nested form data structure
-        const folderValue = result.formData?.['folders-form']?.folder;
+        const folderValue = result.formData?.["folders-form"]?.folder;
         
         return folderValue || null;
     } catch (error) {
-        console.error('Error in getUserFolderSelection:', error);
+        console.error("Error in getUserFolderSelection:", error);
         return null;
     }
 }
