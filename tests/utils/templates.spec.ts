@@ -1,11 +1,7 @@
 import joplin from "api";
 import * as tagUtils from "@templates/utils/tags";
 import { getUserTemplateSelection } from "@templates/utils/templates";
-
-interface DropdownOption {
-    label: string;
-    value: string;
-}
+import { encode } from "html-entities";
 
 interface TagData {
     id: string;
@@ -41,12 +37,18 @@ describe("Get user template selection", () => {
         }
     });
 
-    const expectTemplatesSelector = (templates: DropdownOption[], selectedValue: DropdownOption | null) => {
-        jest.spyOn(joplin.commands, "execute").mockImplementation(async (cmd: string, props: Record<string, unknown>) => {
-            expect(cmd).toEqual("showPrompt");
-            expect(props.autocomplete).toEqual(templates);
+    const expectTemplatesDialog = (selectedTemplateValue: string | null) => {
+        jest.spyOn(joplin.views.dialogs, "open").mockImplementation(async (handle: string) => {
+            if (selectedTemplateValue === null) {
+                return { id: "cancel" };
+            }
             return {
-                answer: selectedValue
+                id: "ok",
+                formData: {
+                    "templates-form": {
+                        template: selectedTemplateValue
+                    }
+                }
             };
         });
     };
@@ -121,30 +123,17 @@ describe("Get user template selection", () => {
             }
         ]);
 
-        const templateOptions = [
-            {
-                label: "Template 1",
-                value: JSON.stringify({
-                    id: "note-id-1",
-                    title: "Template 1",
-                    body: "Template Body"
-                })
-            },
-            {
-                label: "Template 2",
-                value: JSON.stringify({
-                    id: "note-id-2",
-                    title: "Template 2",
-                    body: "Template Body"
-                })
-            }
-        ];
-        const selectedTemplate = templateOptions[0];
+        const selectedNote = {
+            id: "note-id-1",
+            title: "Template 1",
+            body: "Template Body"
+        };
+        const selectedTemplateValue = encode(JSON.stringify(selectedNote));
 
-        expectTemplatesSelector(templateOptions, selectedTemplate);
+        expectTemplatesDialog(selectedTemplateValue);
         const res = await getUserTemplateSelection(dialogHandle);
-        testExpectedCalls(joplin.commands.execute, 1);
-        expect(res).toEqual(selectedTemplate.value);
+        testExpectedCalls(joplin.views.dialogs.open, 1);
+        expect(res).toEqual(JSON.stringify(selectedNote));
     });
 
     test("should show selector correctly when there are multiple template tags", async () => {
@@ -183,38 +172,17 @@ describe("Get user template selection", () => {
             }
         ]);
 
-        const templateOptions = [
-            {
-                label: "Template 1",
-                value: JSON.stringify({
-                    id: "note-id-1",
-                    title: "Template 1",
-                    body: "Template Body"
-                })
-            },
-            {
-                label: "Template 2",
-                value: JSON.stringify({
-                    id: "note-id-2",
-                    title: "Template 2",
-                    body: "Template Body"
-                })
-            },
-            {
-                label: "Template 3",
-                value: JSON.stringify({
-                    id: "note-id-3",
-                    title: "Template 3",
-                    body: "Template Body"
-                })
-            },
-        ];
-        const selectedTemplate = templateOptions[1];
+        const selectedNote = {
+            id: "note-id-2",
+            title: "Template 2",
+            body: "Template Body"
+        };
+        const selectedTemplateValue = encode(JSON.stringify(selectedNote));
 
-        expectTemplatesSelector(templateOptions, selectedTemplate);
+        expectTemplatesDialog(selectedTemplateValue);
         const res = await getUserTemplateSelection(dialogHandle);
-        testExpectedCalls(joplin.commands.execute, 1);
-        expect(res).toEqual(selectedTemplate.value);
+        testExpectedCalls(joplin.views.dialogs.open, 1);
+        expect(res).toEqual(JSON.stringify(selectedNote));
     });
 
     test("should return null if no template is selected", async () => {
@@ -237,29 +205,9 @@ describe("Get user template selection", () => {
             }
         ]);
 
-        const templateOptions = [
-            {
-                label: "Template 1",
-                value: JSON.stringify({
-                    id: "note-id-1",
-                    title: "Template 1",
-                    body: "Template Body"
-                })
-            },
-            {
-                label: "Template 2",
-                value: JSON.stringify({
-                    id: "note-id-2",
-                    title: "Template 2",
-                    body: "Template Body"
-                })
-            }
-        ];
-        const selectedTemplate = null;
-
-        expectTemplatesSelector(templateOptions, selectedTemplate);
+        expectTemplatesDialog(null);
         const res = await getUserTemplateSelection(dialogHandle);
-        testExpectedCalls(joplin.commands.execute, 1);
+        testExpectedCalls(joplin.views.dialogs.open, 1);
         expect(res).toBeNull();
     });
 
@@ -283,22 +231,12 @@ describe("Get user template selection", () => {
             }
         ]);
 
-        const templateOptions = [
-            {
-                label: "Template 1",
-                value: "Template Body"
-            },
-            {
-                label: "Template 2",
-                value: "Template Body"
-            }
-        ];
-        const selectedTemplate = templateOptions[1];
+        const selectedTemplateValue = encode("Template Body");
 
-        expectTemplatesSelector(templateOptions, selectedTemplate);
+        expectTemplatesDialog(selectedTemplateValue);
         const res = await getUserTemplateSelection(dialogHandle, "body");
-        testExpectedCalls(joplin.commands.execute, 1);
-        expect(res).toEqual(selectedTemplate.value);
+        testExpectedCalls(joplin.views.dialogs.open, 1);
+        expect(res).toEqual("Template Body");
     });
 
     test("should sort the templates correctly", async () => {
@@ -326,25 +264,9 @@ describe("Get user template selection", () => {
             }
         ]);
 
-        const templateOptions = [
-            {
-                label: "Template 1",
-                value: "Template Body"
-            },
-            {
-                label: "Template 2",
-                value: "Template Body"
-            },
-            {
-                label: "Template 10",
-                value: "Template Body"
-            }
-        ];
-        const selectedTemplate = null;
-
-        expectTemplatesSelector(templateOptions, selectedTemplate);
+        expectTemplatesDialog(null);
         const res = await getUserTemplateSelection(dialogHandle, "body");
-        testExpectedCalls(joplin.commands.execute, 1);
+        testExpectedCalls(joplin.views.dialogs.open, 1);
         expect(res).toEqual(null);
     });
 });
