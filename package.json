@@ -1,8 +1,8 @@
 {
   "name": "joplin-plugin-templates",
-  "version": "2.4.0",
+  "version": "3.0.0",
   "scripts": {
-    "dist": "webpack --joplin-plugin-config buildMain && webpack --joplin-plugin-config buildExtraScripts && webpack --joplin-plugin-config createArchive",
+    "dist": "NODE_OPTIONS=--openssl-legacy-provider webpack --joplin-plugin-config buildMain && NODE_OPTIONS=--openssl-legacy-provider webpack --joplin-plugin-config buildExtraScripts && NODE_OPTIONS=--openssl-legacy-provider webpack --joplin-plugin-config createArchive",
     "prepare": "npm run dist",
     "update": "npm install -g generator-joplin && yo joplin --update",
     "lint": "eslint '{src,tests}/**/*.{ts,json}'",
