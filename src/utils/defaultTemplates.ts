@@ -37,16 +37,16 @@ export async function getUserDefaultTemplateTypeSelection(dialogHandle: string, 
 
         const result = await joplin.views.dialogs.open(dialogHandle);
         
-        if (result.id === 'cancel') {
+        if (result.id === "cancel") {
             return null;
         }
 
         // Get the template type value from the nested form data structure
-        const value = result.formData?.['template-type-form']?.templateType;
+        const value = result.formData?.["template-type-form"]?.templateType;
         
         return value ? parseInt(value) as DefaultTemplateType : null;
     } catch (error) {
-        console.error('Error in getUserDefaultTemplateTypeSelection:', error);
+        console.error("Error in getUserDefaultTemplateTypeSelection:", error);
         return null;
     }
 }

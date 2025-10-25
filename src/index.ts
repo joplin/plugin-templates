@@ -47,10 +47,10 @@ joplin.plugins.register({
 
         // Asynchronously load legacy templates
         const version = await joplin.versionInfo();
-        if (version.platform === 'desktop') {
+        if (version.platform === "desktop") {
             loadLegacyTemplates(dateAndTimeUtils, profileDir);
         } else {
-            logger.log('Legacy templates loading skipped on mobile');
+            logger.log("Legacy templates loading skipped on mobile");
         }
 
 
@@ -246,7 +246,7 @@ joplin.plugins.register({
             name: "showPluginDocumentation",
             label: "Help",
             execute: async () => {
-                await joplin.commands.execute('openItem', DOCUMENTATION_URL);
+                await joplin.commands.execute("openItem", DOCUMENTATION_URL);
             }
         }));
 
@@ -314,7 +314,7 @@ joplin.plugins.register({
         // Folder context menu
         await joplin.views.menuItems.create("templates_folderid", "copyFolderID", MenuItemLocation.FolderContextMenu);
 
-        if (version.platform === 'mobile') {
+        if (version.platform === "mobile") {
             const commandsPanel = new CommandsPanel([
                 {
                     label: "Create note from template",

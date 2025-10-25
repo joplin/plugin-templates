@@ -22,11 +22,11 @@ export class CommandsPanel {
 
             // Set up message handler
             await joplin.views.panels.onMessage(this.panelHandle, async (message) => {
-                console.log('Received message from webview:', message);
+                console.log("Received message from webview:", message);
                 if (message.type === "executeCommand") {
-                    console.log('Executing command:', message.command);
+                    console.log("Executing command:", message.command);
                     try {
-                        await joplin.commands.execute('dismissPluginPanels');
+                        await joplin.commands.execute("dismissPluginPanels");
                     } catch (error) {
                         // Ignore error
                     }
@@ -42,7 +42,7 @@ export class CommandsPanel {
             // Show the panel
             await joplin.views.panels.show(this.panelHandle, true);
         } catch (error) {
-            console.error('Error creating commands panel:', error);
+            console.error("Error creating commands panel:", error);
             throw error;
         }
     }
