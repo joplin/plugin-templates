@@ -1,15 +1,20 @@
 body {
     text-align: center;
-    font-size: 14px;
+    background-color: var(--joplin-background-color);
+    color: var(--joplin-color);
+    font-size: var(--joplin-font-size, 14px);
+    font-family: var(--joplin-font-family);
 }
 
 table {
     border-style: solid;
     border-collapse: collapse;
+    border-color: var(--joplin-divider-color);
 }
 
 th, td {
     border-style: solid;
+    border-color: var(--joplin-divider-color);
     padding: 5px;
 }
 
@@ -21,18 +26,28 @@ th, td {
 }
 
 .invalidVariable {
-    border: 1px solid;
+    border: 1px solid var(--joplin-color-error, red);
     margin-top: 15px;
     padding: 2px;
 }
 
-input, select {
+input, select, textarea {
     height: 25px;
-    font-size: 16px;
+    font-size: var(--joplin-font-size, 16px);
+    font-family: var(--joplin-font-family);
     width: 95%;
+    background-color: var(--joplin-background-color);
+    color: var(--joplin-color);
+    border: 1px solid var(--joplin-divider-color);
+    border-radius: 3px;
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--joplin-color);
 }
 
 .variablesForm {
     max-height: 80vh;
-    overflow: scroll;
+    overflow: auto;
 }
