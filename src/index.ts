@@ -156,7 +156,7 @@ joplin.plugins.register({
                 const templateId = await getUserTemplateSelection(templateSelectorHandle, "id");
                 if (templateId === null) return;
 
-                const defaultType = await getUserDefaultTemplateTypeSelection(templateSelectorHandle);
+                const defaultType = await getUserDefaultTemplateTypeSelection(templateTypeSelectorHandle);
                 if (defaultType === null) return;
 
                 await setDefaultTemplate(null, templateId, defaultType);
