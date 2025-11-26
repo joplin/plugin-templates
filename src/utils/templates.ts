@@ -87,7 +87,7 @@ export async function getUserTemplateSelection(dialogHandle: string, property?: 
 
         // Add buttons to the dialog
         await joplin.views.dialogs.setButtons(dialogHandle, [
-            { id: "ok", title: "Select" },
+            { id: "ok", title: "Select", default: true },
             { id: "cancel", title: "Cancel" }
         ]);
 

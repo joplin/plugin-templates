@@ -23,5 +23,5 @@ export const setTemplateVariablesView = async (viewHandle: string, title: string
         `
     );
 
-    await joplin.views.dialogs.setButtons(viewHandle, [{ id: "ok" }, { id: "cancel" }]);
+    await joplin.views.dialogs.setButtons(viewHandle, [{ id: "ok", default: true }, { id: "cancel" }]);
 }
