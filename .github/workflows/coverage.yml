@@ -19,7 +19,7 @@ jobs:
         with:
           node-version: 18
       - name: Install dependencies
-        run: npm install
+        run: npm install --legacy-peer-deps
       - name: Generage coverage report
         run: npm run coverage
       - name: Push to store repository
