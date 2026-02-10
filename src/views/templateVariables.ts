@@ -10,7 +10,7 @@ export const setTemplateVariablesView = async (viewHandle: string, title: string
 
     // Add id for autofocus hack to the first input element
     let formHtml = variablesFormInputHtml.join("");
-    formHtml = formHtml.replace(/<(input|select|textarea)(\s)/, '<$1 id="autofocus-target"$2');
+    formHtml = formHtml.replace(/<(input|select|textarea)(\s)/, "<$1 id=\"autofocus-target\"$2");
 
     await joplin.views.dialogs.setHtml(
         viewHandle,
@@ -23,5 +23,5 @@ export const setTemplateVariablesView = async (viewHandle: string, title: string
         `
     );
 
-    await joplin.views.dialogs.setButtons(viewHandle, [{ id: "ok", default: true }, { id: "cancel" }]);
+    await joplin.views.dialogs.setButtons(viewHandle, [{ id: "ok" }, { id: "cancel" }]);
 }

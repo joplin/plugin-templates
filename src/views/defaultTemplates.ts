@@ -65,5 +65,5 @@ export const setDefaultTemplatesView = async (viewHandle: string, globalDefaultT
         `
     );
 
-    await joplin.views.dialogs.setButtons(viewHandle, [{ id: "ok", title: "OK", default: true }]);
+    await joplin.views.dialogs.setButtons(viewHandle, [{ id: "ok" }]);
 }
