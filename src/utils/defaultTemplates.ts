@@ -1,6 +1,7 @@
 import joplin from "api";
 import { DefaultTemplatesConfigSetting, DefaultNoteTemplateIdSetting, DefaultTodoTemplateIdSetting } from "../settings";
 import { encode } from "html-entities";
+import { AUTO_FOCUS_SCRIPT } from "./dialogHelpers";
 
 export enum DefaultTemplateType {
     Both,
@@ -22,8 +23,9 @@ export async function getUserDefaultTemplateTypeSelection(dialogHandle: string, 
             <h2>${encode(prompt || "Select template type")}</h2>
             <form class="variablesForm" name="template-type-form">
                 <div class="variableName">Choose template type:</div>
-                <select name="templateType">${optionsHtml}</select>
+                <select name="templateType" id="autofocus-target">${optionsHtml}</select>
             </form>
+            ${AUTO_FOCUS_SCRIPT}
         `);
 
         // Add buttons to the dialog

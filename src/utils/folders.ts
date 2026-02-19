@@ -2,6 +2,7 @@ import joplin from "api";
 import { fetchAllItems } from "./dataApi";
 import { Note } from "./templates";
 import { encode } from "html-entities";
+import { AUTO_FOCUS_SCRIPT } from "./dialogHelpers";
 
 export interface Folder {
     id: string;
@@ -75,8 +76,9 @@ export async function getUserFolderSelection(dialogHandle: string, returnField: 
             <h2>${encode(prompt || "Select notebook")}</h2>
             <form class="variablesForm" name="folders-form">
                 <div class="variableName">Choose notebook:</div>
-                <select name="folder">${optionsHtml}</select>
+                <select name="folder" id="autofocus-target">${optionsHtml}</select>
             </form>
+            ${AUTO_FOCUS_SCRIPT}
         `);
 
         // Add buttons to the dialog

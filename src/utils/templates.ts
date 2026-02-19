@@ -4,6 +4,7 @@ import { getAllNotesWithTag, getAllTagsWithTitle } from "./tags";
 import { TemplatesSourceSetting, TemplatesSource } from "../settings/templatesSource";
 import { LocaleGlobalSetting } from "../settings/global";
 import { encode, decode } from "html-entities";
+import { AUTO_FOCUS_SCRIPT } from "./dialogHelpers";
 
 export interface Note {
     id: string;
@@ -65,22 +66,25 @@ export async function getUserTemplateSelection(dialogHandle: string, property?: 
 
         await joplin.views.dialogs.addScript(dialogHandle, "./views/webview.css");
 
-        const optionsHtml = templates.map(note => {
-            let optionValue;
-            if (!property) {
-                optionValue = JSON.stringify(note);
-            } else {
-                optionValue = note[property];
-            }
-            return `<option value="${encode(optionValue)}">${encode(note.title)}</option>`;
-        }).join("");
+        const optionsHtml = templates
+            .filter(note => note && note.id && note.title)
+            .map(note => {
+                let optionValue;
+                if (!property) {
+                    optionValue = JSON.stringify(note);
+                } else {
+                    optionValue = note[property];
+                }
+                return `<option value="${encode(optionValue)}">${encode(note.title)}</option>`;
+            }).join("");
 
         await joplin.views.dialogs.setHtml(dialogHandle, `
             <h2>${encode(promptLabel)}</h2>
             <form class="variablesForm" name="templates-form">
                 <div class="variableName">Select a template:</div>
-                <select name="template">${optionsHtml}</select>
+                <select name="template" id="autofocus-target">${optionsHtml}</select>
             </form>
+            ${AUTO_FOCUS_SCRIPT}
         `);
 
         // Add buttons to the dialog
