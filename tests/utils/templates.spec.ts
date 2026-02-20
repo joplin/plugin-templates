@@ -1,6 +1,8 @@
 import joplin from "api";
 import * as tagUtils from "@templates/utils/tags";
+import * as folderUtils from "@templates/utils/folders";
 import { getUserTemplateSelection } from "@templates/utils/templates";
+import { TemplatesSourceSetting, TemplatesSource } from "@templates/settings/templatesSource";
 import { encode } from "html-entities";
 
 interface TagData {
@@ -19,7 +21,8 @@ beforeEach(async () => {
     dialogHandle = await joplin.views.dialogs.create("templateSelector");
 });
 
-describe("Get user template selection", () => {
+// Helper functions for common test setup
+const mockJoplinSettings = () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     jest.spyOn(joplin.views.dialogs, "showMessageBox").mockImplementation(async (message: string) => {
         return 0;
@@ -30,57 +33,71 @@ describe("Get user template selection", () => {
             return "en_GB";
         }
     });
+};
 
-    jest.spyOn(joplin.settings, "value").mockImplementation(async (setting: string) => {
-        if (setting === "templatesSource") {
-            return "tag";
+const mockTemplateSourceSetting = (source: TemplatesSource) => {
+    jest.spyOn(TemplatesSourceSetting, "get").mockImplementation(async () => {
+        return source;
+    });
+};
+
+const expectTemplatesDialog = (selectedTemplateValue: string | null) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    jest.spyOn(joplin.views.dialogs, "open").mockImplementation(async (handle: string) => {
+        if (selectedTemplateValue === null) {
+            return { id: "cancel" };
         }
+        return {
+            id: "ok",
+            formData: {
+                "templates-form": {
+                    template: selectedTemplateValue
+                }
+            }
+        };
+    });
+};
+
+const setTemplateTagsAndNotes = (data: TagData[]) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    jest.spyOn(tagUtils, "getAllTagsWithTitle").mockImplementation(async (title: string) => {
+        return data.map(tag => {
+            return {
+                id: tag.id,
+                title: tag.title
+            }
+        });
     });
 
-    const expectTemplatesDialog = (selectedTemplateValue: string | null) => {
-        jest.spyOn(joplin.views.dialogs, "open").mockImplementation(async (handle: string) => {
-            if (selectedTemplateValue === null) {
-                return { id: "cancel" };
+    jest.spyOn(tagUtils, "getAllNotesWithTag").mockImplementation(async (id: string) => {
+        for (const tag of data) {
+            if (tag.id === id) {
+                return tag.notes;
             }
-            return {
-                id: "ok",
-                formData: {
-                    "templates-form": {
-                        template: selectedTemplateValue
-                    }
-                }
-            };
-        });
-    };
+        }
+        return [];
+    });
+};
 
-    const setTemplateTagsAndNotes = (data: TagData[]) => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        jest.spyOn(tagUtils, "getAllTagsWithTitle").mockImplementation(async (title: string) => {
-            return data.map(tag => {
-                return {
-                    id: tag.id,
-                    title: tag.title
-                }
-            });
-        });
+const setNotebookTemplates = (notes: { id: string; title: string; body: string; }[]) => {
+    jest.spyOn(folderUtils, "getAllNotesInFolder").mockImplementation(async (title: string) => {
+        if (title === "Templates") {
+            return notes;
+        }
+        return [];
+    });
+};
 
-        jest.spyOn(tagUtils, "getAllNotesWithTag").mockImplementation(async (id: string) => {
-            for (const tag of data) {
-                if (tag.id === id) {
-                    return tag.notes;
-                }
-            }
-            return [];
-        });
-    }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const testExpectedCalls = (mockedFunction: any, expectedCalls: number): void => {
+    expect(mockedFunction.mock.calls.length).toBe(expectedCalls);
+};
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const testExpectedCalls = (mockedFunction: any, expectedCalls: number): void => {
-        expect(mockedFunction.mock.calls.length).toBe(expectedCalls);
-    }
-
+describe("Get user template selection", () => {
     beforeEach(() => {
         jest.clearAllMocks();
+        mockJoplinSettings();
+        mockTemplateSourceSetting(TemplatesSource.Tag);
     });
 
     test("should show a dialog when there are no templates", async () => {
@@ -268,5 +285,280 @@ describe("Get user template selection", () => {
         const res = await getUserTemplateSelection(dialogHandle, "body");
         testExpectedCalls(joplin.views.dialogs.open, 1);
         expect(res).toEqual(null);
+    });
+
+    describe("Custom template ordering", () => {
+        test("should sort templates by custom order when order metadata is present", async () => {
+            setTemplateTagsAndNotes([
+                {
+                    id: "tag-id-1",
+                    title: "template",
+                    notes: [
+                        {
+                            id: "note-id-1",
+                            title: "Template C",
+                            body: "---\norder: 3\n---\nTemplate Body C"
+                        },
+                        {
+                            id: "note-id-2",
+                            title: "Template A",
+                            body: "---\norder: 1\n---\nTemplate Body A"
+                        },
+                        {
+                            id: "note-id-3",
+                            title: "Template B",
+                            body: "---\norder: 2\n---\nTemplate Body B"
+                        }
+                    ]
+                }
+            ]);
+
+            // Mock the dialog to capture the HTML content to verify order
+            let capturedHtml = "";
+            jest.spyOn(joplin.views.dialogs, "setHtml").mockImplementation(async (handle: string, html: string) => {
+                capturedHtml = html;
+                return "";
+            });
+
+            expectTemplatesDialog(null);
+            await getUserTemplateSelection(dialogHandle);
+
+            // Verify that templates appear in custom order (A, B, C) not alphabetical (A, B, C happens to be same)
+            // Let's check the order by looking at the option values in the HTML
+            const optionMatches = capturedHtml.match(/<option[^>]*>([^<]+)<\/option>/g);
+            expect(optionMatches).toBeDefined();
+            if (optionMatches) {
+                const titles = optionMatches.map(option => {
+                    const match = option.match(/>([^<]+)</);
+                    return match ? match[1] : "";
+                });
+                expect(titles).toEqual(["Template A", "Template B", "Template C"]);
+            }
+        });
+
+        test("should prioritize templates with order over those without", async () => {
+            setTemplateTagsAndNotes([
+                {
+                    id: "tag-id-1",
+                    title: "template",
+                    notes: [
+                        {
+                            id: "note-id-1",
+                            title: "Template Z",
+                            body: "Template Body Z (no order)"
+                        },
+                        {
+                            id: "note-id-2",
+                            title: "Template A",
+                            body: "---\norder: 1\n---\nTemplate Body A"
+                        },
+                        {
+                            id: "note-id-3",
+                            title: "Template B",
+                            body: "Template Body B (no order)"
+                        }
+                    ]
+                }
+            ]);
+
+            let capturedHtml = "";
+            jest.spyOn(joplin.views.dialogs, "setHtml").mockImplementation(async (handle: string, html: string) => {
+                capturedHtml = html;
+                return "";
+            });
+
+            expectTemplatesDialog(null);
+            await getUserTemplateSelection(dialogHandle);
+
+            const optionMatches = capturedHtml.match(/<option[^>]*>([^<]+)<\/option>/g);
+            expect(optionMatches).toBeDefined();
+            if (optionMatches) {
+                const titles = optionMatches.map(option => {
+                    const match = option.match(/>([^<]+)</);
+                    return match ? match[1] : "";
+                });
+                // Template A (with order: 1) should come first, then B and Z alphabetically
+                expect(titles).toEqual(["Template A", "Template B", "Template Z"]);
+            }
+        });
+
+        test("should fallback to alphabetical sorting when templates have same order", async () => {
+            setTemplateTagsAndNotes([
+                {
+                    id: "tag-id-1",
+                    title: "template",
+                    notes: [
+                        {
+                            id: "note-id-1",
+                            title: "Template Z",
+                            body: "---\norder: 1\n---\nTemplate Body Z"
+                        },
+                        {
+                            id: "note-id-2",
+                            title: "Template A",
+                            body: "---\norder: 1\n---\nTemplate Body A"
+                        },
+                        {
+                            id: "note-id-3",
+                            title: "Template M",
+                            body: "---\norder: 1\n---\nTemplate Body M"
+                        }
+                    ]
+                }
+            ]);
+
+            let capturedHtml = "";
+            jest.spyOn(joplin.views.dialogs, "setHtml").mockImplementation(async (handle: string, html: string) => {
+                capturedHtml = html;
+                return "";
+            });
+
+            expectTemplatesDialog(null);
+            await getUserTemplateSelection(dialogHandle);
+
+            const optionMatches = capturedHtml.match(/<option[^>]*>([^<]+)<\/option>/g);
+            expect(optionMatches).toBeDefined();
+            if (optionMatches) {
+                const titles = optionMatches.map(option => {
+                    const match = option.match(/>([^<]+)</);
+                    return match ? match[1] : "";
+                });
+                // All have same order, so should be alphabetical: A, M, Z
+                expect(titles).toEqual(["Template A", "Template M", "Template Z"]);
+            }
+        });
+
+        test("should handle invalid order values gracefully", async () => {
+            setTemplateTagsAndNotes([
+                {
+                    id: "tag-id-1",
+                    title: "template",
+                    notes: [
+                        {
+                            id: "note-id-1",
+                            title: "Template C",
+                            body: "---\norder: invalid\n---\nTemplate Body C"
+                        },
+                        {
+                            id: "note-id-2",
+                            title: "Template A",
+                            body: "---\norder: 1\n---\nTemplate Body A"
+                        },
+                        {
+                            id: "note-id-3",
+                            title: "Template B",
+                            body: "Template Body B (no order)"
+                        }
+                    ]
+                }
+            ]);
+
+            let capturedHtml = "";
+            jest.spyOn(joplin.views.dialogs, "setHtml").mockImplementation(async (handle: string, html: string) => {
+                capturedHtml = html;
+                return "";
+            });
+
+            expectTemplatesDialog(null);
+            await getUserTemplateSelection(dialogHandle);
+
+            const optionMatches = capturedHtml.match(/<option[^>]*>([^<]+)<\/option>/g);
+            expect(optionMatches).toBeDefined();
+            if (optionMatches) {
+                const titles = optionMatches.map(option => {
+                    const match = option.match(/>([^<]+)</);
+                    return match ? match[1] : "";
+                });
+                // Template A (valid order) first, then B and C alphabetically
+                expect(titles).toEqual(["Template A", "Template B", "Template C"]);
+            }
+        });
+
+        test("should handle malformed front-matter gracefully", async () => {
+            setTemplateTagsAndNotes([
+                {
+                    id: "tag-id-1",
+                    title: "template",
+                    notes: [
+                        {
+                            id: "note-id-1",
+                            title: "Template C",
+                            body: "---\nmalformed yaml: [\n---\nTemplate Body C"
+                        },
+                        {
+                            id: "note-id-2",
+                            title: "Template A",
+                            body: "---\norder: 1\n---\nTemplate Body A"
+                        },
+                        {
+                            id: "note-id-3",
+                            title: "Template B",
+                            body: "Template Body B (no front-matter)"
+                        }
+                    ]
+                }
+            ]);
+
+            let capturedHtml = "";
+            jest.spyOn(joplin.views.dialogs, "setHtml").mockImplementation(async (handle: string, html: string) => {
+                capturedHtml = html;
+                return "";
+            });
+
+            expectTemplatesDialog(null);
+            await getUserTemplateSelection(dialogHandle);
+
+            const optionMatches = capturedHtml.match(/<option[^>]*>([^<]+)<\/option>/g);
+            expect(optionMatches).toBeDefined();
+            if (optionMatches) {
+                const titles = optionMatches.map(option => {
+                    const match = option.match(/>([^<]+)</);
+                    return match ? match[1] : "";
+                });
+                // Template A (valid order) first, then B and C alphabetically
+                expect(titles).toEqual(["Template A", "Template B", "Template C"]);
+            }
+        });
+
+        test("should work with notebook-based templates", async () => {
+            mockTemplateSourceSetting(TemplatesSource.Notebook);
+            
+            setNotebookTemplates([
+                {
+                    id: "note-id-1",
+                    title: "Template C",
+                    body: "---\norder: 3\n---\nTemplate Body C"
+                },
+                {
+                    id: "note-id-2",
+                    title: "Template A",
+                    body: "---\norder: 1\n---\nTemplate Body A"
+                },
+                {
+                    id: "note-id-3",
+                    title: "Template B",
+                    body: "---\norder: 2\n---\nTemplate Body B"
+                }
+            ]);
+
+            let capturedHtml = "";
+            jest.spyOn(joplin.views.dialogs, "setHtml").mockImplementation(async (handle: string, html: string) => {
+                capturedHtml = html;
+                return "";
+            });
+
+            expectTemplatesDialog(null);
+            await getUserTemplateSelection(dialogHandle);
+
+            const optionMatches = capturedHtml.match(/<option[^>]*>([^<]+)<\/option>/g);
+            expect(optionMatches).toBeDefined();
+            if (optionMatches) {
+                const titles = optionMatches.map(option => {
+                    const match = option.match(/>([^<]+)</);
+                    return match ? match[1] : "";
+                });
+                expect(titles).toEqual(["Template A", "Template B", "Template C"]);
+            }
+        });
     });
 });

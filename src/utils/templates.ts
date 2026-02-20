@@ -6,13 +6,76 @@ import { LocaleGlobalSetting } from "../settings/global";
 import { encode, decode } from "html-entities";
 import { AUTO_FOCUS_SCRIPT } from "./dialogHelpers";
 
+// Can't use import for this library because the types in the library
+// are declared incorrectly which result in typescript errors.
+// Reference -> https://github.com/jxson/front-matter/issues/76
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const frontmatter = require("front-matter");
+
 export interface Note {
     id: string;
     title: string;
     body: string;
 }
 
+interface TemplateWithOrder extends Note {
+    order?: number;
+}
+
 type NoteProperty = "body" | "id" | "title";
+
+const extractOrderFromTemplate = (template: Note): number | undefined => {
+    try {
+        const processedTemplate = frontmatter(template.body);
+        const order = processedTemplate.attributes?.order;
+        
+        if (order !== undefined && order !== null) {
+            const numericOrder = Number(order);
+            if (!isNaN(numericOrder)) {
+                return numericOrder;
+            }
+        }
+    } catch (error) {
+        // If front-matter parsing fails, ignore and return undefined
+        // This ensures backward compatibility with templates that don't use front-matter
+    }
+    
+    return undefined;
+};
+
+const sortTemplates = (templates: Note[], userLocale: string): Note[] => {
+    // Extract order metadata for each template
+    const templatesWithOrder: TemplateWithOrder[] = templates.map(template => ({
+        ...template,
+        order: extractOrderFromTemplate(template)
+    }));
+
+    // Sort templates with custom logic
+    return templatesWithOrder.sort((a, b) => {
+        const aHasOrder = a.order !== undefined;
+        const bHasOrder = b.order !== undefined;
+
+        // If both have order, sort by order (ascending), then by title
+        if (aHasOrder && bHasOrder) {
+            if (a.order !== b.order) {
+                return (a.order as number) - (b.order as number);
+            }
+            // Same order, fallback to alphabetical
+            return a.title.localeCompare(b.title, [userLocale, "en-US"], { sensitivity: "accent", numeric: true });
+        }
+
+        // If only one has order, prioritize the one with order
+        if (aHasOrder && !bHasOrder) {
+            return -1;
+        }
+        if (!aHasOrder && bHasOrder) {
+            return 1;
+        }
+
+        // If neither has order, sort alphabetically (existing behavior)
+        return a.title.localeCompare(b.title, [userLocale, "en-US"], { sensitivity: "accent", numeric: true });
+    });
+};
 
 const removeDuplicateTemplates = (templates: Note[]) => {
     const uniqueTemplates: Note[] = [];
@@ -48,9 +111,7 @@ const getAllTemplates = async () => {
     let userLocale: string = await LocaleGlobalSetting.get();
     userLocale = userLocale.split("_").join("-");
 
-    templates.sort((a, b) => {
-        return a.title.localeCompare(b.title, [userLocale, "en-US"], { sensitivity: "accent", numeric: true });
-    });
+    templates = sortTemplates(templates, userLocale);
 
     return templates;
 }
