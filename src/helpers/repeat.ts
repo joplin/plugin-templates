@@ -9,7 +9,7 @@ export const repeatHelper: HelperConstructorBlock = (ctx) => {
         }
 
         let ret = "";
-        for (let i = 0; i < rawNum; i++) {
+        for (let i = 0; i < num; i++) {
             ret += options.fn({ ...this, "repeat_index": i });
         }
         return ret;
