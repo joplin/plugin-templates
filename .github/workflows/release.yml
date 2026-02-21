@@ -1,0 +1,43 @@
+name: Release
+
+# Trigger only on release publication to avoid duplicate runs from tag pushes
+on:
+  release:
+    types: [published]
+
+# Prevent concurrent releases to avoid conflicts
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-attach:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18  # Fallback since .nvmrc does not exist
+      
+      # Use legacy-peer-deps to handle peer dependency conflicts in this project
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+      
+      - name: Build plugin
+        run: npm run dist
+      
+      # Attach the generated .jpl file to the GitHub release
+      - name: Upload release binary
+        uses: softprops/action-gh-release@v2
+        with:
+          files: publish/joplin.plugin.templates.jpl
+          fail_on_unmatched_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
