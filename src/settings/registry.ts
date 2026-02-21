@@ -6,6 +6,7 @@ import { DefaultNoteTemplateIdSetting } from "./defaultNoteTemplateId";
 import { DefaultTemplatesConfigSetting } from "./defaultTemplatesConfig";
 import { DefaultTodoTemplateIdSetting } from "./defaultTodoTemplateId";
 import { TemplatesSourceSetting } from "./templatesSource";
+import { FocusTitleAfterCreateSetting } from "./focusTitleAfterCreate";
 
 import { PluginSetting } from "./base";
 
@@ -16,6 +17,7 @@ export class PluginSettingsRegistry {
         DefaultTemplatesConfigSetting,
         DefaultTodoTemplateIdSetting,
         TemplatesSourceSetting,
+        FocusTitleAfterCreateSetting,
     ];
 
     public static async registerSettings(): Promise<void> {

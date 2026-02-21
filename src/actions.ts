@@ -2,7 +2,7 @@ import joplin from "api";
 import { NewNote } from "./parser";
 import { getSelectedFolder } from "./utils/folders";
 import { applyTagToNote, getAnyTagWithTitle } from "./utils/tags";
-import { ApplyTagsWhileInsertingSetting } from "./settings";
+import { ApplyTagsWhileInsertingSetting, FocusTitleAfterCreateSetting } from "./settings";
 
 export enum TemplateAction {
     NewNote = "newNote",
@@ -33,6 +33,17 @@ const performNewNoteAction = async (template: NewNote, isTodo: 0 | 1) => {
 
     const note = await joplin.data.post(["notes"], null, notePayload);
     await joplin.commands.execute("openNote", note.id);
+
+    // Focus title bar if the user has enabled the setting
+    const focusTitle = await FocusTitleAfterCreateSetting.get();
+    if (focusTitle) {
+        try {
+            await joplin.commands.execute("focusElement", "noteTitle");
+        } catch {
+            // focusElement may not be available in all Joplin versions — fail silently
+        }
+    }
+
     for (const tag of template.tags) {
         const tagId = (await getAnyTagWithTitle(tag)).id;
         await applyTagToNote(tagId, note.id);
