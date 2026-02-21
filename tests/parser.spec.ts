@@ -87,6 +87,7 @@ describe("Template parser", () => {
                 datetime - {{datetime}}
                 bowm - {{bowm}}
                 bows - {{bows}}
+                notebook - {{notebook}}
                 custom_datetime - {{#custom_datetime}}[]YYYY[-]MM[-]DD[ ]HH[:]mm[]{{/custom_datetime}}
             `
         });
@@ -101,8 +102,73 @@ describe("Template parser", () => {
             datetime - 12/08/2021 17:04
             bowm - 09/08/2021
             bows - 08/08/2021
+            notebook - Default Notebook
             custom_datetime - 2021-08-12 17:04
         `);
+    });
+
+    test("should parse notebook variable correctly", async () => {
+        // Mock joplin.workspace.selectedFolder to return a folder
+        jest.spyOn(joplin.workspace, "selectedFolder").mockImplementation(async () => {
+            return { id: "folder-123" };
+        });
+
+        // Mock joplin.data.get to return folder details
+        jest.spyOn(joplin.data, "get").mockImplementation(async (path: string[]) => {
+            if (path[0] === "folders" && path[1] === "folder-123") {
+                return { title: "My Notebook" };
+            }
+            throw new Error("Unexpected API call");
+        });
+
+        const parsedTemplate = await parser.parseTemplate({
+            id: "note-id",
+            title: "Template Title",
+            body: "Notebook: {{notebook}}"
+        });
+
+        assert(parsedTemplate);
+        expect(parsedTemplate.body).toEqual("Notebook: My Notebook");
+    });
+
+    test("should handle missing notebook gracefully", async () => {
+        // Mock joplin.workspace.selectedFolder to throw an error
+        jest.spyOn(joplin.workspace, "selectedFolder").mockImplementation(async () => {
+            throw new Error("No folder selected");
+        });
+
+        const parsedTemplate = await parser.parseTemplate({
+            id: "note-id",
+            title: "Template Title",
+            body: "Notebook: {{notebook}}"
+        });
+
+        assert(parsedTemplate);
+        expect(parsedTemplate.body).toEqual("Notebook: ");
+    });
+
+    test("should handle notebook variable in title", async () => {
+        // Mock joplin.workspace.selectedFolder to return a folder
+        jest.spyOn(joplin.workspace, "selectedFolder").mockImplementation(async () => {
+            return { id: "folder-456" };
+        });
+
+        // Mock joplin.data.get to return folder details
+        jest.spyOn(joplin.data, "get").mockImplementation(async (path: string[]) => {
+            if (path[0] === "folders" && path[1] === "folder-456") {
+                return { title: "Work Notes" };
+            }
+            throw new Error("Unexpected API call");
+        });
+
+        const parsedTemplate = await parser.parseTemplate({
+            id: "note-id",
+            title: "{{notebook}} - Meeting Notes",
+            body: "Content here"
+        });
+
+        assert(parsedTemplate);
+        expect(parsedTemplate.title).toEqual("Work Notes - Meeting Notes");
     });
 
     test("should parse text, number and boolean custom variables correctly", async () => {

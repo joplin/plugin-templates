@@ -30,7 +30,21 @@ export default {
     settings: {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         globalValue: async (setting: string): Promise<string> => { return ""; },
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         value: async (setting: string): Promise<string> => { return ""; }
+    },
+    workspace: {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        selectedFolder: async (): Promise<{ id: string }> => { return { id: "default-folder" }; }
+    },
+    data: {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        get: async (path: string[], options?: unknown): Promise<unknown> => { 
+            if (path[0] === "folders") {
+                return { title: "Default Notebook" };
+            }
+            return {};
+        }
     },
     versionInfo: async (): Promise<{ platform: string }> => { return { platform: "desktop" }; },
     require: (): unknown => { return ""; }
