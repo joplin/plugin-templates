@@ -7,6 +7,7 @@ import { Note } from "./utils/templates";
 import { notEmpty } from "./utils/typescript";
 import { getVariableFromDefinition } from "./variables/parser";
 import { CustomVariable } from "./variables/types/base";
+import { SearchCustomVariable } from "./variables/types/search";
 import { setTemplateVariablesView } from "./views/templateVariables";
 import { HelperFactory } from "./helpers";
 
@@ -90,6 +91,50 @@ export class Parser {
             variableObjects[variableName] = getVariableFromDefinition(variableName, variables[variableName]);
         });
 
+        // Pre-fetch notes for any SearchCustomVariable BEFORE rendering the dialog
+        for (const variable of Object.values(variableObjects)) {
+            if (variable instanceof SearchCustomVariable) {
+                try {
+                    const q = variable.getQuery();
+                    let rawNotes: any[];
+
+                    if (q) {
+                        // Use search API when a query constraint is specified
+                        const searchResults = await joplin.data.get(["search"], {
+                            query: q,
+                            type: "note",
+                            fields: ["id", "title", "parent_id"],
+                            limit: 50,
+                        });
+                        rawNotes = searchResults.items;
+                    } else {
+                        // No query constraint — fetch all notes directly
+                        const notesResults = await joplin.data.get(["notes"], {
+                            fields: ["id", "title", "parent_id"],
+                            limit: 50,
+                        });
+                        rawNotes = notesResults.items;
+                    }
+
+                    const notesWithFolders = await Promise.all(
+                        rawNotes.map(async (note: any) => {
+                            try {
+                                const folder = await joplin.data.get(["folders", note.parent_id], { fields: ["title"] });
+                                return { id: note.id, title: note.title, folderTitle: folder.title };
+                            } catch {
+                                return { id: note.id, title: note.title, folderTitle: "" };
+                            }
+                        })
+                    );
+
+                    variable.setNotes(notesWithFolders);
+                } catch (err) {
+                    this.logger.log(`Error pre-fetching notes for search variable: ${err}`);
+                }
+            }
+        }
+
+        // Render dialog once, with notes already populated
         await setTemplateVariablesView(this.dialog, title, variableObjects);
         const dialogResponse = (await joplin.views.dialogs.open(this.dialog));
 

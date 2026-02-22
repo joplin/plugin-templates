@@ -6,6 +6,7 @@ import { InvalidCustomVariable } from "./types/invalid";
 import { NumberCustomVariable } from "./types/number";
 import { TextCustomVariable } from "./types/text";
 import { TimeCustomVariable } from "./types/time";
+import { SearchCustomVariable } from "./types/search";
 
 // NOTE - InvalidCustomVariable should be at the last of the list
 // because it accepts any definition.
@@ -16,6 +17,7 @@ const VARIABLE_TYPES = [
     DateCustomVariable,
     TimeCustomVariable,
     EnumCustomVariable,
+    SearchCustomVariable,
     InvalidCustomVariable
 ];
 

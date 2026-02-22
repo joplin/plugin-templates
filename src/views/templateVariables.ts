@@ -5,6 +5,8 @@ import { AUTO_FOCUS_SCRIPT } from "../utils/dialogHelpers";
 
 export const setTemplateVariablesView = async (viewHandle: string, title: string, variables: Record<string, CustomVariable>): Promise<void> => {
     await joplin.views.dialogs.addScript(viewHandle, "./views/webview.css");
+    await joplin.views.dialogs.addScript(viewHandle, "./views/autocomplete.css");
+    await joplin.views.dialogs.addScript(viewHandle, "./views/autocomplete.js");
 
     const variablesFormInputHtml = Object.values(variables).map(variable => variable.toHTML());
 
