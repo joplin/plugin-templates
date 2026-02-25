@@ -174,6 +174,134 @@ describe("Template parser", () => {
         `);
     });
 
+    test("should parse boolean variable with default='no' correctly", async () => {
+        const template = {
+            id: "note-id",
+            title: "Test Boolean Default",
+            body: dedent`
+                ---
+                enable_feature:\n  type: boolean\n  default: no
+                ---
+
+                Feature enabled: {{ enable_feature }}
+            `
+        };
+        testVariableTypes({
+            enable_feature: BooleanCustomVariable
+        }, (v) => {
+            // Verify the HTML contains the correct default selection
+            const html = v.enable_feature.toHTML();
+            expect(html).toContain("value=\"false\" selected");
+        });
+        handleVariableDialog("ok", {
+            enable_feature: "false"
+        });
+
+        const parsedTemplate = await parser.parseTemplate(template);
+
+        assert(parsedTemplate);
+        expect(parsedTemplate.title).toEqual("Test Boolean Default");
+        expect(parsedTemplate.body).toEqual(dedent`
+            Feature enabled: false
+        `);
+    });
+
+    test("should parse boolean variable with default='yes' correctly", async () => {
+        const template = {
+            id: "note-id",
+            title: "Test Boolean Default Yes",
+            body: dedent`
+                ---
+                enable_feature:\n  type: boolean\n  default: yes
+                ---
+
+                Feature enabled: {{ enable_feature }}
+            `
+        };
+        testVariableTypes({
+            enable_feature: BooleanCustomVariable
+        }, (v) => {
+            // Verify the HTML contains the correct default selection
+            const html = v.enable_feature.toHTML();
+            expect(html).toContain("value=\"true\" selected");
+        });
+        handleVariableDialog("ok", {
+            enable_feature: "true"
+        });
+
+        const parsedTemplate = await parser.parseTemplate(template);
+
+        assert(parsedTemplate);
+        expect(parsedTemplate.title).toEqual("Test Boolean Default Yes");
+        expect(parsedTemplate.body).toEqual(dedent`
+            Feature enabled: true
+        `);
+    });
+
+    test("should preserve existing boolean behavior when no default is specified", async () => {
+        const template = {
+            id: "note-id",
+            title: "Test Boolean No Default",
+            body: dedent`
+                ---
+                flag: boolean
+                ---
+
+                Flag: {{ flag }}
+            `
+        };
+        testVariableTypes({
+            flag: BooleanCustomVariable
+        }, (v) => {
+            // Verify default is "yes" (true) when not specified
+            const html = v.flag.toHTML();
+            expect(html).toContain("value=\"true\" selected");
+        });
+        handleVariableDialog("ok", {
+            flag: "true"
+        });
+
+        const parsedTemplate = await parser.parseTemplate(template);
+
+        assert(parsedTemplate);
+        expect(parsedTemplate.title).toEqual("Test Boolean No Default");
+        expect(parsedTemplate.body).toEqual(dedent`
+            Flag: true
+        `);
+    });
+
+    test("should fallback to default behavior for invalid boolean default values", async () => {
+        const template = {
+            id: "note-id",
+            title: "Test Invalid Default",
+            body: dedent`
+                ---
+                flag:\n  type: boolean\n  default: invalid_value
+                ---
+
+                Flag: {{ flag }}
+            `
+        };
+        testVariableTypes({
+            flag: BooleanCustomVariable
+        }, (v) => {
+            // Invalid default should fallback to true
+            const html = v.flag.toHTML();
+            expect(html).toContain("value=\"true\" selected");
+        });
+        handleVariableDialog("ok", {
+            flag: "true"
+        });
+
+        const parsedTemplate = await parser.parseTemplate(template);
+
+        assert(parsedTemplate);
+        expect(parsedTemplate.title).toEqual("Test Invalid Default");
+        expect(parsedTemplate.body).toEqual(dedent`
+            Flag: true
+        `);
+    });
+
     test("should parse date, time custom variables correctly", async () => {
         const template = {
             id: "note-id",
