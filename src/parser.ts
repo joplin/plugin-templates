@@ -7,6 +7,7 @@ import { Note } from "./utils/templates";
 import { notEmpty } from "./utils/typescript";
 import { getVariableFromDefinition } from "./variables/parser";
 import { CustomVariable } from "./variables/types/base";
+import { DateCustomVariable } from "./variables/types/date";
 import { setTemplateVariablesView } from "./views/templateVariables";
 import { HelperFactory } from "./helpers";
 
@@ -89,6 +90,14 @@ export class Parser {
         Object.keys(variables).map(variableName => {
             variableObjects[variableName] = getVariableFromDefinition(variableName, variables[variableName]);
         });
+
+        // Inject the user's Joplin date format into each DateCustomVariable
+        // so the placeholder matches their configured format (fixes issue #112).
+        for (const variable of Object.values(variableObjects)) {
+            if (variable instanceof DateCustomVariable) {
+                variable.setDateFormat(this.utils.getDateFormat());
+            }
+        }
 
         await setTemplateVariablesView(this.dialog, title, variableObjects);
         const dialogResponse = (await joplin.views.dialogs.open(this.dialog));
