@@ -10,6 +10,10 @@ import { CustomVariable } from "./variables/types/base";
 import { setTemplateVariablesView } from "./views/templateVariables";
 import { HelperFactory } from "./helpers";
 
+// Unique placeholder that Handlebars will output for {{ note_id }}.
+// actions.ts replaces this with the real note ID after the note is created.
+export const NOTE_ID_PLACEHOLDER = "__JOPLIN_TEMPLATE_NOTE_ID__";
+
 // Can't use import for this library because the types in the library
 // are declared incorrectly which result in typescript errors.
 // Reference -> https://github.com/jxson/front-matter/issues/76
@@ -281,9 +285,19 @@ export class Parser {
             const templateBody = processedTemplate.body;
             const compiledTemplate = Handlebars.compile(templateBody);
 
+            // note_id is intentionally excluded from the shared context above
+            // because it is only meaningful in the note body (it resolves to a
+            // placeholder that actions.ts swaps for the real ID after creation).
+            // Including it in the title/tags context would leave the placeholder
+            // string unreplaced there.
+            const bodyContext = {
+                ...context,
+                note_id: NOTE_ID_PLACEHOLDER
+            };
+
             return {
                 ...newNoteMeta,
-                body: compiledTemplate(context)
+                body: compiledTemplate(bodyContext)
             };
         } catch (err) {
             console.error("Error in parsing template.", err);
