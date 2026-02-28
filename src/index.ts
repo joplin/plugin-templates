@@ -10,7 +10,7 @@ import { TemplateAction, performAction } from "./actions";
 import { loadLegacyTemplates } from "./legacyTemplates";
 import { Logger } from "./logger";
 import { PromiseGroup } from "./utils/promises";
-import { PluginSettingsRegistry, DefaultNoteTemplateIdSetting, DefaultTodoTemplateIdSetting, DefaultTemplatesConfigSetting } from "./settings";
+import { PluginSettingsRegistry, DefaultNoteTemplateIdSetting, DefaultTodoTemplateIdSetting, DefaultTemplatesConfigSetting, KeyboardShortcutsSetting } from "./settings";
 import { LocaleGlobalSetting, DateFormatGlobalSetting, TimeFormatGlobalSetting, ProfileDirGlobalSetting } from "./settings/global";
 import { DefaultTemplatesConfig } from "./settings/defaultTemplatesConfig";
 import { CommandsPanel } from "./views/commandsPanel";
@@ -265,6 +265,48 @@ joplin.plugins.register({
         }));
 
 
+        // Register keyboard-shortcut commands for individual templates (Issue #122)
+        // Users configure these in Settings > Templates > "Template keyboard shortcuts (JSON)"
+        const shortcutEntries = await KeyboardShortcutsSetting.get();
+        const shortcutMenuItems: { commandName: string; accelerator?: string }[] = [];
+
+        for (let i = 0; i < shortcutEntries.length; i++) {
+            const entry = shortcutEntries[i];
+            const commandName = `templateShortcut_${i + 1}`;
+
+            const actionEnum: TemplateAction =
+                entry.action === "newNote"
+                    ? TemplateAction.NewNote
+                    : entry.action === "newTodo"
+                    ? TemplateAction.NewTodo
+                    : TemplateAction.InsertText;
+
+            joplinCommands.add(joplin.commands.register({
+                name: commandName,
+                label: entry.label || `Template shortcut ${i + 1}`,
+                execute: async () => {
+                    if (!entry.templateId) {
+                        await joplin.views.dialogs.showMessageBox(
+                            `Template shortcut ${i + 1}: no templateId configured.`);
+                        return;
+                    }
+                    const template = await getTemplateFromId(entry.templateId);
+                    if (!template) {
+                        await joplin.views.dialogs.showMessageBox(
+                            `Template shortcut ${i + 1}: template not found (ID: ${entry.templateId}).`);
+                        return;
+                    }
+                    await performActionWithParsedTemplate(actionEnum, template);
+                }
+            }));
+
+            const menuItem: { commandName: string; accelerator?: string } = { commandName };
+            if (entry.accelerator && entry.accelerator.trim() !== "") {
+                menuItem.accelerator = entry.accelerator.trim();
+            }
+            shortcutMenuItems.push(menuItem);
+        }
+
         // Create templates menu
         await joplin.views.menus.create("templates", "Templates", [
             {
@@ -304,6 +346,10 @@ joplin.plugins.register({
                     },
                 ]
             },
+            // Dynamically-added template shortcuts (Issue #122)
+            ...(shortcutMenuItems.length > 0
+                ? [{ label: "Template shortcuts", submenu: shortcutMenuItems }]
+                : []),
             {
                 commandName: "showPluginDocumentation"
             }
