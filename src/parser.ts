@@ -53,13 +53,31 @@ export class Parser {
         HelperFactory.registerHelpers(this.utils);
     }
 
-    private getDefaultContext() {
+    private async getDefaultContext() {
+        let notebookName = "";
+        
+        try {
+            // Get current folder ID
+            const folder = await joplin.workspace.selectedFolder();
+            if (folder && folder.id) {
+                // Get folder details to get the title
+                const folderDetails = await joplin.data.get(["folders", folder.id], { fields: ["title"] });
+                if (folderDetails && folderDetails.title) {
+                    notebookName = folderDetails.title;
+                }
+            }
+        } catch (error) {
+            // Fail gracefully - if we can't get notebook name, use empty string
+            console.warn("Could not retrieve notebook name for template variable:", error);
+        }
+
         return {
             date: this.utils.getCurrentTime(this.utils.getDateFormat()),
             time: this.utils.getCurrentTime(this.utils.getTimeFormat()),
             datetime: this.utils.getCurrentTime(),
             bowm: this.utils.formatMsToLocal(this.utils.getBeginningOfWeek(1), this.utils.getDateFormat()),
-            bows: this.utils.formatMsToLocal(this.utils.getBeginningOfWeek(0), this.utils.getDateFormat())
+            bows: this.utils.formatMsToLocal(this.utils.getBeginningOfWeek(0), this.utils.getDateFormat()),
+            notebook: notebookName
         }
     }
 
@@ -122,10 +140,10 @@ export class Parser {
         return this.mapUserResponseToVariables(variableObjects, userResponse);
     }
 
-    private parseSpecialVariables(specialVariables: Record<string, unknown>, customVariableInputs: Record<string, string>) {
+    private async parseSpecialVariables(specialVariables: Record<string, unknown>, customVariableInputs: Record<string, string>) {
         const res: Record<string, string> = {};
         const context = {
-            ...this.getDefaultContext(),
+            ...await this.getDefaultContext(),
             ...customVariableInputs
         };
 
@@ -270,14 +288,14 @@ export class Parser {
                 return null;
             }
 
-            const parsedSpecialVariables = this.parseSpecialVariables(specialVariables, variableInputs);
+            const parsedSpecialVariables = await this.parseSpecialVariables(specialVariables, variableInputs);
             const newNoteMeta = await this.getNoteMetadata(parsedSpecialVariables);
 
             // Remove the fallback property because it's not actually a variable defined by the user.
             delete parsedSpecialVariables.fallback_note_title;
 
             const context = {
-                ...this.getDefaultContext(),
+                ...await this.getDefaultContext(),
                 ...variableInputs,
                 ...parsedSpecialVariables
             };
