@@ -14,6 +14,6 @@ export class TimeCustomVariable extends CustomVariable {
     }
 
     protected inputHTML(): string {
-        return `<input name="${encode(this.name)}" type="time"></input>`;
+        return `<input name="${encode(this.name)}" type="time" aria-label="${encode(this.label)}"></input>`;
     }
 }
