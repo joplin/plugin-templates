@@ -357,7 +357,17 @@ joplin.plugins.register({
                     command: "showPluginDocumentation"
                 }
             ]);
-            await commandsPanel.create();
+
+            await joplin.commands.register({
+                name: "showTemplatesPanel",
+                label: "Templates",
+                iconName: "far fa-file-alt",
+                execute: async () => {
+                    await commandsPanel.create();
+                }
+            });
+
+            await joplin.views.menuItems.create("showTemplatesPanelMenuItem", "showTemplatesPanel", MenuItemLocation.Tools);
         }
     },
 });
