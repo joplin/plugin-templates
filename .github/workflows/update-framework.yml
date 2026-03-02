@@ -1,15 +1,9 @@
 name: Update Joplin Plugin Framework
 
-# Run monthly on the 1st at 00:00 UTC, and allow manual trigger
 on:
   schedule:
-    - cron: '0 0 1 * *'  # Monthly on the 1st
-  workflow_dispatch:  # Allow manual trigger
-
-# Prevent concurrent framework updates to avoid conflicts
-concurrency:
-  group: update-framework
-  cancel-in-progress: false
+    - cron: '0 0 1 * *'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -26,19 +20,17 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18  # Fallback since .nvmrc does not exist
+          node-version: 18
       
       - name: Install generator-joplin globally
         run: npm install -g generator-joplin yo
       
-      # Removed --force flag to prevent overwriting custom modifications
       - name: Run framework update
         run: yo joplin --update
       
       - name: Install dependencies
         run: npm install --legacy-peer-deps
       
-      # Check if any files changed to avoid creating empty PRs
       - name: Check for changes
         id: changes
         run: |
@@ -62,5 +54,6 @@ jobs:
             - Build succeeds
             - No breaking changes introduced
           branch: chore/update-plugin-framework
+          branch-suffix: timestamp
           delete-branch: true
           labels: dependencies, automated
