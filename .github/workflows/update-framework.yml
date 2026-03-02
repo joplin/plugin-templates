@@ -26,8 +26,12 @@ jobs:
         run: npm install -g generator-joplin yo
       
       - name: Run framework update
+ fix/framework-update-ci
         run: |
           printf "y\n" | yo joplin --update
+=======
+        run: yo joplin --update
+ master
       
       - name: Install dependencies
         run: npm install --legacy-peer-deps
