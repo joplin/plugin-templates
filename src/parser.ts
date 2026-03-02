@@ -2,7 +2,7 @@ import joplin from "api";
 import * as Handlebars from "handlebars/dist/handlebars";
 import { Logger } from "./logger";
 import { DateAndTimeUtils } from "./utils/dateAndTime";
-import { doesFolderExist } from "./utils/folders";
+import { doesFolderExist, getCurrentNotebookTitle } from "./utils/folders";
 import { Note } from "./utils/templates";
 import { notEmpty } from "./utils/typescript";
 import { getVariableFromDefinition } from "./variables/parser";
@@ -50,22 +50,7 @@ export class Parser {
     }
 
     private async getDefaultContext() {
-        let notebookName = "";
-        
-        try {
-            // Get current folder ID
-            const folder = await joplin.workspace.selectedFolder();
-            if (folder && folder.id) {
-                // Get folder details to get the title
-                const folderDetails = await joplin.data.get(["folders", folder.id], { fields: ["title"] });
-                if (folderDetails && folderDetails.title) {
-                    notebookName = folderDetails.title;
-                }
-            }
-        } catch (error) {
-            // Fail gracefully - if we can't get notebook name, use empty string
-            console.warn("Could not retrieve notebook name for template variable:", error);
-        }
+        const notebookName = await getCurrentNotebookTitle();
 
         return {
             date: this.utils.getCurrentTime(this.utils.getDateFormat()),

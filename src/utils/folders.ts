@@ -22,7 +22,7 @@ export const getFolderFromId = async (folderId: string | null): Promise<Folder |
     }
 
     try {
-        return await joplin.data.get([ "folders", folderId ], { fields: ["id", "title"] });
+        return await joplin.data.get(["folders", folderId], { fields: ["id", "title"] });
     } catch (error) {
         console.error("There was an error loading a folder from id", error);
         return null;
@@ -35,12 +35,12 @@ export const createFolder = async (title: string): Promise<string> => {
 }
 
 export const getAllNotesInFolder = async (title: string): Promise<Note[]> => {
-    return await fetchAllItems(["search"], { query: `notebook:${title}`, fields: ["id", "title", "body"]})
+    return await fetchAllItems(["search"], { query: `notebook:${title}`, fields: ["id", "title", "body"] })
 }
 
 export const doesFolderExist = async (folderId: string): Promise<boolean> => {
     try {
-        await joplin.data.get([ "folders", folderId ], { fields: ["title"] });
+        await joplin.data.get(["folders", folderId], { fields: ["title"] });
         return true;
     } catch (error) {
         return false;
@@ -59,7 +59,7 @@ const getAllFolders = async (): Promise<Folder[]> => {
 export async function getUserFolderSelection(dialogHandle: string, returnField: "id" | "folder" = "folder", prompt?: string): Promise<string | null> {
     try {
         const folders = await getAllFolders();
-        
+
         if (folders.length === 0) {
             await joplin.views.dialogs.showMessageBox("No notebooks found.");
             return null;
@@ -91,17 +91,45 @@ export async function getUserFolderSelection(dialogHandle: string, returnField: 
         await joplin.views.dialogs.setFitToContent(dialogHandle, true);
 
         const result = await joplin.views.dialogs.open(dialogHandle);
-        
+
         if (result.id === "cancel") {
             return null;
         }
 
         // Get the folder value from the nested form data structure
         const folderValue = result.formData?.["folders-form"]?.folder;
-        
+
         return folderValue || null;
     } catch (error) {
         console.error("Error in getUserFolderSelection:", error);
         return null;
+    }
+}
+
+export async function getCurrentNotebookTitle(): Promise<string> {
+    try {
+        const folder = await joplin.workspace.selectedFolder();
+
+        if (!folder) return "";
+
+        // If title already exists on selectedFolder, use it directly
+        if (folder.title) return folder.title;
+
+        // Otherwise fallback to fetching full details
+        if (folder.id) {
+            const folderDetails = await joplin.data.get(
+                ["folders", folder.id],
+                { fields: ["title"] }
+            );
+
+            if (folderDetails?.title) {
+                return folderDetails.title;
+            }
+        }
+
+        return "";
+    } catch (error) {
+        console.warn("Could not retrieve notebook name for template variable", error);
+        return "";
     }
 }
