@@ -3,6 +3,7 @@ import { NewNote, NOTE_ID_PLACEHOLDER } from "./parser";
 import { getSelectedFolder } from "./utils/folders";
 import { applyTagToNote, getAnyTagWithTitle } from "./utils/tags";
 import { ApplyTagsWhileInsertingSetting } from "./settings";
+import { getGeoLocationForNote } from "./utils/geolocation";
 
 export enum TemplateAction {
     NewNote = "newNote",
@@ -32,10 +33,19 @@ const performInsertTextAction = async (template: NewNote) => {
 
 const performNewNoteAction = async (template: NewNote, isTodo: 0 | 1) => {
     const folderId = template.folder ? template.folder : await getSelectedFolder();
-    const notePayload = { body: template.body, parent_id: folderId, title: template.title, is_todo: isTodo };
+    const notePayload: Record<string, unknown> = { body: template.body, parent_id: folderId, title: template.title, is_todo: isTodo };
 
     if (isTodo && template.todo_due) {
         notePayload["todo_due"] = template.todo_due;
+    }
+
+    const geoLocation = await getGeoLocationForNote();
+    if (geoLocation) {
+        notePayload["latitude"] = geoLocation.latitude;
+        notePayload["longitude"] = geoLocation.longitude;
+        if (geoLocation.altitude !== undefined) {
+            notePayload["altitude"] = geoLocation.altitude;
+        }
     }
 
     const note = await joplin.data.post(["notes"], null, notePayload);
