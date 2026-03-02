@@ -9,7 +9,6 @@ export interface Folder {
     title: string;
 }
 
-type FolderProperty = "id" | "title";
 
 export const getSelectedFolder = async (): Promise<string> => {
     const folder = await joplin.workspace.selectedFolder();
