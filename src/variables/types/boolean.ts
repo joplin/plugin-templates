@@ -6,15 +6,16 @@ export class BooleanCustomVariable extends CustomVariable {
     static definitionName = "boolean";
     private defaultValue: boolean;
 
-    constructor(name: string, label: string, defaultValue = true) {
-        super(name, label);
-        this.defaultValue = defaultValue;
+    constructor(name: string, label: string, rawDefault: string | boolean | null = null) {
+        super(name, label, rawDefault);
+        const parsed = BooleanCustomVariable.parseBooleanDefault(rawDefault);
+        this.defaultValue = parsed ?? true;
     }
 
     protected inputHTML(): string {
         const yesSelected = this.defaultValue ? " selected" : "";
         const noSelected = !this.defaultValue ? " selected" : "";
-        
+
         return (
             `
             <select name="${encode(this.name)}">
@@ -30,34 +31,15 @@ export class BooleanCustomVariable extends CustomVariable {
         return input === "true";
     }
 
-    static createFromDefinition(name: string, definition: unknown): CustomVariable {
-        if (typeof definition === "string" && definition.trim() === this.definitionName) {
-            return new this(name, name, true);
-        } else if (typeof definition === "object" && definition !== null) {
-            if ("type" in definition) {
-                const variableType = definition["type"];
-                if (typeof variableType === "string" && variableType.trim() === this.definitionName) {
-                    let label = name;
-                    if ("label" in definition && typeof definition["label"] === "string") {
-                        label = definition["label"].trim();
-                    }
-
-                    let defaultValue = true;
-                    if ("default" in definition && typeof definition["default"] === "string") {
-                        const defaultStr = definition["default"].trim().toLowerCase();
-                        if (defaultStr === "no" || defaultStr === "false") {
-                            defaultValue = false;
-                        } else if (defaultStr === "yes" || defaultStr === "true") {
-                            defaultValue = true;
-                        }
-                        // Invalid values fallback to true (existing behavior)
-                    }
-
-                    return new this(name, label, defaultValue);
-                }
-            }
+    private static parseBooleanDefault(rawDefault: string | boolean | null): boolean | undefined {
+        if (rawDefault === null) return undefined;
+        if (typeof rawDefault === "boolean") return rawDefault;
+        if (typeof rawDefault === "string") {
+            const normalized = rawDefault.trim().toLowerCase();
+            if (normalized === "true" || normalized === "yes") return true;
+            if (normalized === "false" || normalized === "no") return false;
         }
 
-        throw new InvalidDefinitionError();
+        throw new InvalidDefinitionError("Invalid boolean default");
     }
 }

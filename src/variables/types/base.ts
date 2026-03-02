@@ -1,16 +1,18 @@
 import { DateAndTimeUtils } from "@templates/utils/dateAndTime";
 import { encode } from "html-entities";
 
-export class InvalidDefinitionError extends Error {}
+export class InvalidDefinitionError extends Error { }
 
 export class CustomVariable {
     static definitionName: string;
     protected label: string;
     protected name: string;
+    protected rawDefault: string | boolean | null;
 
-    constructor(name: string, label: string) {
+    constructor(name: string, label: string, rawDefault: string | boolean | null = null) {
         this.name = name;
         this.label = label;
+        this.rawDefault = rawDefault;
     }
 
     protected inputHTML(): string {
@@ -39,16 +41,33 @@ export class CustomVariable {
 
     static createFromDefinition(name: string, definition: unknown): CustomVariable {
         if (typeof definition === "string" && definition.trim() === this.definitionName) {
-            return new this(name, name);
+            return new this(name, name, null);
         } else if (typeof definition === "object" && definition !== null) {
             if ("type" in definition) {
-                const variableType = definition["type"];
+                const definitionObj = definition as Record<string, unknown>;
+                const variableType = definitionObj["type"];
                 if (typeof variableType === "string" && variableType.trim() === this.definitionName) {
                     let label = name;
-                    if ("label" in definition && typeof definition["label"] === "string") {
-                        label = definition["label"].trim();
+                    if ("label" in definitionObj && typeof definitionObj["label"] === "string") {
+                        label = definitionObj["label"].trim();
                     }
-                    return new this(name, label);
+
+                    let rawDefault: string | boolean | null = null;
+                    if ("default" in definitionObj) {
+                        const value = definitionObj["default"];
+
+                        if (
+                            typeof value === "string" ||
+                            typeof value === "boolean" ||
+                            value === null
+                        ) {
+                            rawDefault = value;
+                        } else {
+                            throw new InvalidDefinitionError();
+                        }
+                    }
+
+                    return new this(name, label, rawDefault);
                 }
             }
         }
