@@ -26,15 +26,7 @@ jobs:
         run: npm install -g generator-joplin yo
       
       - name: Run framework update
- fix/framework-update-ci
-        run: |
-          printf "y\n" | yo joplin --update
-=======
-        run: yo joplin --update
- master
-      
-      - name: Install dependencies
-        run: npm install --legacy-peer-deps
+        run: yo joplin --update --silent
       
       - name: Check for changes
         id: changes
@@ -44,6 +36,9 @@ jobs:
           else
             echo "has_changes=true" >> $GITHUB_OUTPUT
           fi
+      
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
       
       - name: Create Pull Request
         if: steps.changes.outputs.has_changes == 'true'
