@@ -12,7 +12,8 @@ table {
     border-color: var(--joplin-divider-color);
 }
 
-th, td {
+th,
+td {
     border-style: solid;
     border-color: var(--joplin-divider-color);
     padding: 5px;
@@ -31,7 +32,9 @@ th, td {
     padding: 2px;
 }
 
-input, select, textarea {
+input,
+select,
+textarea {
     height: 25px;
     font-size: var(--joplin-font-size, 16px);
     font-family: var(--joplin-font-family);
@@ -42,7 +45,9 @@ input, select, textarea {
     border-radius: 3px;
 }
 
-input:focus, select:focus, textarea:focus {
+input:focus,
+select:focus,
+textarea:focus {
     outline: none;
     border-color: var(--joplin-color);
 }
@@ -50,4 +55,148 @@ input:focus, select:focus, textarea:focus {
 .variablesForm {
     max-height: 80vh;
     overflow: auto;
+}
+
+/* ── Flatpickr: make the calendar fit the dialog and match Joplin theme ── */
+
+.flatpickr-calendar {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    font-family: var(--joplin-font-family) !important;
+    font-size: 13px !important;
+    background: var(--joplin-background-color) !important;
+    color: var(--joplin-color) !important;
+    border: 1px solid var(--joplin-divider-color) !important;
+    box-shadow: none !important;
+}
+
+/* Month/year header row */
+.flatpickr-months {
+    display: flex !important;
+    align-items: center !important;
+    overflow: visible !important;
+    background: var(--joplin-background-color) !important;
+    color: var(--joplin-color) !important;
+}
+
+.flatpickr-month {
+    flex: 1 !important;
+    height: auto !important;
+    overflow: visible !important;
+    background: var(--joplin-background-color) !important;
+    color: var(--joplin-color) !important;
+}
+
+.flatpickr-current-month {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    padding: 6px 0 !important;
+    position: static !important;
+    width: 100% !important;
+    font-size: 13px !important;
+    color: var(--joplin-color) !important;
+}
+
+.flatpickr-current-month .flatpickr-monthDropdown-months,
+.flatpickr-current-month .numInputWrapper {
+    color: var(--joplin-color) !important;
+    background: transparent !important;
+    font-size: 13px !important;
+}
+
+.flatpickr-current-month input.cur-year {
+    color: var(--joplin-color) !important;
+    font-size: 13px !important;
+}
+
+/* Prev/next month arrows */
+.flatpickr-prev-month,
+.flatpickr-next-month {
+    color: var(--joplin-color) !important;
+    fill: var(--joplin-color) !important;
+}
+
+/* Inner container and day grid — override hardcoded pixel widths */
+.flatpickr-rContainer {
+    width: 100% !important;
+}
+
+.flatpickr-weekdays {
+    width: 100% !important;
+    display: flex !important;
+    background: transparent !important;
+}
+
+.flatpickr-weekday {
+    flex: 1 !important;
+    max-width: unset !important;
+    font-size: 12px !important;
+    color: var(--joplin-color) !important;
+    background: transparent !important;
+}
+
+.flatpickr-days {
+    width: 100% !important;
+}
+
+.dayContainer {
+    width: 100% !important;
+    min-width: unset !important;
+    max-width: 100% !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: space-around !important;
+}
+
+.flatpickr-day {
+    flex: 1 1 13% !important;
+    max-width: 13% !important;
+    height: 32px !important;
+    line-height: 32px !important;
+    font-size: 12px !important;
+    color: var(--joplin-color) !important;
+    border-radius: 4px !important;
+}
+
+.flatpickr-day.selected,
+.flatpickr-day.selected:hover {
+    background: #4a90d9 !important;
+    border-color: #4a90d9 !important;
+    color: #fff !important;
+}
+
+.flatpickr-day:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.flatpickr-day.today {
+    border-color: #4a90d9 !important;
+}
+
+.flatpickr-day.flatpickr-disabled,
+.flatpickr-day.prevMonthDay,
+.flatpickr-day.nextMonthDay {
+    opacity: 0.3 !important;
+}
+
+/* Custom year dropdown added by datepicker.js */
+select.year-select {
+    color: var(--joplin-color) !important;
+    background: var(--joplin-background-color) !important;
+    border: 1px solid var(--joplin-divider-color) !important;
+    border-radius: 3px !important;
+    font-size: 13px !important;
+    font-family: var(--joplin-font-family) !important;
+    padding: 2px 4px !important;
+    height: auto !important;
+    width: auto !important;
+    cursor: pointer !important;
+}
+
+select.year-select:focus {
+    outline: none !important;
+    border-color: var(--joplin-color) !important;
 }
