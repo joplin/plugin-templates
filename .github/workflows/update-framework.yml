@@ -25,7 +25,7 @@ jobs:
           node-version: '18'
 
       - name: Install project dependencies
-        run: npm ci
+        run: npm install --legacy-peer-deps
 
       - name: Install generator-joplin
         run: npm install -g yo generator-joplin
@@ -34,7 +34,7 @@ jobs:
         run: yo joplin --update
 
       - name: Reinstall dependencies
-        run: npm install
+        run: npm install --legacy-peer-deps
 
       - name: Check for changes
         id: check_changes
@@ -50,7 +50,8 @@ jobs:
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: 'chore: update plugin framework'
-          title: 'chore: update plugin framework'
+          commit-message: 'chore: monthly joplin plugin framework update'
+          title: 'chore: update joplin plugin framework (automated)'
           branch: chore/update-plugin-framework
           body: 'Automated framework update via generator-joplin.'
+          delete-branch: true
