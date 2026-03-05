@@ -1,5 +1,5 @@
 import joplin from "api";
-import { NewNote } from "./parser";
+import { NewNote, NOTE_ID_PLACEHOLDER } from "./parser";
 import { getSelectedFolder } from "./utils/folders";
 import { applyTagToNote, getAnyTagWithTitle } from "./utils/tags";
 import { ApplyTagsWhileInsertingSetting } from "./settings";
@@ -10,15 +10,22 @@ export enum TemplateAction {
     InsertText = "insertText"
 }
 
+
 const performInsertTextAction = async (template: NewNote) => {
-    await joplin.commands.execute("insertText", template.body);
+    // When inserting into an existing note, resolve {{ note_id }} to the
+    // currently selected note's ID, since there is no "new note" being created.
+    const currentNote = await joplin.workspace.selectedNote();
+    const body = template.body.includes(NOTE_ID_PLACEHOLDER)
+        ? template.body.split(NOTE_ID_PLACEHOLDER).join(currentNote.id)
+        : template.body;
+
+    await joplin.commands.execute("insertText", body);
 
     const applyTags = await ApplyTagsWhileInsertingSetting.get()
     if (applyTags) {
-        const noteId = (await joplin.workspace.selectedNote()).id;
         for (const tag of template.tags) {
             const tagId = (await getAnyTagWithTitle(tag)).id;
-            await applyTagToNote(tagId, noteId);
+            await applyTagToNote(tagId, currentNote.id);
         }
     }
 }
@@ -32,12 +39,20 @@ const performNewNoteAction = async (template: NewNote, isTodo: 0 | 1) => {
     }
 
     const note = await joplin.data.post(["notes"], null, notePayload);
+
+    // Post-process: replace the note_id placeholder with the actual note ID
+    if (template.body.includes(NOTE_ID_PLACEHOLDER)) {
+        const updatedBody = template.body.split(NOTE_ID_PLACEHOLDER).join(note.id);
+        await joplin.data.put(["notes", note.id], null, { body: updatedBody });
+    }
+
     await joplin.commands.execute("openNote", note.id);
     for (const tag of template.tags) {
         const tagId = (await getAnyTagWithTitle(tag)).id;
         await applyTagToNote(tagId, note.id);
     }
 }
+
 
 export const performAction = async (action: TemplateAction, template: NewNote): Promise<void> => {
     switch (action) {
