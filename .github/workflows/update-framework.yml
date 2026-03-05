@@ -1,7 +1,4 @@
- github-action-update-framework-82
-name: Update Plugin Framework
 name: Update Joplin Plugin Framework
- 
 
 on:
   schedule:
@@ -15,7 +12,6 @@ permissions:
 jobs:
   update-framework:
     runs-on: ubuntu-latest
- github-action-update-framework-82
 
     steps:
       - name: Checkout repository
@@ -28,36 +24,15 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Install project dependencies
+      - name: Install dependencies
         run: npm install --legacy-peer-deps
 
-      - name: Install generator-joplin
+      - name: Install generator-joplin globally
         run: npm install -g yo generator-joplin
 
-      - name: Update framework
-        run: yo joplin --update
-
-      - name: Reinstall dependencies
-        run: npm install --legacy-peer-deps
-
-      - name: Check for changes
-        id: check_changes
-    
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-      
-      - name: Install generator-joplin globally
-        run: npm install -g generator-joplin yo
-      
       - name: Run framework update
         run: yo joplin --update --silent
-      
+
       - name: Check for changes
         id: changes
         run: |
@@ -66,26 +41,12 @@ jobs:
           else
             echo "has_changes=true" >> $GITHUB_OUTPUT
           fi
- github-action-update-framework-82
 
-      - name: Create Pull Request
-        if: steps.check_changes.outputs.has_changes == 'true'
-        uses: peter-evans/create-pull-request@v6
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: 'chore: monthly joplin plugin framework update'
-          title: 'chore: update joplin plugin framework (automated)'
-          branch: chore/update-plugin-framework
-          body: 'Automated framework update via generator-joplin.'
-          delete-branch: true
-      
-      - name: Install dependencies
-        run: npm install --legacy-peer-deps
-      
       - name: Create Pull Request
         if: steps.changes.outputs.has_changes == 'true'
         uses: peter-evans/create-pull-request@v6
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: 'chore: monthly joplin plugin framework update'
           title: 'chore: update joplin plugin framework (automated)'
           body: |
