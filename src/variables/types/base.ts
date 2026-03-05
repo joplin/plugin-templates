@@ -7,9 +7,9 @@ export class CustomVariable {
     static definitionName: string;
     protected label: string;
     protected name: string;
-    protected rawDefault: string | boolean | null;
+    protected rawDefault: string | boolean | number | null;
 
-    constructor(name: string, label: string, rawDefault: string | boolean | null = null) {
+    constructor(name: string, label: string, rawDefault: string | boolean | number | null = null) {
         this.name = name;
         this.label = label;
         this.rawDefault = rawDefault;
@@ -52,18 +52,19 @@ export class CustomVariable {
                         label = definitionObj["label"].trim();
                     }
 
-                    let rawDefault: string | boolean | null = null;
+                    let rawDefault: string | boolean | number | null = null;
                     if ("default" in definitionObj) {
                         const value = definitionObj["default"];
 
                         if (
                             typeof value === "string" ||
                             typeof value === "boolean" ||
+                            typeof value === "number" ||
                             value === null
                         ) {
                             rawDefault = value;
                         } else {
-                            throw new InvalidDefinitionError();
+                            throw new InvalidDefinitionError("Unsupported default value type");
                         }
                     }
 

@@ -4,17 +4,16 @@ import { CustomVariable, InvalidDefinitionError } from "./base";
 
 export class BooleanCustomVariable extends CustomVariable {
     static definitionName = "boolean";
-    private defaultValue: boolean;
+    private defaultValue: boolean | null;
 
-    constructor(name: string, label: string, rawDefault: string | boolean | null = null) {
+    constructor(name: string, label: string, rawDefault: string | boolean | number | null = null) {
         super(name, label, rawDefault);
-        const parsed = BooleanCustomVariable.parseBooleanDefault(rawDefault);
-        this.defaultValue = parsed ?? true;
+        this.defaultValue = BooleanCustomVariable.parseBooleanDefault(rawDefault);
     }
 
     protected inputHTML(): string {
-        const yesSelected = this.defaultValue ? " selected" : "";
-        const noSelected = !this.defaultValue ? " selected" : "";
+        const yesSelected = this.defaultValue === true ? " selected" : "";
+        const noSelected = this.defaultValue === false ? " selected" : "";
 
         return (
             `
@@ -31,8 +30,8 @@ export class BooleanCustomVariable extends CustomVariable {
         return input === "true";
     }
 
-    private static parseBooleanDefault(rawDefault: string | boolean | null): boolean | undefined {
-        if (rawDefault === null) return undefined;
+    private static parseBooleanDefault(rawDefault: string | boolean | number | null): boolean | null {
+        if (rawDefault === null) return null;
         if (typeof rawDefault === "boolean") return rawDefault;
         if (typeof rawDefault === "string") {
             const normalized = rawDefault.trim().toLowerCase();
