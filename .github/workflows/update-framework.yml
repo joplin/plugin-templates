@@ -48,4 +48,6 @@ jobs:
             - No breaking changes introduced
           branch: chore/update-plugin-framework
           branch-suffix: timestamp
+          committer: Albus <bot@nishantwrp.com>
+          author: Albus <bot@nishantwrp.com>
           delete-branch: true
