@@ -34,11 +34,19 @@ jobs:
       - name: New package.json content
         id: new-package-json
         run: |
-          echo 'content="$(cat package.json)"' >> $GITHUB_OUTPUT
+          {
+            echo 'content<<EOF'
+            cat package.json
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
       - name: New tsconfig.json content
         id: new-tsconfig-json
         run: |
-          echo 'content="$(cat tsconfig.json)"' >> $GITHUB_OUTPUT
+          {
+            echo 'content<<EOF'
+            cat tsconfig.json
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
       - name: Revert package.json, package-lock.json, tsconfig.json
         run: |
           git checkout -- package.json package-lock.json tsconfig.json
