@@ -22,7 +22,7 @@ jobs:
       - name: Install generator-joplin globally
         run: npm install -g generator-joplin yo
       - name: Run framework update
-        run: yo joplin --update --silent --force
+        run: yo joplin --update --silent --force --skip-install
       - name: Check for changes
         id: changes
         run: |
@@ -35,9 +35,13 @@ jobs:
         id: new-package-json
         run: |
           cat package.json
-      - name: Revert package.json & package-lock.json
+      - name: New tsconfig.json content
+        id: new-tsconfig-json
         run: |
-          git checkout -- package.json package-lock.json
+          cat tsconfig.json
+      - name: Revert package.json, package-lock.json, tsconfig.json
+        run: |
+          git checkout -- package.json package-lock.json tsconfig.json
       - name: Create Pull Request
         if: steps.changes.outputs.has_changes == 'true'
         uses: peter-evans/create-pull-request@v6
@@ -45,12 +49,18 @@ jobs:
           commit-message: 'chore: routine joplin plugin framework update'
           title: 'chore: routine joplin plugin framework update'
           body: |
-            This is an automated pull request to update the Joplin plugin framework.
+            This is an automated pull request to update the joplin plugin framework.
 
-            **Package.json was reverted, here's the framework version**
+            ## Some files were not updated from the framework
 
+            ### package.json
             ```json
             ${{ steps.new-package-json.outputs.new-package-json }}
+            ```
+  
+            ### tsconfig.json
+            ```json
+            ${{ steps.new-tsconfig-json.outputs.new-tsconfig-json }}
             ```
           branch: chore/update-plugin-framework
           branch-suffix: timestamp
