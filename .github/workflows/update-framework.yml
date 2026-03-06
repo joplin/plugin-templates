@@ -36,7 +36,7 @@ jobs:
         run: |
           {
             echo 'content<<EOF'
-            cat package.json
+            sed -e '$a\' package.json
             echo EOF
           } >> "$GITHUB_OUTPUT"
       - name: New tsconfig.json content
@@ -44,7 +44,7 @@ jobs:
         run: |
           {
             echo 'content<<EOF'
-            cat tsconfig.json
+            sed -e '$a\' tsconfig.json
             echo EOF
           } >> "$GITHUB_OUTPUT"
       - name: Revert package.json, package-lock.json, tsconfig.json
