@@ -23,14 +23,6 @@ jobs:
         run: npm install -g generator-joplin yo
       - name: Run framework update
         run: yo joplin --update --silent --force --skip-install
-      - name: New package.json content
-        id: new-package-json
-        run: |
-          {
-            echo 'content<<EOF'
-            sed -e '$a\' package.json
-            echo EOF
-          } >> "$GITHUB_OUTPUT"
       - name: New tsconfig.json content
         id: new-tsconfig-json
         run: |
@@ -39,10 +31,10 @@ jobs:
             sed -e '$a\' tsconfig.json
             echo EOF
           } >> "$GITHUB_OUTPUT"
-      - name: Revert package.json, package-lock.json, tsconfig.json
+      - name: Revert tsconfig.json
         run: |
-          git checkout -- package.json package-lock.json tsconfig.json
-      # Just package.json, tsconfig.json changes would not be important anyways
+          git checkout -- tsconfig.json
+      # Just tsconfig.json changes would not be important anyways
       - name: Check for changes
         id: changes
         run: |
@@ -62,11 +54,6 @@ jobs:
 
             ## Some files were not updated from the framework
 
-            ### package.json
-            ```json
-            ${{ steps.new-package-json.outputs.content }}
-            ```
-  
             ### tsconfig.json
             ```json
             ${{ steps.new-tsconfig-json.outputs.content }}
