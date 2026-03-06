@@ -73,8 +73,4 @@ export default class Joplin {
      */
     require(_path: string): any;
     versionInfo(): Promise<import("./types").VersionInfo>;
-    /**
-     * Tells whether the current theme is a dark one or not.
-     */
-    shouldUseDarkColors(): Promise<boolean>;
 }

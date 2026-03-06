@@ -9,17 +9,8 @@ import JoplinViewsEditors from './JoplinViewsEditor';
 /**
  * This namespace provides access to view-related services.
  *
- * ## Creating a view
- *
- * All view services provide a `create()` method which you would use to create the view object,
- * whether it's a dialog, a toolbar button or a menu item. In some cases, the `create()` method will
- * return a [[ViewHandle]], which you would use to act on the view, for example to set certain
- * properties or call some methods.
- *
- * ## The `webviewApi` object
- *
- * Within a view, you can use the global object `webviewApi` for various utility functions, such as
- * sending messages or displaying context menu. Refer to [[WebviewApi]] for the full documentation.
+ * All view services provide a `create()` method which you would use to create the view object, whether it's a dialog, a toolbar button or a menu item.
+ * In some cases, the `create()` method will return a [[ViewHandle]], which you would use to act on the view, for example to set certain properties or call some methods.
  */
 export default class JoplinViews {
     private store;
