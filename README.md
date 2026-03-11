@@ -10,7 +10,7 @@
 
 This plugin allows you to create templates in Joplin and use them to create new notes and to-dos.
 
-> **📚 New to the plugin?** Check out the [Complete Feature Demonstration Template](DEMO_TEMPLATE.md) to see all features in action with examples and expected outputs.
+> **📚 New to the plugin?** Check out the [Complete Feature Demonstration Template](DEMO_TEMPLATE.md) to see all features in action with examples and expected outputs. Also, checkout the [Templates AI Assistant](https://joplin-templates-assistant.nishantwrp.com) for creating templates using AI without having to learn the template syntax yourself.
 
 ## Table of contents
 
