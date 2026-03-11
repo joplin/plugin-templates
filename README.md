@@ -85,6 +85,7 @@ The currently supported built in template variables are:
 | `{{#custom_datetime}}` | Current date and/or time formatted based on a supplied string (using [moment.js](https://momentjs.com/) formatting) | `{{#custom_datetime}}M d{{/custom_datetime}}` |
 | `{{bowm}}` | Date of the beginning of the week (when week starts on Monday) | |
 | `{{bows}}` | Date of the beginning of the week (when week starts on Sunday) | |
+| `{{note_id}}` | ID of the note/to-do created using this template. | |
 
 > **NOTE**: All dates are formatted based on your Joplin settings in `General > Date Format`
 
