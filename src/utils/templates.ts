@@ -5,6 +5,7 @@ import { TemplatesSourceSetting, TemplatesSource } from "../settings/templatesSo
 import { LocaleGlobalSetting } from "../settings/global";
 import { encode, decode } from "html-entities";
 import { AUTO_FOCUS_SCRIPT } from "./dialogHelpers";
+import { fetchAllItems } from "./dataApi";
 
 export interface Note {
     id: string;
@@ -58,7 +59,7 @@ const getAllTemplates = async () => {
 export async function getUserTemplateSelection(dialogHandle: string, property?: NoteProperty, promptLabel = "Template:"): Promise<string | null> {
     try {
         const templates = await getAllTemplates();
-        
+
         if (templates.length === 0) {
             await joplin.views.dialogs.showMessageBox("No templates found! Please create a template and try again.");
             return null;
@@ -97,15 +98,15 @@ export async function getUserTemplateSelection(dialogHandle: string, property?: 
         await joplin.views.dialogs.setFitToContent(dialogHandle, true);
 
         const result = await joplin.views.dialogs.open(dialogHandle);
-        
+
         if (result.id === "cancel") {
             return null;
         }
-        
+
         // Get the template value and decode HTML entities
         const templateValue = result.formData?.["templates-form"]?.template;
         const decodedValue = templateValue ? decode(templateValue) : null;
-        
+
         return decodedValue;
     } catch (error) {
         console.error("Error in getUserTemplateSelection:", error);
@@ -113,13 +114,35 @@ export async function getUserTemplateSelection(dialogHandle: string, property?: 
     }
 }
 
+/**
+ * Checks whether a given note still has the 'template' tag.
+ * Returns false if the note has no template tag or if the check fails.
+ */
+export const isNoteATemplate = async (noteId: string): Promise<boolean> => {
+    try {
+        const tags = await fetchAllItems(["notes", noteId, "tags"], { fields: ["id", "title"] });
+        return tags.some((tag: { title: string }) => tag.title === "template");
+    } catch (error) {
+        console.error("Error checking if note is a template", error);
+        return false;
+    }
+};
+
 export const getTemplateFromId = async (templateId: string | null): Promise<Note | null> => {
     if (!templateId) {
         return null;
     }
 
     try {
-        return await joplin.data.get([ "notes", templateId ], { fields: ["id", "title", "body"] });
+        const note = await joplin.data.get(["notes", templateId], { fields: ["id", "title", "body"] });
+
+        const stillATemplate = await isNoteATemplate(templateId);
+        if (!stillATemplate) {
+            console.warn(`Note "${note.title}" (id: ${templateId}) is set as a default template but no longer has the 'template' tag.`);
+            return null;
+        }
+
+        return note;
     } catch (error) {
         console.error("There was an error loading a template from id", error);
         return null;

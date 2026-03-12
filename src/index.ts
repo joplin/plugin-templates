@@ -200,22 +200,32 @@ joplin.plugins.register({
             label: "Create note from default template",
             execute: async () => {
                 let defaultTemplate: Note | null = null;
+                let defaultTemplateIdWasSet = false;
 
                 const defaultTemplatesConfig = await DefaultTemplatesConfigSetting.get();
                 const currentFolderId = await getSelectedFolder();
 
                 if (currentFolderId in defaultTemplatesConfig) {
-                    defaultTemplate = await getTemplateFromId(defaultTemplatesConfig[currentFolderId].defaultNoteTemplateId);
+                    const notebookDefaultId = defaultTemplatesConfig[currentFolderId].defaultNoteTemplateId;
+                    if (notebookDefaultId) defaultTemplateIdWasSet = true;
+                    defaultTemplate = await getTemplateFromId(notebookDefaultId);
                 }
 
                 if (defaultTemplate === null) {
-                    defaultTemplate = await getTemplateFromId(await DefaultNoteTemplateIdSetting.get());
+                    const globalDefaultId = await DefaultNoteTemplateIdSetting.get();
+                    if (globalDefaultId) defaultTemplateIdWasSet = true;
+                    defaultTemplate = await getTemplateFromId(globalDefaultId);
                 }
 
                 if (defaultTemplate) {
                     return await performActionWithParsedTemplate(TemplateAction.NewNote, defaultTemplate);
                 }
-                await joplin.views.dialogs.showMessageBox("No default note template is set.");
+
+                if (defaultTemplateIdWasSet) {
+                    await joplin.views.dialogs.showMessageBox("The note set as the default template is no longer a template. Please set a new default template via Tools \u2192 Templates \u2192 Default templates.");
+                } else {
+                    await joplin.views.dialogs.showMessageBox("No default note template is set.");
+                }
             }
         }));
 
@@ -224,22 +234,32 @@ joplin.plugins.register({
             label: "Create to-do from default template",
             execute: async () => {
                 let defaultTemplate: Note | null = null;
+                let defaultTemplateIdWasSet = false;
 
                 const defaultTemplatesConfig = await DefaultTemplatesConfigSetting.get();
                 const currentFolderId = await getSelectedFolder();
 
                 if (currentFolderId in defaultTemplatesConfig) {
-                    defaultTemplate = await getTemplateFromId(defaultTemplatesConfig[currentFolderId].defaultTodoTemplateId);
+                    const notebookDefaultId = defaultTemplatesConfig[currentFolderId].defaultTodoTemplateId;
+                    if (notebookDefaultId) defaultTemplateIdWasSet = true;
+                    defaultTemplate = await getTemplateFromId(notebookDefaultId);
                 }
 
                 if (defaultTemplate === null) {
-                    defaultTemplate = await getTemplateFromId(await DefaultTodoTemplateIdSetting.get());
+                    const globalDefaultId = await DefaultTodoTemplateIdSetting.get();
+                    if (globalDefaultId) defaultTemplateIdWasSet = true;
+                    defaultTemplate = await getTemplateFromId(globalDefaultId);
                 }
 
                 if (defaultTemplate) {
                     return await performActionWithParsedTemplate(TemplateAction.NewTodo, defaultTemplate);
                 }
-                await joplin.views.dialogs.showMessageBox("No default to-do template is set.");
+
+                if (defaultTemplateIdWasSet) {
+                    await joplin.views.dialogs.showMessageBox("The note set as the default template is no longer a template. Please set a new default template via Tools \u2192 Templates \u2192 Default templates.");
+                } else {
+                    await joplin.views.dialogs.showMessageBox("No default to-do template is set.");
+                }
             }
         }));
 
