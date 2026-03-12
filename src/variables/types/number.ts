@@ -6,7 +6,7 @@ export class NumberCustomVariable extends CustomVariable {
     static definitionName = "number";
 
     protected inputHTML(): string {
-        return `<input name="${encode(this.name)}" type="number"></input>`;
+        return `<input name="${encode(this.name)}" type="number" aria-label="${encode(this.label)}"></input>`;
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

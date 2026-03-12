@@ -5,6 +5,6 @@ export class TextCustomVariable extends CustomVariable {
     static definitionName = "text";
 
     protected inputHTML(): string {
-        return `<input name="${encode(this.name)}" type="text"></input>`;
+        return `<input name="${encode(this.name)}" type="text" aria-label="${encode(this.label)}"></input>`;
     }
 }
