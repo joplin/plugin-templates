@@ -1,5 +1,4 @@
 import joplin from "api";
-import { PassThrough } from "stream";
 
 export interface CommandButton {
     label: string;
@@ -10,12 +9,19 @@ export class CommandsPanel {
     private panelHandle: string;
     private commands: CommandButton[];
 
+    private created = false;
+
     constructor(commands: CommandButton[]) {
         this.panelHandle = "templatesCommandsPanel";
         this.commands = commands;
     }
 
     public async create(): Promise<void> {
+        if (this.created) {
+            await joplin.views.panels.show(this.panelHandle, true);
+            return;
+        }
+
         try {
             // Create the panel
             this.panelHandle = await joplin.views.panels.create(this.panelHandle);
@@ -41,6 +47,7 @@ export class CommandsPanel {
 
             // Show the panel
             await joplin.views.panels.show(this.panelHandle, true);
+            this.created = true;
         } catch (error) {
             console.error("Error creating commands panel:", error);
             throw error;
