@@ -246,12 +246,9 @@ joplin.plugins.register({
             joplin.commands.register({
                 name: "copyFolderID",
                 label: "Copy notebook ID",
-                execute: async (folderId: string) => {
-                    if (typeof folderId === "undefined") {
-                        const selectedFolder = await joplin.workspace.selectedFolder();
-                        folderId = selectedFolder.id;
-                    }
-                    await joplin.clipboard.writeText(folderId);
+                execute: async (folderId?: string) => {
+                    const effectiveId = folderId ?? (await joplin.workspace.selectedFolder()).id;
+                    await joplin.clipboard.writeText(effectiveId);
 
                     await joplin.commands.execute("editor.focus");
                 }
