@@ -1093,4 +1093,42 @@ describe("Template parser", () => {
         expect(parsedTemplate).toBeNull();
         expect(errorMessagesShown).toEqual(1);
     });
+
+    test("should allow custom variables in datetime helper delta_days attribute", async () => {
+        // Issue #161: template_todo_alarm: {{datetime delta_days=days_until_due ...}}
+        // The datetime helper's delta_days should accept custom variable names
+        // Note: template_todo_alarm must be quoted in YAML to avoid parsing issues
+        
+        const template = {
+            id: "note-id",
+            title: "Task Template",
+            body: dedent`
+                ---
+                days_until_due: number
+                template_title: Task due in {{days_until_due}} days
+                template_todo_alarm: '{{datetime delta_days=days_until_due set_time="09:00" }}'
+
+                ---
+
+                Due date: {{datetime delta_days=days_until_due }}
+            `
+        };
+        testVariableTypes({
+            days_until_due: NumberCustomVariable
+        });
+        handleVariableDialog("ok", {
+            days_until_due: "5"
+        });
+
+        const parsedTemplate = await parser.parseTemplate(template);
+
+        assert(parsedTemplate);
+        // title should be resolved with days_until_due = 5
+        expect(parsedTemplate.title).toEqual("Task due in 5 days");
+        // todo_due should be set (5 days from 2021-08-12, which is 2021-08-17)
+        expect(parsedTemplate.todo_due).not.toBeNull();
+        // body should have 5 days from today formatted
+        expect(parsedTemplate.body).toContain("Due date:");
+        
+    });
 });

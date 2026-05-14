@@ -84,7 +84,7 @@ export class Parser {
 
     private async getVariableInputs(title: string, variables: Record<string, unknown>) {
         if (Object.keys(variables).length == 0) {
-            return {};
+            return { inputs: {}, objects: {} };
         }
 
         this.checkVariableNames(Object.keys(variables));
@@ -119,23 +119,43 @@ export class Parser {
             throw new Error(err);
         }
 
-        return this.mapUserResponseToVariables(variableObjects, userResponse);
+        return {
+            inputs: this.mapUserResponseToVariables(variableObjects, userResponse),
+            objects: variableObjects
+        };
     }
 
-    private parseSpecialVariables(specialVariables: Record<string, unknown>, customVariableInputs: Record<string, string>) {
+    private parseSpecialVariables(
+        specialVariables: Record<string, unknown>,
+        customVariableInputs: Record<string, string>,
+        customVariableObjects: Record<string, CustomVariable>
+    ) {
         const res: Record<string, string> = {};
-        const context = {
-            ...this.getDefaultContext(),
-            ...customVariableInputs
-        };
+        const context = { ...this.getDefaultContext() };
+
+        // Add processed custom variable values FIRST (numbers, dates, etc.)
+        // This allows expressions like {{datetime delta_days=days_until_due}} to work
+        // by resolving the variable name to its actual numeric value
+        // Note: customVariableInputs already contains the processed values from mapUserResponseToVariables
+        for (const [name, value] of Object.entries(customVariableInputs)) {
+            context[name] = value;
+        }
+        // The raw inputs are only used by mapUserResponseToVariables, not by Handlebars compilation.
 
         for (const variable of Object.keys(specialVariables)) {
-            if (typeof specialVariables[variable] !== "string") {
-                throw new Error(`${variable} should be a string, found ${typeof specialVariables[variable]}.`);
+            const rawValue = specialVariables[variable];
+            if (typeof rawValue === "string") {
+                const compiledText = Handlebars.compile(rawValue);
+                res[variable] = compiledText(context);
+            } else if (rawValue instanceof Date) {
+                // Handle Date objects from datetime helper by converting to string using the datetime format
+                res[variable] = this.utils.formatMsToLocal(rawValue.getTime(), this.utils.getDateTimeFormat());
+            } else if (rawValue !== null && rawValue !== undefined) {
+                // Handle other objects by converting to string
+                res[variable] = String(rawValue);
+            } else {
+                res[variable] = "";
             }
-
-            const compiledText = Handlebars.compile(specialVariables[variable]);
-            res[variable] = compiledText(context);
         }
 
         return res;
@@ -265,12 +285,14 @@ export class Parser {
                 }
             }
 
-            const variableInputs = await this.getVariableInputs(template.title, customVariables);
-            if (variableInputs === null) {
+            const variableResult = await this.getVariableInputs(template.title, customVariables);
+            if (variableResult === null) {
                 return null;
             }
 
-            const parsedSpecialVariables = this.parseSpecialVariables(specialVariables, variableInputs);
+            const variableInputs = variableResult.inputs;
+            const variableObjects = variableResult.objects;
+            const parsedSpecialVariables = this.parseSpecialVariables(specialVariables, variableInputs, variableObjects);
             const newNoteMeta = await this.getNoteMetadata(parsedSpecialVariables);
 
             // Remove the fallback property because it's not actually a variable defined by the user.
