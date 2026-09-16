@@ -66,8 +66,11 @@ jobs:
             ```json
             ${{ steps.new-tsconfig-json.outputs.content }}
             ```
+          # No branch-suffix: a fixed branch name makes the action update the
+          # existing open PR in place each month. With a timestamp suffix every
+          # run got its own branch and opened a fresh PR, so #168, #170 and #172
+          # ended up as three byte-identical PRs for a diff that had not moved.
           branch: chore/update-plugin-framework
-          branch-suffix: timestamp
           committer: Albus <bot@nishantwrp.com>
           author: Albus <bot@nishantwrp.com>
           delete-branch: true
