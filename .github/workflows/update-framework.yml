@@ -47,6 +47,14 @@ jobs:
         if: steps.changes.outputs.has_changes == 'true'
         uses: peter-evans/create-pull-request@v6
         with:
+          # Without an explicit token this falls back to GITHUB_TOKEN, and
+          # GitHub suppresses workflow triggers for events raised by that
+          # token to avoid recursion. The result is a PR with zero check runs,
+          # which nobody can review with any confidence. Set
+          # FRAMEWORK_UPDATE_TOKEN to a PAT (or app token) with `repo` scope to
+          # get CI on these PRs. If it is unset, this degrades to the previous
+          # behaviour rather than failing the run.
+          token: ${{ secrets.FRAMEWORK_UPDATE_TOKEN || github.token }}
           commit-message: 'chore: routine joplin plugin framework update'
           title: 'chore: routine joplin plugin framework update'
           body: |
