@@ -1,5 +1,6 @@
 import Plugin from '../Plugin';
-import { FolderEntity } from '../../database/types';
+import { PluginStore } from '../ViewController';
+import { FolderEntity, NoteEntity } from '../../database/types';
 import { Disposable, EditContextMenuFilterObject, FilterHandler } from './types';
 declare enum ItemChangeEventType {
     Create = 1,
@@ -40,7 +41,7 @@ type ResourceChangeHandler = WorkspaceEventHandler<ResourceChangeEvent>;
 export default class JoplinWorkspace {
     private store;
     private plugin;
-    constructor(plugin: Plugin, store: any);
+    constructor(plugin: Plugin, store: PluginStore);
     /**
      * Called when a new note or notes are selected.
      */
@@ -80,8 +81,10 @@ export default class JoplinWorkspace {
     filterEditorContextMenu(handler: FilterHandler<EditContextMenuFilterObject>): void;
     /**
      * Gets the currently selected note. Will be `null` if no note is selected.
+     *
+     * On desktop, this returns the selected note in the focused window.
      */
-    selectedNote(): Promise<any>;
+    selectedNote(): Promise<NoteEntity | null>;
     /**
      * Gets the currently selected folder. In some cases, for example during
      * search or when viewing a tag, no folder is actually selected in the user
@@ -93,5 +96,12 @@ export default class JoplinWorkspace {
      * Gets the IDs of the selected notes (can be zero, one, or many). Use the data API to retrieve information about these notes.
      */
     selectedNoteIds(): Promise<string[]>;
+    /**
+     * Gets the last hash (note section ID) from cross-note link targeting specific section.
+     * New hash is available after `onNoteSelectionChange()` is triggered.
+     * Example of cross-note link where `hello-world` is a hash: [Other Note Title](:/9bc9a5cb83f04554bf3fd3e41b4bb415#hello-world).
+     * Method returns empty value when a note was navigated with method other than cross-note link containing valid hash.
+     */
+    selectedNoteHash(): Promise<string>;
 }
 export {};

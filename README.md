@@ -10,7 +10,7 @@
 
 This plugin allows you to create templates in Joplin and use them to create new notes and to-dos.
 
-> **📚 New to the plugin?** Check out the [Complete Feature Demonstration Template](DEMO_TEMPLATE.md) to see all features in action with examples and expected outputs.
+> **📚 New to the plugin?** Checkout the [Templates AI Assistant](https://joplin-templates-assistant.nishantwrp.com) for creating templates using AI without having to learn the template syntax yourself.
 
 ## Table of contents
 
@@ -64,6 +64,8 @@ You can access the templates options in `Tools` > `Templates`.
 
 # Features
 
+> After going through this section, check out the [Complete Feature Demonstration Template](DEMO_TEMPLATE.md) to see all features in action with examples and expected outputs.
+
 ## Template variables
 
 ### Built in variables
@@ -85,6 +87,7 @@ The currently supported built in template variables are:
 | `{{#custom_datetime}}` | Current date and/or time formatted based on a supplied string (using [moment.js](https://momentjs.com/) formatting) | `{{#custom_datetime}}M d{{/custom_datetime}}` |
 | `{{bowm}}` | Date of the beginning of the week (when week starts on Monday) | |
 | `{{bows}}` | Date of the beginning of the week (when week starts on Sunday) | |
+| `{{note_id}}` | ID of the note/to-do created using this template. | |
 
 > **NOTE**: All dates are formatted based on your Joplin settings in `General > Date Format`
 

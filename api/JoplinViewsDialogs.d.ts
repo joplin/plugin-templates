@@ -1,5 +1,7 @@
 import Plugin from '../Plugin';
 import { ButtonSpec, ViewHandle, DialogResult, Toast } from './types';
+import { JoplinViewsDialogs as JoplinViewsDialogsImplementation, ShowOpenDialogOptions } from '../BasePlatformImplementation';
+import { PluginStore } from '../ViewController';
 /**
  * Allows creating and managing dialogs. A dialog is modal window that
  * contains a webview and a row of buttons. You can update the
@@ -33,7 +35,7 @@ export default class JoplinViewsDialogs {
     private store;
     private plugin;
     private implementation_;
-    constructor(implementation: any, plugin: Plugin, store: any);
+    constructor(implementation: JoplinViewsDialogsImplementation, plugin: Plugin, store: PluginStore);
     private controller;
     /**
      * Creates a new dialog
@@ -43,6 +45,9 @@ export default class JoplinViewsDialogs {
      * Displays a message box with OK/Cancel buttons. Returns the button index that was clicked - "0" for OK and "1" for "Cancel"
      */
     showMessageBox(message: string): Promise<number>;
+    /**
+     * Displays a Toast notification in the corner of the application screen.
+     */
     showToast(toast: Toast): Promise<void>;
     /**
      * Displays a dialog to select a file or a directory. Same options and
@@ -51,7 +56,7 @@ export default class JoplinViewsDialogs {
      *
      * <span class="platform-desktop">desktop</span>
      */
-    showOpenDialog(options: any): Promise<any>;
+    showOpenDialog(options: ShowOpenDialogOptions): Promise<string[] | null>;
     /**
      * Sets the dialog HTML content
      */

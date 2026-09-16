@@ -11,6 +11,6 @@ export class DateCustomVariable extends CustomVariable {
     }
 
     protected inputHTML(): string {
-        return `<input name="${encode(this.name)}" type="date"></input>`;
+        return `<input name="${encode(this.name)}" type="date" aria-label="${encode(this.label)}"></input>`;
     }
 }

@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.1.0](https://github.com/joplin/plugin-templates/compare/v3.0.0...v3.1.0) (2026-03-11)
+
+
+### Features
+
+* add ai assiant menu button ([21b8e7a](https://github.com/joplin/plugin-templates/commit/21b8e7aeebf9baa2d33a81cca3429286a80b2c3a))
+* add note_id template variable that resolves to the created note's ID ([2389d96](https://github.com/joplin/plugin-templates/commit/2389d96580d362f3dd7aeeafc6e949843252c4a3))
+* **ci:** support coverage action on demand ([f84999d](https://github.com/joplin/plugin-templates/commit/f84999d795d813b5501de27e365f4f03699a4e97))
+
+
+### Bug Fixes
+
+* **#82:** make the framework update action work ([#154](https://github.com/joplin/plugin-templates/issues/154)) ([830bcc7](https://github.com/joplin/plugin-templates/commit/830bcc73c2b5fe1b8a1a8be9c88969bcd20b9c88)), closes [#82](https://github.com/joplin/plugin-templates/issues/82)
+* remove unused default button property and fix lint errors ([f12156c](https://github.com/joplin/plugin-templates/commit/f12156cf7b6e42205d0570c4930ac59b00c42965))
+* run framework update non-interactively in CI ([#148](https://github.com/joplin/plugin-templates/issues/148)) ([c627d13](https://github.com/joplin/plugin-templates/commit/c627d1371a19bea5d67d868fd21387949ad164ad))
+* update GitHub Actions to use Node 18 and latest action versions ([fa43e11](https://github.com/joplin/plugin-templates/commit/fa43e11d49c9663ac817c6ebd83bf7fe47ed5e67))
+* use --legacy-peer-deps for npm install in CI ([76db5bd](https://github.com/joplin/plugin-templates/commit/76db5bd261e2deba3c7191caa9012023e4da3f0c))
+
 ## [2.4.0](https://github.com/joplin/plugin-templates/compare/v2.3.0...v2.4.0) (2023-05-27)
 
 
