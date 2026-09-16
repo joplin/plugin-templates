@@ -334,6 +334,21 @@ describe("Handlebars Helpers", () => {
             expect(template({ count: -1 })).toEqual("");
         });
 
+        // Regression test for #124. parseInt and the loop's own coercion
+        // disagree on trailing garbage: parseInt("3abc") is 3, but Number("3abc")
+        // is NaN, so comparing against the raw string silently produced nothing.
+        test("should use the parsed count when the input has trailing characters", () => {
+            const template = Handlebars.compile("{{#repeat count}}item{{/repeat}}");
+            expect(template({ count: "3abc" })).toEqual("itemitemitem");
+        });
+
+        // Same disagreement in the other direction: Number("3.7") is 3.7, so the
+        // raw comparison ran one iteration too many.
+        test("should use the parsed count when the input is fractional", () => {
+            const template = Handlebars.compile("{{#repeat count}}item{{/repeat}}");
+            expect(template({ count: "3.7" })).toEqual("itemitemitem");
+        });
+
         test("should repeat exactly once for count of 1", () => {
             const template = Handlebars.compile("{{#repeat 1}}only{{/repeat}}");
             expect(template({})).toEqual("only");
