@@ -95,6 +95,7 @@ export class Parser {
         });
 
         await setTemplateVariablesView(this.dialog, title, variableObjects);
+        await joplin.views.dialogs.setFitToContent(this.dialog, Object.keys(variableObjects).length <= 5);
         const dialogResponse = (await joplin.views.dialogs.open(this.dialog));
 
         if (dialogResponse.id === "cancel") {
