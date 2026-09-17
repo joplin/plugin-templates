@@ -16,6 +16,7 @@ import { DefaultTemplatesConfig } from "./settings/defaultTemplatesConfig";
 import { CommandsPanel } from "./views/commandsPanel";
 
 const DOCUMENTATION_URL = "https://github.com/joplin/plugin-templates#readme";
+const AI_ASSISTANT_URL = "https://joplin-templates-assistant.nishantwrp.com/";
 
 joplin.plugins.register({
     onStart: async function () {
@@ -275,6 +276,14 @@ joplin.plugins.register({
         }));
 
         joplinCommands.add(joplin.commands.register({
+            name: "showAIAssistant",
+            label: "AI Assistant",
+            execute: async () => {
+                await joplin.commands.execute("openItem", AI_ASSISTANT_URL);
+            }
+        }));
+
+        joplinCommands.add(joplin.commands.register({
             name: "showPluginDocumentation",
             label: "Help",
             execute: async () => {
@@ -337,6 +346,9 @@ joplin.plugins.register({
                 ]
             },
             {
+                commandName: "showAIAssistant"
+            },
+            {
                 commandName: "showPluginDocumentation"
             }
         ]);
@@ -383,6 +395,10 @@ joplin.plugins.register({
                 {
                     label: "Clear default templates for notebook",
                     command: "clearDefaultTemplatesForNotebook"
+                },
+                {
+                    label: "AI Assistant",
+                    command: "showAIAssistant"
                 },
                 {
                     label: "Help",

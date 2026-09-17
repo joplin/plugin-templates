@@ -14,7 +14,7 @@ export class EnumCustomVariable extends CustomVariable {
         const optionsHtml = this.options.map(o => {
             return `<option value="${encode(o)}">${encode(o)}</option>`
         }).join("");
-        return `<select name="${encode(this.name)}">${optionsHtml}</select>`;
+        return `<select name="${encode(this.name)}" aria-label="${encode(this.label)}">${optionsHtml}</select>`;
     }
 
     private static getOptionsFromType(type: string) {

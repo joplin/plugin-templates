@@ -1,0 +1,76 @@
+name: Update Joplin Plugin Framework
+
+on:
+  schedule:
+    - cron: '0 0 1 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-framework:
+    runs-on: ubuntu-latest    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install generator-joplin globally
+        run: npm install -g generator-joplin yo
+      - name: Run framework update
+        run: yo joplin --update --silent --force --skip-install
+      - name: New tsconfig.json content
+        id: new-tsconfig-json
+        run: |
+          {
+            echo 'content<<EOF'
+            sed -e '$a\' tsconfig.json
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
+      - name: Revert tsconfig.json
+        run: |
+          git checkout -- tsconfig.json
+      # Just tsconfig.json changes would not be important anyways
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff --quiet; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+      - name: Create Pull Request
+        if: steps.changes.outputs.has_changes == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          # Without an explicit token this falls back to GITHUB_TOKEN, and
+          # GitHub suppresses workflow triggers for events raised by that
+          # token to avoid recursion. The result is a PR with zero check runs,
+          # which nobody can review with any confidence. Set
+          # FRAMEWORK_UPDATE_TOKEN to a PAT (or app token) with `repo` scope to
+          # get CI on these PRs. If it is unset, this degrades to the previous
+          # behaviour rather than failing the run.
+          token: ${{ secrets.FRAMEWORK_UPDATE_TOKEN || github.token }}
+          commit-message: 'chore: routine joplin plugin framework update'
+          title: 'chore: routine joplin plugin framework update'
+          body: |
+            This is an automated pull request to update the joplin plugin framework.
+
+            ## Some files were not updated from the framework
+
+            ### tsconfig.json
+            ```json
+            ${{ steps.new-tsconfig-json.outputs.content }}
+            ```
+          # No branch-suffix: a fixed branch name makes the action update the
+          # existing open PR in place each month. With a timestamp suffix every
+          # run got its own branch and opened a fresh PR, so #168, #170 and #172
+          # ended up as three byte-identical PRs for a diff that had not moved.
+          branch: chore/update-plugin-framework
+          committer: Albus <bot@nishantwrp.com>
+          author: Albus <bot@nishantwrp.com>
+          delete-branch: true
