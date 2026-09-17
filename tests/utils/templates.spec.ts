@@ -1,5 +1,6 @@
 import joplin from "api";
 import * as tagUtils from "@templates/utils/tags";
+import * as folderUtils from "@templates/utils/folders";
 import { getUserTemplateSelection } from "@templates/utils/templates";
 import { encode } from "html-entities";
 
@@ -268,5 +269,94 @@ describe("Get user template selection", () => {
         const res = await getUserTemplateSelection(dialogHandle, "body");
         testExpectedCalls(joplin.views.dialogs.open, 1);
         expect(res).toEqual(null);
+    });
+});
+
+describe("isNoteATemplate", () => {
+    const setTemplateTagsAndNotes = (data: TagData[]) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        jest.spyOn(tagUtils, "getAllTagsWithTitle").mockImplementation(async (title: string) => {
+            return data.map(tag => {
+                return {
+                    id: tag.id,
+                    title: tag.title
+                }
+            });
+        });
+
+        jest.spyOn(tagUtils, "getAllNotesWithTag").mockImplementation(async (id: string) => {
+            for (const tag of data) {
+                if (tag.id === id) {
+                    return tag.notes;
+                }
+            }
+            return [];
+        });
+    }
+
+    test("should return true for tag source if note has template tag", async () => {
+        jest.spyOn(joplin.settings, "value").mockImplementation(async (setting: string) => {
+            if (setting === "templatesSource") return "tag";
+            return "";
+        });
+        setTemplateTagsAndNotes([
+            {
+                id: "tag-1",
+                title: "template",
+                notes: [{ id: "note-1", title: "Test", body: "" }]
+            }
+        ]);
+
+        const { isNoteATemplate } = await import("@templates/utils/templates");
+        const res = await isNoteATemplate({ id: "note-1", title: "Test", body: "" });
+        expect(res).toBe(true);
+    });
+
+    test("should return false for tag source if note lacks template tag", async () => {
+        jest.spyOn(joplin.settings, "value").mockImplementation(async (setting: string) => {
+            if (setting === "templatesSource") return "tag";
+            return "";
+        });
+        setTemplateTagsAndNotes([
+            {
+                id: "tag-1",
+                title: "template",
+                notes: [{ id: "note-2", title: "Other Note", body: "" }]
+            }
+        ]);
+
+        const { isNoteATemplate } = await import("@templates/utils/templates");
+        const res = await isNoteATemplate({ id: "note-1", title: "Test", body: "" });
+        expect(res).toBe(false);
+    });
+
+    test("should return true for notebook source if parent folder is Templates", async () => {
+        jest.spyOn(joplin.settings, "value").mockImplementation(async (setting: string) => {
+            if (setting === "templatesSource") return "notebook";
+            return "";
+        });
+        jest.spyOn(folderUtils, "getFolderFromId").mockImplementation(async (id: string) => {
+            if (id === "folder-1") return { id: "folder-1", title: "Templates" };
+            return null;
+        });
+
+        const { isNoteATemplate } = await import("@templates/utils/templates");
+        const res = await isNoteATemplate({ id: "note-1", title: "Test", body: "", parent_id: "folder-1" });
+        expect(res).toBe(true);
+    });
+
+    test("should return false for notebook source if parent folder is not Templates", async () => {
+        jest.spyOn(joplin.settings, "value").mockImplementation(async (setting: string) => {
+            if (setting === "templatesSource") return "notebook";
+            return "";
+        });
+        jest.spyOn(folderUtils, "getFolderFromId").mockImplementation(async (id: string) => {
+            if (id === "folder-2") return { id: "folder-2", title: "Personal" };
+            return null;
+        });
+
+        const { isNoteATemplate } = await import("@templates/utils/templates");
+        const res = await isNoteATemplate({ id: "note-1", title: "Test", body: "", parent_id: "folder-2" });
+        expect(res).toBe(false);
     });
 });
