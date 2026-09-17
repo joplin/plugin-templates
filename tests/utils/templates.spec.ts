@@ -1,7 +1,6 @@
 import joplin from "api";
 import * as tagUtils from "@templates/utils/tags";
 import { getUserTemplateSelection } from "@templates/utils/templates";
-import { encode } from "html-entities";
 
 interface TagData {
     id: string;
@@ -128,7 +127,7 @@ describe("Get user template selection", () => {
             title: "Template 1",
             body: "Template Body"
         };
-        const selectedTemplateValue = encode(JSON.stringify(selectedNote));
+        const selectedTemplateValue = JSON.stringify(selectedNote);
 
         expectTemplatesDialog(selectedTemplateValue);
         const res = await getUserTemplateSelection(dialogHandle);
@@ -177,7 +176,7 @@ describe("Get user template selection", () => {
             title: "Template 2",
             body: "Template Body"
         };
-        const selectedTemplateValue = encode(JSON.stringify(selectedNote));
+        const selectedTemplateValue = JSON.stringify(selectedNote);
 
         expectTemplatesDialog(selectedTemplateValue);
         const res = await getUserTemplateSelection(dialogHandle);
@@ -231,12 +230,42 @@ describe("Get user template selection", () => {
             }
         ]);
 
-        const selectedTemplateValue = encode("Template Body");
+        const selectedTemplateValue = "Template Body";
 
         expectTemplatesDialog(selectedTemplateValue);
         const res = await getUserTemplateSelection(dialogHandle, "body");
         testExpectedCalls(joplin.views.dialogs.open, 1);
         expect(res).toEqual("Template Body");
+    });
+
+    test("should not double-decode template value containing literal HTML entities (#178)", async () => {
+        setTemplateTagsAndNotes([
+            {
+                id: "tag-id-1",
+                title: "template",
+                notes: [
+                    {
+                        id: "note-id-1",
+                        title: "Q&amp;A Template",
+                        body: "Body with &lt;div&gt;"
+                    }
+                ]
+            }
+        ]);
+
+        const selectedNote = {
+            id: "note-id-1",
+            title: "Q&amp;A Template",
+            body: "Body with &lt;div&gt;"
+        };
+        const selectedTemplateValue = JSON.stringify(selectedNote);
+
+        expectTemplatesDialog(selectedTemplateValue);
+        const res = await getUserTemplateSelection(dialogHandle);
+        testExpectedCalls(joplin.views.dialogs.open, 1);
+        expect(res).toEqual(JSON.stringify(selectedNote));
+        expect(res).toContain("Q&amp;A Template");
+        expect(res).not.toContain("Q&A Template");
     });
 
     test("should sort the templates correctly", async () => {
