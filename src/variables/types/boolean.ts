@@ -8,7 +8,7 @@ export class BooleanCustomVariable extends CustomVariable {
     protected inputHTML(): string {
         return (
             `
-            <select name="${encode(this.name)}">
+            <select name="${encode(this.name)}" aria-label="${encode(this.label)}">
                 <option value="true">Yes</option>
                 <option value="false">No</option>
             </select>
