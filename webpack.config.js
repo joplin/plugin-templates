@@ -387,7 +387,6 @@ function main(environ) {
 	return configs[configName];
 }
 
-
 module.exports = (env) => {
 	let exportedConfigs = [];
 

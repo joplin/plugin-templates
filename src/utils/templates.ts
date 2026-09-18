@@ -1,15 +1,17 @@
 import joplin from "api";
-import { getAllNotesInFolder } from "./folders";
+import { getAllNotesInFolder, getFolderFromId } from "./folders";
 import { getAllNotesWithTag, getAllTagsWithTitle } from "./tags";
 import { TemplatesSourceSetting, TemplatesSource } from "../settings/templatesSource";
 import { LocaleGlobalSetting } from "../settings/global";
 import { encode, decode } from "html-entities";
 import { AUTO_FOCUS_SCRIPT } from "./dialogHelpers";
+import { fetchAllItems } from "./dataApi";
 
 export interface Note {
     id: string;
     title: string;
     body: string;
+    parent_id?: string;
 }
 
 type NoteProperty = "body" | "id" | "title";
@@ -58,7 +60,7 @@ const getAllTemplates = async () => {
 export async function getUserTemplateSelection(dialogHandle: string, property?: NoteProperty, promptLabel = "Template:"): Promise<string | null> {
     try {
         const templates = await getAllTemplates();
-        
+
         if (templates.length === 0) {
             await joplin.views.dialogs.showMessageBox("No templates found! Please create a template and try again.");
             return null;
@@ -97,15 +99,15 @@ export async function getUserTemplateSelection(dialogHandle: string, property?: 
         await joplin.views.dialogs.setFitToContent(dialogHandle, true);
 
         const result = await joplin.views.dialogs.open(dialogHandle);
-        
+
         if (result.id === "cancel") {
             return null;
         }
-        
+
         // Get the template value and decode HTML entities
         const templateValue = result.formData?.["templates-form"]?.template;
         const decodedValue = templateValue ? decode(templateValue) : null;
-        
+
         return decodedValue;
     } catch (error) {
         console.error("Error in getUserTemplateSelection:", error);
@@ -113,15 +115,47 @@ export async function getUserTemplateSelection(dialogHandle: string, property?: 
     }
 }
 
+/**
+ * Checks whether a given note is still considered a template based on the user's TemplatesSource setting.
+ * - For Tag source: checks if the note has the 'template' tag.
+ * - For Notebook source: checks if the note's parent folder title is 'Templates'.
+ */
+export const isNoteATemplate = async (note: Note): Promise<boolean> => {
+    try {
+        const templatesSource = await TemplatesSourceSetting.get();
+
+        if (templatesSource === TemplatesSource.Tag) {
+            const templateTags = await getAllTagsWithTitle("template");
+            for (const tag of templateTags) {
+                const notesWithTag = await getAllNotesWithTag(tag.id);
+                if (notesWithTag.some(n => n.id === note.id)) {
+                    return true;
+                }
+            }
+            return false;
+        } else {
+            if (!note.parent_id) {
+                return false;
+            }
+            const folder = await getFolderFromId(note.parent_id);
+            return folder !== null && folder.title === "Templates";
+        }
+    } catch (error) {
+        console.error("Error checking if note is a template", error);
+        return false;
+    }
+};
+
 export const getTemplateFromId = async (templateId: string | null): Promise<Note | null> => {
     if (!templateId) {
         return null;
     }
 
     try {
-        return await joplin.data.get([ "notes", templateId ], { fields: ["id", "title", "body"] });
+        return await joplin.data.get(["notes", templateId], { fields: ["id", "title", "body", "parent_id"] });
     } catch (error) {
         console.error("There was an error loading a template from id", error);
         return null;
     }
 }
+
