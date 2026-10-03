@@ -13,11 +13,11 @@ export class CustomVariable {
         this.label = label;
     }
 
-    protected inputHTML(): string {
+    protected inputHTML(dateAndTimeUtils?: DateAndTimeUtils): string {
         return "";
     }
 
-    public toHTML(): string {
+    public toHTML(dateAndTimeUtils?: DateAndTimeUtils): string {
         return (
             `
             <div class="variableInput">
@@ -25,7 +25,7 @@ export class CustomVariable {
                     ${encode(this.label)}
                 </div>
                 <div>
-                    ${this.inputHTML()}
+                    ${this.inputHTML(dateAndTimeUtils)}
                 </div>
             </div>
             `

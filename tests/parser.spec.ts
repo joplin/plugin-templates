@@ -192,7 +192,7 @@ describe("Template parser", () => {
             time_var: TimeCustomVariable
         });
         handleVariableDialog("ok", {
-            date_var: "2021-12-03",
+            date_var: "03/12/2021",
             time_var: "20:43"
         });
 
@@ -492,7 +492,7 @@ describe("Template parser", () => {
         });
 
         handleVariableDialog("ok", {
-            some_date: "2023-05-09",
+            some_date: "09.05.2023",
             some_time: "17:25"
         });
 
@@ -1052,7 +1052,7 @@ describe("Template parser", () => {
         });
 
         handleVariableDialog("ok", {
-            my_date: "2023-03-15",
+            my_date: "15/03/2023",
         });
 
         const parsedTemplate = await parser.parseTemplate(template);

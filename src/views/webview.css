@@ -31,7 +31,9 @@ th, td {
     padding: 2px;
 }
 
-input, select, textarea {
+input,
+select,
+textarea {
     height: 25px;
     font-size: var(--joplin-font-size, 16px);
     font-family: var(--joplin-font-family);
@@ -42,7 +44,9 @@ input, select, textarea {
     border-radius: 3px;
 }
 
-input:focus, select:focus, textarea:focus {
+input:focus,
+select:focus,
+textarea:focus {
     outline: none;
     border-color: var(--joplin-color);
 }
