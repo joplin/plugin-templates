@@ -1093,4 +1093,40 @@ describe("Template parser", () => {
         expect(parsedTemplate).toBeNull();
         expect(errorMessagesShown).toEqual(1);
     });
+    test("should not html escape special characters in template output", async () => {
+        // Templates render into markdown notes, not html, so characters like
+        // apostrophes and quotes must survive as typed.
+        const template = {
+            id: "note-id",
+            title: "Some Template",
+            body: dedent`
+                ---
+                note_text: text
+                template_title: Notes on {{ note_text }}
+                template_tags: {{ note_text }}
+                ---
+
+                {{ note_text }}
+                {{{ note_text }}}
+            `
+        };
+        testVariableTypes({
+            note_text: TextCustomVariable
+        });
+        handleVariableDialog("ok", {
+            note_text: "it's a \"test\" <b> & more"
+        });
+
+        const parsedTemplate = await parser.parseTemplate(template);
+
+        assert(parsedTemplate);
+        // The triple stache was the old workaround, and must keep behaving
+        // identically now that the double stache no longer escapes.
+        expect(parsedTemplate.body).toEqual(dedent`
+            it's a "test" <b> & more
+            it's a "test" <b> & more
+        `);
+        expect(parsedTemplate.title).toEqual("Notes on it's a \"test\" <b> & more");
+        expect(parsedTemplate.tags).toEqual(["it's a \"test\" <b> & more"]);
+    });
 });

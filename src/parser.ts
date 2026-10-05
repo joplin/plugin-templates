@@ -134,7 +134,10 @@ export class Parser {
                 throw new Error(`${variable} should be a string, found ${typeof specialVariables[variable]}.`);
             }
 
-            const compiledText = Handlebars.compile(specialVariables[variable]);
+            // noEscape: templates render into markdown notes, not html, so
+            // values must be inserted verbatim. Without this, an apostrophe in
+            // a variable turns into &#x27; in the note title.
+            const compiledText = Handlebars.compile(specialVariables[variable], { noEscape: true });
             res[variable] = compiledText(context);
         }
 
@@ -283,7 +286,8 @@ export class Parser {
             };
 
             const templateBody = processedTemplate.body;
-            const compiledTemplate = Handlebars.compile(templateBody);
+            // See the note on noEscape in parseSpecialVariables above.
+            const compiledTemplate = Handlebars.compile(templateBody, { noEscape: true });
 
             // note_id is intentionally excluded from the shared context above
             // because it is only meaningful in the note body (it resolves to a
