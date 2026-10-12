@@ -163,7 +163,7 @@ Currently there are four special variables.
 | `template_title` | Title of the note/to-do created using this template. | template_title: Standup - {{ date }} |
 | `template_tags` | Comma separated tags to be applied to the note/to-do created  using this template. | template_tags: spec, {{ project }} |
 | `template_notebook` | The ID of the target notebook for this template. Whenever a new note/to-do will be created by this template, it will be created in this target notebook. | template_notebook: 82d2384b025f44588e4d3851a1237028 |
-| `template_todo_alarm` | The date and time for a to-do alarm/reminder. Only applies when creating to-dos from templates. | template_todo_alarm: {{ datetime delta_days=1 format="YYYY-MM-DD HH:mm" }} |
+| `template_todo_alarm` | The date and time for a to-do alarm/reminder. Only applies when creating to-dos from templates. | template_todo_alarm: {{ datetime delta_days=1 }} |
 
 **Points to note**
 - If `template_title` is not provided, the title of the template will be used as a fallback value.
@@ -171,7 +171,7 @@ Currently there are four special variables.
 - You can't use these variable names i.e. `template_title`, `template_tags`, `template_notebook`, and `template_todo_alarm` for custom variables. In general, please avoid defining custom variables with `template_` prefix.
 - To get the ID of a notebook, you can right click on that notebook and click on `Copy notebook ID`.
 - While you are inserting the template in an existing note/to-do, `template_tags` variable is used to apply those tags to the note the template is inserted in. However, you can disable using `template_tags` while inserting templates from the plugin settings.
-- The `template_todo_alarm` variable expects a date-time string in the format "YYYY-MM-DD HH:mm" (without seconds). You can use the `datetime` helper to generate properly formatted timestamps.
+- The `template_todo_alarm` variable expects a date-time string in your Joplin date and time format (found in Preferences > General). The `datetime` helper outputs this format by default, so don't pass a custom `format` to it.
 
 **Example of a template using special variables**
 
@@ -416,7 +416,7 @@ Meeting in 2 days at 2 PM: {{datetime delta_days=2 set_time="14:00" format="YYYY
 ---
 days_until_due: number
 template_title: Task due in {{days_until_due}} days
-template_todo_alarm: {{datetime delta_days=days_until_due set_time="09:00" format="YYYY-MM-DD HH:mm"}}
+template_todo_alarm: {{datetime delta_days=days_until_due set_time='09:00'}}
 
 ---
 
