@@ -466,6 +466,35 @@ describe("Template parser", () => {
         expect(parsedTemplate.tags).toStrictEqual(["books", "finished"]);
     });
 
+    test("should not treat a variable whose name ends with a special variable name as that special variable", async () => {
+        const template = {
+            id: "note-id",
+            title: "Some Template",
+            body: dedent`
+                ---
+                my_template_title: text
+                template_title: {{ my_template_title }}
+
+                ---
+
+                {{ my_template_title }}
+            `
+        };
+        testVariableTypes({
+            my_template_title: TextCustomVariable
+        });
+
+        handleVariableDialog("ok", {
+            my_template_title: "Weekly review"
+        });
+
+        const parsedTemplate = await parser.parseTemplate(template);
+
+        assert(parsedTemplate);
+        expect(parsedTemplate.title).toEqual("Weekly review");
+        expect(parsedTemplate.body).toEqual("Weekly review");
+    });
+
     test("should format custom date and time variable according to user config", async () => {
         const dateFormat = "DD.MM.YYYY";
         const timeFormat = "HH.mm";
