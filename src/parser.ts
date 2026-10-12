@@ -215,14 +215,16 @@ export class Parser {
                 }
 
                 const firstMatch = matches[0];
+                const splitVal = firstMatch.split(":");
+                const value = splitVal.slice(1).join(":").trim();
 
-                // Don't do anything if it already contains a double quote
-                if (firstMatch.indexOf("\"") !== -1) {
+                // Don't do anything if the user has already quoted the value
+                if (value.startsWith("\"") || value.startsWith("'")) {
                     continue;
                 }
 
-                const splitVal = firstMatch.split(":");
-                const wrappedString = `${splitVal[0]}: "${splitVal.slice(1).join(":").trim()}"`;
+                const escapedValue = value.replace(/\\/g, "\\\\").replace(/"/g, "\\\"");
+                const wrappedString = `${splitVal[0]}: "${escapedValue}"`;
 
                 definitionsBlock = definitionsBlock.replace(firstMatch, wrappedString);
             }

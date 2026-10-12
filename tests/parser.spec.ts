@@ -383,6 +383,49 @@ describe("Template parser", () => {
         expect(parsedTemplate).toBeNull();
     });
 
+    test("should quote special variable values that contain double quotes", async () => {
+        const template = {
+            id: "note-id",
+            title: "Some Template",
+            body: dedent`
+                ---
+                template_title: {{ datetime format="dddd D MMMM YYYY" }}
+                template_tags: {{ datetime format="YYYY" }}, weekly
+                template_todo_alarm: {{ datetime set_time="09:00" delta_days=1 }}
+
+                ---
+            `
+        };
+
+        const parsedTemplate = await parser.parseTemplate(template);
+
+        assert(parsedTemplate);
+        expect(parsedTemplate.title).toEqual("Thursday 12 August 2021");
+        expect(parsedTemplate.tags).toStrictEqual(["2021", "weekly"]);
+        expect(parsedTemplate.todo_due).toEqual(1628845200000); // 13 August 2021 09:00
+    });
+
+    test("should keep backslashes and already quoted special variable values as written", async () => {
+        const titleWithBackslash = "Q3\\Q4 {{ datetime format=\"YYYY\" }}";
+        const template = {
+            id: "note-id",
+            title: "Some Template",
+            body: dedent`
+                ---
+                template_title: ${titleWithBackslash}
+                template_tags: 'weekly, {{ datetime format="YYYY" }}'
+
+                ---
+            `
+        };
+
+        const parsedTemplate = await parser.parseTemplate(template);
+
+        assert(parsedTemplate);
+        expect(parsedTemplate.title).toEqual("Q3\\Q4 2021");
+        expect(parsedTemplate.tags).toStrictEqual(["weekly", "2021"]);
+    });
+
     test("should show an error message if notebook defined in templates_notebook doesn't exist", async () => {
         const template = {
             id: "note-id",
