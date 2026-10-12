@@ -436,6 +436,24 @@ describe("Template parser", () => {
         expect(parsedTemplate).toBeNull();
     });
 
+    test("should keep dollar signs in special variable values as written", async () => {
+        const template = {
+            id: "note-id",
+            title: "Some Template",
+            body: dedent`
+                ---
+                template_title: Budget $$ and $& report
+
+                ---
+            `
+        };
+
+        const parsedTemplate = await parser.parseTemplate(template);
+
+        assert(parsedTemplate);
+        expect(parsedTemplate.title).toEqual("Budget $$ and $& report");
+    });
+
     test("should skip empty values in tags special variable", async () => {
         const template = {
             id: "note-id",

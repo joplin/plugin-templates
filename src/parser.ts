@@ -224,7 +224,8 @@ export class Parser {
                 const splitVal = firstMatch.split(":");
                 const wrappedString = `${splitVal[0]}: "${splitVal.slice(1).join(":").trim()}"`;
 
-                definitionsBlock = definitionsBlock.replace(firstMatch, wrappedString);
+                // A replacer function stops "$" sequences in the value being read as replacement patterns
+                definitionsBlock = definitionsBlock.replace(firstMatch, () => wrappedString);
             }
 
             return definitionsBlock;
