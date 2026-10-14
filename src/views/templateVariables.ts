@@ -3,10 +3,16 @@ import { encode } from "html-entities";
 import { CustomVariable } from "../variables/types/base";
 import { AUTO_FOCUS_SCRIPT } from "../utils/dialogHelpers";
 
-export const setTemplateVariablesView = async (viewHandle: string, title: string, variables: Record<string, CustomVariable>): Promise<void> => {
-    await joplin.views.dialogs.addScript(viewHandle, "./views/webview.css");
+import { DateAndTimeUtils } from "../utils/dateAndTime";
 
-    const variablesFormInputHtml = Object.values(variables).map(variable => variable.toHTML());
+export const setTemplateVariablesView = async (viewHandle: string, title: string, variables: Record<string, CustomVariable>, utils?: DateAndTimeUtils): Promise<void> => {
+    await joplin.views.dialogs.addScript(viewHandle, "./views/webview.css");
+    await joplin.views.dialogs.addScript(viewHandle, "./views/flatpicker-overrides.css");
+    await joplin.views.dialogs.addScript(viewHandle, "./views/flatpickr.min.css");
+    await joplin.views.dialogs.addScript(viewHandle, "./views/flatpickr.min.js");
+    await joplin.views.dialogs.addScript(viewHandle, "./views/datepicker.js");
+
+    const variablesFormInputHtml = Object.values(variables).map(variable => variable.toHTML(utils));
 
     // Add id for autofocus hack to the first input element
     let formHtml = variablesFormInputHtml.join("");

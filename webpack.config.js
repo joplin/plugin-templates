@@ -218,6 +218,14 @@ const pluginConfig = { ...baseConfig, entry: './src/index.ts',
 						],
 					},
 				},
+				{
+					from: path.resolve(__dirname, 'node_modules/flatpickr/dist/flatpickr.min.js'),
+					to: path.resolve(__dirname, 'dist/views/flatpickr.min.js'),
+				},
+				{
+					from: path.resolve(__dirname, 'node_modules/flatpickr/dist/flatpickr.min.css'),
+					to: path.resolve(__dirname, 'dist/views/flatpickr.min.css'),
+				},
 			],
 		}),
 	] };

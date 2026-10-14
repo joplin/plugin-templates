@@ -94,7 +94,7 @@ export class Parser {
             variableObjects[variableName] = getVariableFromDefinition(variableName, variables[variableName]);
         });
 
-        await setTemplateVariablesView(this.dialog, title, variableObjects);
+        await setTemplateVariablesView(this.dialog, title, variableObjects, this.utils);
         const dialogResponse = (await joplin.views.dialogs.open(this.dialog));
 
         if (dialogResponse.id === "cancel") {

@@ -192,7 +192,7 @@ describe("Template parser", () => {
             time_var: TimeCustomVariable
         });
         handleVariableDialog("ok", {
-            date_var: "2021-12-03",
+            date_var: "03/12/2021",
             time_var: "20:43"
         });
 
@@ -204,6 +204,63 @@ describe("Template parser", () => {
         expect(parsedTemplate.title).toEqual("Template");
         expect(parsedTemplate.body).toEqual(dedent`
             03/12/2021 20:43
+        `);
+    });
+
+    test("should handle empty date custom variable gracefully without crashing", async () => {
+        const template = {
+            id: "note-id",
+            title: "Template",
+            body: dedent`
+                ---
+                date_var: date
+                ---
+
+                Date: [{{ date_var }}]
+            `
+        };
+        testVariableTypes({
+            date_var: DateCustomVariable
+        });
+        handleVariableDialog("ok", {
+            date_var: ""
+        });
+
+        const parsedTemplate = await parser.parseTemplate(template);
+
+        assert(parsedTemplate);
+        expect(parsedTemplate.body).toEqual(dedent`
+            Date: []
+        `);
+    });
+
+    test("should convert alternative date format to configured format and fallback gracefully on invalid text", async () => {
+        const template = {
+            id: "note-id",
+            title: "Template",
+            body: dedent`
+                ---
+                date_iso: date
+                date_invalid: date
+                ---
+
+                ISO: {{ date_iso }}, Invalid: {{ date_invalid }}
+            `
+        };
+        testVariableTypes({
+            date_iso: DateCustomVariable,
+            date_invalid: DateCustomVariable
+        });
+        handleVariableDialog("ok", {
+            date_iso: "2021-12-03",
+            date_invalid: "not-a-date"
+        });
+
+        const parsedTemplate = await parser.parseTemplate(template);
+
+        assert(parsedTemplate);
+        expect(parsedTemplate.body).toEqual(dedent`
+            ISO: 03/12/2021, Invalid: not-a-date
         `);
     });
 
@@ -492,7 +549,7 @@ describe("Template parser", () => {
         });
 
         handleVariableDialog("ok", {
-            some_date: "2023-05-09",
+            some_date: "09.05.2023",
             some_time: "17:25"
         });
 
@@ -1052,7 +1109,7 @@ describe("Template parser", () => {
         });
 
         handleVariableDialog("ok", {
-            my_date: "2023-03-15",
+            my_date: "15/03/2023",
         });
 
         const parsedTemplate = await parser.parseTemplate(template);
