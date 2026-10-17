@@ -134,7 +134,14 @@ export class Parser {
                 throw new Error(`${variable} should be a string, found ${typeof specialVariables[variable]}.`);
             }
 
-            const compiledText = Handlebars.compile(specialVariables[variable]);
+            // Pass `{ noEscape: true }` so Handlebars does not run every
+            // `{{ var }}` through `escapeExpression`. Templates render into
+            // markdown notes, not HTML — escaping `' " & < >` to entities
+            // mangles `template_title`/`template_tags` for any value that
+            // contains one of those characters. Triple-stache
+            // (`{{{ var }}}`) still works the same under `noEscape`, so
+            // existing templates are unaffected.
+            const compiledText = Handlebars.compile(specialVariables[variable], { noEscape: true });
             res[variable] = compiledText(context);
         }
 
@@ -283,7 +290,7 @@ export class Parser {
             };
 
             const templateBody = processedTemplate.body;
-            const compiledTemplate = Handlebars.compile(templateBody);
+            const compiledTemplate = Handlebars.compile(templateBody, { noEscape: true });
 
             // note_id is intentionally excluded from the shared context above
             // because it is only meaningful in the note body (it resolves to a

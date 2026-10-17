@@ -1093,4 +1093,118 @@ describe("Template parser", () => {
         expect(parsedTemplate).toBeNull();
         expect(errorMessagesShown).toEqual(1);
     });
+
+    // Regression tests for #173: HTML escaping leaks into markdown notes.
+    // Templates render into markdown, not HTML, so `{{ var }}` must NOT
+    // pass the value through `escapeExpression` and turn characters like
+    // `'`, `"`, `&`, `<`, `>` into entities.
+    test("should not HTML-escape text, number and dropdown variables in the body (#173)", async () => {
+        const template = {
+            id: "note-id",
+            title: "Some Template",
+            body: dedent`
+                ---
+                text_var: text
+                num_var: number
+                choice_var: dropdown(alpha, beta)
+
+                ---
+
+                text:    {{ text_var }}
+                number:  {{ num_var }}
+                choice:  {{ choice_var }}
+            `
+        };
+        testVariableTypes({
+            text_var: TextCustomVariable,
+            num_var: NumberCustomVariable,
+            choice_var: EnumCustomVariable,
+        });
+        handleVariableDialog("ok", {
+            text_var: "it's a \"test\" with &amp; <markup>",
+            num_var: "42",
+            choice_var: "alpha",
+        });
+
+        const parsedTemplate = await parser.parseTemplate(template);
+
+        assert(parsedTemplate);
+        expect(parsedTemplate.body).toEqual(dedent`
+            text:    it's a "test" with &amp; <markup>
+            number:  42
+            choice:  alpha
+        `);
+        // Make absolutely sure no HTML entities leaked in.
+        expect(parsedTemplate.body).not.toContain("&#x27;");
+        expect(parsedTemplate.body).not.toContain("&quot;");
+        expect(parsedTemplate.body).not.toContain("&lt;");
+        expect(parsedTemplate.body).not.toContain("&gt;");
+    });
+
+    test("should not HTML-escape template_title and template_tags (#173)", async () => {
+        const template = {
+            id: "note-id",
+            title: "Fallback Title",
+            body: dedent`
+                ---
+                topic: text
+                template_title: Today's "notes" — {{ topic }}
+                template_tags: alpha, {{ topic }}
+
+                ---
+
+                body: {{ topic }}
+            `
+        };
+        testVariableTypes({
+            topic: TextCustomVariable,
+        });
+        handleVariableDialog("ok", {
+            topic: "it's <fun>",
+        });
+
+        const parsedTemplate = await parser.parseTemplate(template);
+
+        assert(parsedTemplate);
+        // Title and tag list keep the user's input verbatim.
+        expect(parsedTemplate.title).toEqual("Today's \"notes\" — it's <fun>");
+        expect(parsedTemplate.tags).toStrictEqual(["alpha", "it's <fun>"]);
+        // Body is markdown, so `<fun>` and the apostrophe must stay as plain characters.
+        expect(parsedTemplate.body.trim()).toEqual("body: it's <fun>");
+        // No HTML entities should leak in anywhere.
+        expect(parsedTemplate.title).not.toMatch(/&(amp|quot|#x27|lt|gt);/);
+        expect(parsedTemplate.tags.join(",")).not.toMatch(/&(amp|quot|#x27|lt|gt);/);
+        expect(parsedTemplate.body).not.toMatch(/&(amp|quot|#x27|lt|gt);/);
+    });
+
+    test("should still support the {{{ var }}} triple-stache under noEscape (#173)", async () => {
+        const template = {
+            id: "note-id",
+            title: "Some Template",
+            body: dedent`
+                ---
+                text_var: text
+
+                ---
+
+                {{ text_var }}
+                {{{ text_var }}}
+            `
+        };
+        testVariableTypes({
+            text_var: TextCustomVariable,
+        });
+        handleVariableDialog("ok", {
+            text_var: "it's a \"test\"",
+        });
+
+        const parsedTemplate = await parser.parseTemplate(template);
+
+        assert(parsedTemplate);
+        // Double stache and triple stache produce the same value under noEscape.
+        expect(parsedTemplate.body).toEqual(dedent`
+            it's a "test"
+            it's a "test"
+        `);
+    });
 });
