@@ -69,9 +69,15 @@ export const datetimeHelper: HelperConstructorBlock = (ctx) => {
 
         if (attrs[SET_DATE]) {
             const parsedDate = ctx.dateAndTimeUtils.parseDate(attrs[SET_DATE] as string, ctx.dateAndTimeUtils.getDateFormat());
-            now.set("date", parsedDate.date);
-            now.set("month", parsedDate.month);
+
+            // The day has to be set last. Setting it first overflows into the
+            // next month when the current month is shorter than the day that
+            // was asked for, and the day is then silently lost. Setting the
+            // day to 1 up front makes changing the month and the year safe.
+            now.set("date", 1);
             now.set("year", parsedDate.year);
+            now.set("month", parsedDate.month);
+            now.set("date", parsedDate.date);
         }
 
         if (attrs[SET_TIME]) {

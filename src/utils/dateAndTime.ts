@@ -72,6 +72,12 @@ export class DateAndTimeUtils {
         return new Date().setDate(currentDate.getDate() - diff);
     }
 
+    /**
+     * Parses a date that is written in the given format.
+     *
+     * The month is zero based, the same way moment handles it, so that the
+     * result can be passed to moment's set("month", ...) directly.
+     */
     public parseDate(input: string, format: string): ParsedDate {
         const date = moment(input, format, true);
 
